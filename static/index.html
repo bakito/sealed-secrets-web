@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <style type="text/css" media="screen">
+      body {
+        background-color: rgb(40, 42, 54);
+      }
+
+      #input {
+        position: absolute;
+        top: 0;
+        right: 50%;
+        bottom: 0;
+        left: 0;
+      }
+
+      #output {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 50%;
+
+        border-left: 1px solid rgb(68, 71, 90);
+      }
+
+      #submitform {
+        min-width: 500px;
+        margin-left: -250px;
+        text-align: center;
+        position: fixed;
+        left: 50%;
+        bottom: 30px;
+        z-index: 100;
+      }
+
+      .button {
+        background-color: #8BE9FD;
+        border: none;
+        color: rgb(40, 42, 54);
+        padding: 12px 12px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      #error {
+        visibility: hidden;
+        min-width: 500px;
+        max-width: 500px;
+        margin-left: -250px;
+        background-color: #FF5555;
+        color: rgb(40, 42, 54);
+        text-align: center;
+        padding: 12px;
+        position: fixed;
+        z-index: 200;
+        left: 50%;
+        bottom: 30px;
+      }
+
+      #error.show {
+        visibility: visible;
+        -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+      }
+
+      @-webkit-keyframes fadein {
+        from {bottom: 0; opacity: 0;}
+        to {bottom: 30px; opacity: 1;}
+      }
+
+      @keyframes fadein {
+        from {bottom: 0; opacity: 0;}
+        to {bottom: 30px; opacity: 1;}
+      }
+
+      @-webkit-keyframes fadeout {
+        from {bottom: 30px; opacity: 1;}
+        to {bottom: 0; opacity: 0;}
+      }
+
+      @keyframes fadeout {
+        from {bottom: 30px; opacity: 1;}
+        to {bottom: 0; opacity: 0;}
+      }
+    </style>
+
+    <title>Sealed Secrets</title>
+  </head>
+  <body>
+    {{if ne .Error ""}}
+      <div id="error">{{.Error}}</div>
+    {{end}}
+
+
+    <div id="input">{{.Input}}</div>
+    <div id="output">{{.Output}}</div>
+
+    <form id="submitform" method="POST">
+      <textarea id="inputtext" name="input" style="display: none;"></textarea>
+      <input class="button" type="submit" name="submit" value="Encode">
+      <input class="button" type="submit" name="submit" value="Decode">
+      <input class="button" type="submit" name="submit" value="Seal">
+    </form>
+
+    <script src="/static/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+      var options = {
+        selectionStyle: "line",
+        highlightActiveLine: true,
+        highlightSelectedWord: false,
+        readOnly: false,
+        cursorStyle: "ace",
+        behavioursEnabled: true,
+        wrapBehavioursEnabled: true,
+        autoScrollEditorIntoView: false,
+        copyWithEmptySelection: false,
+        useSoftTabs: true,
+        navigateWithinSoftTabs: true,
+        enableMultiselect: false,
+        showPrintMargin: false,
+        newLineMode: "unix",
+        useSoftTabs: true,
+        tabSize: 2,
+        displayIndentGuides: true,
+      }
+
+      var input = ace.edit("input");
+      input.setTheme("ace/theme/dracula");
+      input.session.setMode("ace/mode/{{.Mode}}");
+      input.setOptions(options);
+
+      document.getElementById('inputtext').value = input.getSession().getValue();
+      input.getSession().on("change", function () {
+        document.getElementById('inputtext').value = input.getSession().getValue();
+      });
+
+      var output = ace.edit("output");
+      output.setTheme("ace/theme/dracula");
+      output.session.setMode("ace/mode/{{.Mode}}");
+      output.setOptions(options);
+
+      {{if ne .Error ""}}
+        var error = document.getElementById("error");
+        error.className = "show";
+        setTimeout(function() {
+          error.className = error.className.replace("show", "");
+        }, 3000);
+      {{end}}
+    </script>
+  </body>
+</html>
