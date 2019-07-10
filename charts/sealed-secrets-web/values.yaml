@@ -1,0 +1,38 @@
+replicaCount: 1
+
+image:
+  repository: ricoberger/sealed-secrets-web
+  tag: 1.0.0
+  pullPolicy: IfNotPresent
+  args: []
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: sealed-secrets-web.local
+      paths: []
+
+  tls: []
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
