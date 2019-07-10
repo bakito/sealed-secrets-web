@@ -1,15 +1,15 @@
 WHAT := sealedsecretsweb
 
-PROJECT     ?= sealed-secrets-web
-REPO        ?= github.com/ricoberger/sealed-secrets-web
-PWD         ?= $(shell pwd)
-VERSION     ?= $(shell git describe --tags)
-REVISION    ?= $(shell git rev-parse HEAD)
-BRANCH      ?= $(shell git rev-parse --abbrev-ref HEAD)
-BUILDUSER   ?= $(shell id -un)
-BUILDTIME   ?= $(shell date '+%Y%m%d-%H:%M:%S')
+BRANCH       ?= $(shell git rev-parse --abbrev-ref HEAD)
+BUILDTIME    ?= $(shell date '+%Y%m%d-%H:%M:%S')
+BUILDUSER    ?= $(shell id -un)
+DOCKER_IMAGE ?= ricoberger/sealed-secrets-web
+PWD          ?= $(shell pwd)
+REPO         ?= github.com/ricoberger/sealed-secrets-web
+REVISION     ?= $(shell git rev-parse HEAD)
+VERSION      ?= $(shell git describe --tags)
 
-.PHONY: build build-darwin-amd64 build-linux-amd64 build-windows-amd64 clean release release-major release-minor release-patch
+.PHONY: build build-darwin-amd64 build-linux-amd64 build-windows-amd64 clean docker-build docker-publish release release-major release-minor release-patch
 
 build:
 	for target in $(WHAT); do \
@@ -54,7 +54,13 @@ build-windows-amd64:
 clean:
 	rm -rf ./bin
 
-release: clean build-darwin-amd64 build-linux-amd64 build-windows-amd64
+docker-build: build-linux-amd64
+	docker build -t "$(DOCKER_IMAGE):${VERSION}" --build-arg REVISION=${REVISION} --build-arg VERSION=${VERSION} .
+
+docker-publish:
+	docker push "$(DOCKER_IMAGE):${VERSION}"
+
+release: clean docker-build docker-publish
 
 release-major:
 	$(eval MAJORVERSION=$(shell git describe --tags --abbrev=0 | sed s/v// | awk -F. '{print $$1+1".0.0"}'))
