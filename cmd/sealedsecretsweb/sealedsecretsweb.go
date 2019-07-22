@@ -114,8 +114,13 @@ func main() {
 		log.Fatalf("Failed to initialize sealed secrets handler: %#v", err)
 	}
 
-	// Parse template.
-	tmpl, err := template.ParseFiles("static/index.html")
+	// Parse templates.
+	indexTmpl, err := template.ParseFiles("static/index.html")
+	if err != nil {
+		log.Fatalf("Failed to parse template: %#v", err)
+	}
+
+	listTmpl, err := template.ParseFiles("static/list.html")
 	if err != nil {
 		log.Fatalf("Failed to parse template: %#v", err)
 	}
@@ -141,7 +146,19 @@ func main() {
 		}
 
 		if r.Method == http.MethodGet {
-			tmpl.Execute(w, data)
+			urlValues := r.URL.Query()
+
+			if urlValues.Get("namespace") != "" && urlValues.Get("name") != "" {
+				secret, err := sealedSecretsHandler.GetSecret(urlValues.Get("namespace"), urlValues.Get("name"))
+				if err != nil {
+					log.Printf("Get secret error: %#v", err)
+					data.Error = fmt.Sprintf("Get secret error: %s", err.Error())
+				} else {
+					data.Input = string(secret)
+				}
+			}
+
+			indexTmpl.Execute(w, data)
 			return
 		} else if r.Method == http.MethodPost {
 			data.Input = r.FormValue("input")
@@ -175,12 +192,40 @@ func main() {
 			}
 
 			// Render template with the "calculated" input, output and error values.
-			tmpl.Execute(w, data)
+			indexTmpl.Execute(w, data)
 			return
 		}
 
 		data.Error = "Invalid method."
-		tmpl.Execute(w, data)
+		indexTmpl.Execute(w, data)
+		return
+	})
+
+	// Main handler.
+	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+		data := struct {
+			Error   string
+			Secrets []secrets.Secret
+		}{
+			"",
+			nil,
+		}
+
+		if r.Method == http.MethodGet {
+			s, err := sealedSecretsHandler.List()
+			if err != nil {
+				log.Fatalf("Failed to list sealed secrets: %#v", err)
+				data.Error = fmt.Sprintf("Failed to list sealed secrets: %s", err.Error())
+			}
+
+			data.Secrets = s
+
+			listTmpl.Execute(w, data)
+			return
+		}
+
+		data.Error = "Invalid method."
+		listTmpl.Execute(w, data)
 		return
 	})
 

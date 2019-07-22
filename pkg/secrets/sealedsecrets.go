@@ -2,6 +2,7 @@ package secrets
 
 import (
 	"crypto/rsa"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -10,6 +11,8 @@ import (
 	"strings"
 
 	ssv1alpha1 "github.com/bitnami-labs/sealed-secrets/pkg/apis/sealed-secrets/v1alpha1"
+	ssClient "github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealed-secrets/v1alpha1"
+	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -205,4 +208,78 @@ func (h *SealedSecretsHandler) Seal(data []byte, codecs runtimeserializer.CodecF
 	}
 
 	return h.sealedSecretOutput(codecs, ssecret)
+}
+
+// List returns a list of all secrets.
+func (h *SealedSecretsHandler) List() ([]Secret, error) {
+	conf, err := h.clientConfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := ssClient.NewForConfig(conf)
+	if err != nil {
+		return nil, err
+	}
+
+	ssList, err := client.SealedSecrets("").List(metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	var secrets []Secret
+
+	for _, item := range ssList.Items {
+		secret := Secret{}
+		secret.MetaData.Name = item.Name
+		secret.MetaData.Namespace = item.Namespace
+
+		secrets = append(secrets, secret)
+	}
+
+	return secrets, nil
+}
+
+// GetSecret returns a secret by name in the given namespace.
+func (h *SealedSecretsHandler) GetSecret(namespace, name string) ([]byte, error) {
+	conf, err := h.clientConfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	restClient, err := corev1.NewForConfig(conf)
+	if err != nil {
+		return nil, err
+	}
+
+	secret, err := restClient.Secrets(namespace).Get(name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	var data map[string]string
+	data = make(map[string]string)
+
+	for key, value := range secret.Data {
+		data[key] = string(value)
+	}
+
+	s := Secret{}
+	s.Kind = secret.TypeMeta.Kind
+	s.APIVersion = secret.TypeMeta.APIVersion
+	s.MetaData.Name = secret.Name
+	s.MetaData.Namespace = secret.Namespace
+	s.MetaData.Labels = secret.Labels
+	s.MetaData.Annotations = secret.Annotations
+	s.Data = data
+	s.StringData = secret.StringData
+	s.Type = secret.Type
+
+	if h.outputFormat == "yaml" {
+		return yaml.Marshal(s)
+	} else if h.outputFormat == "json" {
+		return json.Marshal(s)
+	}
+
+	return nil, fmt.Errorf("unsupported output format: %s", h.outputFormat)
 }
