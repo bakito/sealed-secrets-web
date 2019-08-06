@@ -1,120 +1,90 @@
 package secrets
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 
+	ssClient "github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealed-secrets/v1alpha1"
 	"gopkg.in/yaml.v2"
-	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
-// SecretHandler handles encoding and decoding of secrets.
-type SecretHandler struct {
+// Handler handles our secrets operations.
+type Handler struct {
+	clientConfig clientcmd.ClientConfig
 	outputFormat string
+	restClient   *corev1.CoreV1Client
+	ssClient     *ssClient.BitnamiV1alpha1Client
 }
 
-// Secret is the representation of our secret.
-// Our secret is very similar to the v1.Secret but with some small differences.
-type Secret struct {
-	Kind       string `yaml:"kind,omitempty" json:"kind,omitempty"`
-	APIVersion string `yaml:"apiVersion,omitempty" json:"apiVersion,omitempty"`
+// NewHandler creates a new secrets handler.
+func NewHandler(clientConfig clientcmd.ClientConfig, outputFormat string) (*Handler, error) {
+	conf, err := clientConfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
 
-	MetaData struct {
-		Name              string            `yaml:"name" json:"name"`
-		Namespace         string            `yaml:"namespace,omitempty" json:"namespace,omitempty"`
-		CreationTimestamp string            `yaml:"creationTimestamp,omitempty" json:"creationTimestamp,omitempty"`
-		Labels            map[string]string `yaml:"labels,omitempty" json:"labels,omitempty"`
-		Annotations       map[string]string `yaml:"annotations,omitempty" json:"annotations,omitempty"`
-	} `yaml:"metadata" json:"metadata"`
+	ssClient, err := ssClient.NewForConfig(conf)
+	if err != nil {
+		return nil, err
+	}
 
-	Data       map[string]string `yaml:"data,omitempty" json:"data,omitempty"`
-	StringData map[string]string `yaml:"stringData,omitempty" json:"stringData,omitempty"`
-	Type       v1.SecretType     `yaml:"type,omitempty" json:"type,omitempty"`
-}
+	restClient, err := corev1.NewForConfig(conf)
+	if err != nil {
+		return nil, err
+	}
 
-// NewSecretHandler returns a new secret handler.
-func NewSecretHandler(outputFormat string) *SecretHandler {
-	return &SecretHandler{
+	return &Handler{
+		clientConfig: clientConfig,
 		outputFormat: outputFormat,
-	}
+		ssClient:     ssClient,
+		restClient:   restClient,
+	}, nil
 }
 
-// Encode handles the base64 encoding of the 'data' and 'stringData' fields of a secret.
-func (h *SecretHandler) Encode(data string) ([]byte, error) {
-	secret := &Secret{}
-
-	if h.outputFormat == "yaml" {
-		err := yaml.Unmarshal([]byte(data), &secret)
-		if err != nil {
-			return nil, err
-		}
-	} else if h.outputFormat == "json" {
-		err := json.Unmarshal([]byte(data), &secret)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, fmt.Errorf("unsupported output format: %s", h.outputFormat)
+// List returns a list of all secrets.
+func (h *Handler) List() (map[string]interface{}, error) {
+	ssList, err := h.ssClient.SealedSecrets("").List(metav1.ListOptions{})
+	if err != nil {
+		return nil, err
 	}
 
-	for key, value := range secret.Data {
-		secret.Data[key] = base64.StdEncoding.EncodeToString([]byte(value))
+	var secrets map[string]interface{}
+	secrets = make(map[string]interface{})
+
+	for _, item := range ssList.Items {
+		secrets[item.Name] = item.Namespace
 	}
 
-	for key, value := range secret.StringData {
-		secret.StringData[key] = base64.StdEncoding.EncodeToString([]byte(value))
-	}
-
-	if h.outputFormat == "yaml" {
-		return yaml.Marshal(secret)
-	} else if h.outputFormat == "json" {
-		return json.Marshal(secret)
-	}
-
-	return nil, fmt.Errorf("unsupported output format: %s", h.outputFormat)
+	return secrets, nil
 }
 
-// Decode handles the base64 decoding of the 'data' and 'stringData' fields of a secret.
-func (h *SecretHandler) Decode(data string) ([]byte, error) {
-	secret := &Secret{}
-
-	if h.outputFormat == "yaml" {
-		err := yaml.Unmarshal([]byte(data), &secret)
-		if err != nil {
-			return nil, err
-		}
-	} else if h.outputFormat == "json" {
-		err := json.Unmarshal([]byte(data), &secret)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, fmt.Errorf("unsupported output format: %s", h.outputFormat)
+// GetSecret returns a secret by name in the given namespace.
+func (h *Handler) GetSecret(namespace, name string) ([]byte, error) {
+	secret, err := h.restClient.Secrets(namespace).Get(name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
 	}
 
-	for key, value := range secret.Data {
-		decoded, err := base64.StdEncoding.DecodeString(value)
-		if err != nil {
-			return nil, err
-		}
-
-		secret.Data[key] = string(decoded)
-	}
-
-	for key, value := range secret.StringData {
-		decoded, err := base64.StdEncoding.DecodeString(value)
-		if err != nil {
-			return nil, err
-		}
-
-		secret.StringData[key] = string(decoded)
+	jsonData, err := json.Marshal(secret)
+	if err != nil {
+		return nil, err
 	}
 
 	if h.outputFormat == "yaml" {
-		return yaml.Marshal(secret)
+		var secretMap map[string]interface{}
+		secretMap = make(map[string]interface{})
+
+		err = json.Unmarshal(jsonData, &secretMap)
+		if err != nil {
+			return nil, err
+		}
+
+		return yaml.Marshal(secretMap)
 	} else if h.outputFormat == "json" {
-		return json.Marshal(secret)
+		return jsonData, nil
 	}
 
 	return nil, fmt.Errorf("unsupported output format: %s", h.outputFormat)
