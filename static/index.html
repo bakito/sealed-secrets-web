@@ -92,6 +92,44 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/static/ace/ace.js"></script>
   <script>
+    const YAML_SECRET = `# The 'apiVersion' and 'kind' should always be 'v1' and 'Secret'.
+apiVersion: v1
+kind: Secret
+# Metadata section of the secret.
+# The encoding and decoding function only uses the 'name', 'namespace', 'annotations'
+# and 'labels' field.
+# All other fields will be striped during the encoding / decoding.
+metadata:
+  name: mysecretname
+  namespace: mysecretnamespace
+# All fields in the 'data' section will be encoded, decoded or encryped.
+data:
+  username: admin
+  password: admin
+  values.yaml: |
+    secretName: mysecretname
+    secretValue: mysecretvalue
+    subSecrets:
+      key: value
+# The type of the Secret can be any valid Kubernetes secret type.
+# Normaly this should be 'Opaque'.
+type: Opaque`
+
+	  const JSON_SECRET = `{
+  "apiVersion": "v1",
+  "kind": "Secret",
+  "metadata": {
+    "name": "mysecretname",
+    "namespace": "mysecretnamespace"
+  },
+  "data": {
+    "username": "admin",
+    "password": "admin",
+    "values.yaml": "secretName: mysecretname\nsecretValue: mysecretvalue\nsubSecrets:\n  key: value\n"
+  },
+  "type": "Opaque"
+}`
+
     new Vue({
       el: '#app',
       vuetify: new Vuetify(),
@@ -102,7 +140,7 @@
           error: '',
           editor1: Object,
           editor2: Object,
-          editor1Content: '',
+          editor1Content: '{{.OutputFormat}}' === 'yaml' ? YAML_SECRET : JSON_SECRET,
           editor2Content: '',
           options: {
             selectionStyle: "line",
