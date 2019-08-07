@@ -30,8 +30,8 @@ func (h *Handler) Encode(data string) ([]byte, error) {
 			return nil, err
 		}
 
-		for key, value := range secretData["data"].(map[interface{}]interface{}) {
-			secretData["data"].(map[interface{}]interface{})[key] = base64.StdEncoding.EncodeToString([]byte(value.(string)))
+		for key, value := range secretData["data"].(map[string]interface{}) {
+			secretData["data"].(map[string]interface{})[key] = base64.StdEncoding.EncodeToString([]byte(value.(string)))
 		}
 
 		return json.Marshal(secretData)
@@ -67,13 +67,13 @@ func (h *Handler) Decode(data string) ([]byte, error) {
 			return nil, err
 		}
 
-		for key, value := range secretData["data"].(map[interface{}]interface{}) {
+		for key, value := range secretData["data"].(map[string]interface{}) {
 			decoded, err := base64.StdEncoding.DecodeString(value.(string))
 			if err != nil {
 				return nil, err
 			}
 
-			secretData["data"].(map[interface{}]interface{})[key] = string(decoded)
+			secretData["data"].(map[string]interface{})[key] = string(decoded)
 		}
 
 		return json.Marshal(secretData)
