@@ -1,16 +1,21 @@
 replicaCount: 1
 
-serviceAccountName: ""
-
 image:
   repository: ricoberger/sealed-secrets-web
-  tag: 2.0.1
+  tag: 2.1.0
   pullPolicy: IfNotPresent
   args: []
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+
+rbac:
+  create: true
+
+serviceAccount:
+  create: true
+  name: sealed-secrets-web
 
 service:
   type: ClusterIP
