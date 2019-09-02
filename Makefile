@@ -3,7 +3,6 @@ WHAT := sealedsecretsweb
 BRANCH       ?= $(shell git rev-parse --abbrev-ref HEAD)
 BUILDTIME    ?= $(shell date '+%Y%m%d-%H:%M:%S')
 BUILDUSER    ?= $(shell id -un)
-DOCKER_IMAGE ?= ricoberger/sealed-secrets-web
 PWD          ?= $(shell pwd)
 REPO         ?= github.com/ricoberger/sealed-secrets-web
 REVISION     ?= $(shell git rev-parse HEAD)
@@ -55,10 +54,17 @@ clean:
 	rm -rf ./bin
 
 docker-build: build-linux-amd64
-	docker build -t "$(DOCKER_IMAGE):${VERSION}" --build-arg REVISION=${REVISION} --build-arg VERSION=${VERSION} .
+	for target in $(WHAT); do \
+		docker build -f cmd/$$target/Dockerfile -t "$$target:${VERSION}" --build-arg REVISION=${REVISION} --build-arg VERSION=${VERSION} .; \
+	done
 
 docker-publish:
-	docker push "$(DOCKER_IMAGE):${VERSION}"
+	for target in $(WHAT); do \
+		docker tag $$target:${VERSION} ricoberger/$$target:${VERSION}; \
+		docker tag $$target:${VERSION} docker.pkg.github.com/ricoberger/sealed-secrets-web/$$target:${VERSION}; \
+		docker push ricoberger/$$target:${VERSION}; \
+		docker push docker.pkg.github.com/ricoberger/sealed-secrets-web/$$target:${VERSION}; \
+	done
 
 release: clean docker-build docker-publish
 
