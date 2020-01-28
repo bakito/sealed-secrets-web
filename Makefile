@@ -60,10 +60,10 @@ docker-build: build-linux-amd64
 
 docker-publish:
 	for target in $(WHAT); do \
-		docker tag $$target:${VERSION} ricoberger/$$target:${VERSION}; \
-		docker tag $$target:${VERSION} docker.pkg.github.com/ricoberger/sealed-secrets-web/$$target:${VERSION}; \
-		docker push ricoberger/$$target:${VERSION}; \
-		docker push docker.pkg.github.com/ricoberger/sealed-secrets-web/$$target:${VERSION}; \
+		docker tag $$target:${VERSION} ricoberger/sealed-secrets-web:${VERSION}; \
+		docker tag $$target:${VERSION} docker.pkg.github.com/ricoberger/sealed-secrets-web/sealed-secrets-web:${VERSION}; \
+		docker push ricoberger/sealed-secrets-web:${VERSION}; \
+		docker push docker.pkg.github.com/ricoberger/sealed-secrets-web/sealed-secrets-web:${VERSION}; \
 	done
 
 release: clean docker-build docker-publish
