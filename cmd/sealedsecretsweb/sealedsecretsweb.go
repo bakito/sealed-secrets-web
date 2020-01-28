@@ -27,6 +27,7 @@ var (
 	certFile       = flag.String("cert", "", "Certificate / public key to use for encryption. Overrides --controller-*")
 	controllerNs   = flag.String("controller-namespace", metav1.NamespaceSystem, "Namespace of sealed-secrets controller.")
 	controllerName = flag.String("controller-name", "sealed-secrets-controller", "Name of sealed-secrets controller.")
+	disableLoadSecrets = flag.Bool("disable-load-secrets", false, "Disable the loading of existing secrets")
 	outputFormat   = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
 	printVersion   = flag.Bool("version", false, "Print version information and exit")
 

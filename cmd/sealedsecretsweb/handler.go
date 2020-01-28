@@ -15,9 +15,11 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	data := struct {
-		OutputFormat string
+		OutputFormat       string
+		DisableLoadSecrets bool
 	}{
 		*outputFormat,
+		*disableLoadSecrets,
 	}
 
 	indexTmpl.Execute(w, data)
@@ -58,6 +60,11 @@ func sealHandler(w http.ResponseWriter, r *http.Request) {
 
 func secretsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
+		if *disableLoadSecrets {
+			http.Error(w, fmt.Sprintf("Loading secrets is disabled"), http.StatusForbidden)
+			return
+		}
+
 		// List all secrets.
 		secrets, err := sHandler.List()
 
@@ -124,6 +131,11 @@ func secretsHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(js)
 		return
 	} else if r.Method == http.MethodPut {
+		if *disableLoadSecrets {
+			http.Error(w, fmt.Sprintf("Loading secrets is disabled"), http.StatusForbidden)
+			return
+		}
+
 		// Load existing secret.
 		data := struct {
 			Name      string `json:"name"`
