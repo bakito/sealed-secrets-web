@@ -35,7 +35,7 @@
         <v-spacer></v-spacer>
         <v-btn @click="encode" text>Encode</v-btn>
         <v-btn @click="decode" text>Decode</v-btn>
-        <v-btn @click="loadSecrets" text>Secrets</v-btn>
+        {{ if eq .DisableLoadSecrets false}}<v-btn @click="loadSecrets" text>Secrets</v-btn>{{end}}
         <v-btn @click="seal" text>Seal</v-btn>
       </v-app-bar>
 
@@ -75,8 +75,8 @@
                   <v-chip color="primary">{{"{{namespace}}"}}</v-chip>
                 </v-list-item-icon>
               </v-list-item>
-            </v-card-text>
-          </v-list>
+            </v-list>
+          </v-card-text>
         </v-card>
       </v-dialog>
 
