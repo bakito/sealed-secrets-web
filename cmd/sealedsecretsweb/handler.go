@@ -39,7 +39,7 @@ func sealHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ss, err := secrets.Seal(data.Secret)
+	ss, err := secrets.Seal(data.Secret, *kubesealArgs)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("kubeseal error: %s", err.Error()), http.StatusBadRequest)
 		return

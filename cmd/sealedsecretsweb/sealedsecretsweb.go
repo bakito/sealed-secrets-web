@@ -14,7 +14,6 @@ import (
 	"github.com/bitnami-labs/flagenv"
 	"github.com/bitnami-labs/pflagenv"
 	flag "github.com/spf13/pflag"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -24,10 +23,8 @@ const (
 )
 
 var (
-	certFile       = flag.String("cert", "", "Certificate / public key to use for encryption. Overrides --controller-*")
-	controllerNs   = flag.String("controller-namespace", metav1.NamespaceSystem, "Namespace of sealed-secrets controller.")
-	controllerName = flag.String("controller-name", "sealed-secrets-controller", "Name of sealed-secrets controller.")
 	disableLoadSecrets = flag.Bool("disable-load-secrets", false, "Disable the loading of existing secrets")
+	kubesealArgs   = flag.String("kubeseal-arguments", "", "Arguments which are passed to kubeseal")
 	outputFormat   = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
 	printVersion   = flag.Bool("version", false, "Print version information and exit")
 
@@ -45,7 +42,7 @@ func init() {
 	loadingRules.DefaultClientConfig = &clientcmd.DefaultClientConfig
 	overrides := clientcmd.ConfigOverrides{}
 	kflags := clientcmd.RecommendedConfigOverrideFlags("")
-	flag.StringVar(&loadingRules.ExplicitPath, "kubeconfig", "", "Path to a kube config. Only required if out-of-cluster")
+	flag.StringVar(&loadingRules.ExplicitPath, "kubeconfig", "", "Path to a kubeconfig. Only required if out-of-cluster")
 	clientcmd.BindOverrideFlags(&overrides, flag.CommandLine, kflags)
 	clientConfig = clientcmd.NewInteractiveDeferredLoadingClientConfig(loadingRules, &overrides, os.Stdin)
 

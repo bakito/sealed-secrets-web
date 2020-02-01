@@ -2,13 +2,14 @@ package secrets
 
 import (
 	"io"
-	"os"
 	"os/exec"
+	"strings"
 )
 
 // Seal runs the kubeseal client to create the sealed secret.
-func Seal(secret string) ([]byte, error) {
-	cmd := exec.Command("kubeseal", os.Args[1:]...)
+func Seal(secret string, kubesealArgs string) ([]byte, error) {
+	args := strings.Split(kubesealArgs, " ")
+	cmd := exec.Command("kubeseal", args...)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, err
