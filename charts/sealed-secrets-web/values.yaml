@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ricoberger/sealed-secrets-web
-  tag: 2.1.5
+  tag: 2.2.0
   pullPolicy: IfNotPresent
   args: []
 
