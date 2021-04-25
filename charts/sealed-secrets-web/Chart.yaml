@@ -1,5 +1,5 @@
 apiVersion: v1
-appVersion: 2.2.0
+appVersion: 2.2.1
 description: A web interface for Sealed Secrets by Bitnami.
 home: https://github.com/ricoberger/sealed-secrets-web
 icon: https://raw.githubusercontent.com/ricoberger/sealed-secrets-web/master/assets/logo.png
@@ -7,4 +7,4 @@ maintainers:
   - name: Rico Berger
     url: https://ricoberger.de
 name: sealed-secrets-web
-version: 2.2.0
+version: 2.2.1
