@@ -5,22 +5,22 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-  <link rel="apple-touch-icon" sizes="57x57" href="/static/icons/apple-icon-57x57.png">
-  <link rel="apple-touch-icon" sizes="60x60" href="/static/icons/apple-icon-60x60.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="/static/icons/apple-icon-72x72.png">
-  <link rel="apple-touch-icon" sizes="76x76" href="/static/icons/apple-icon-76x76.png">
-  <link rel="apple-touch-icon" sizes="114x114" href="/static/icons/apple-icon-114x114.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="/static/icons/apple-icon-120x120.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="/static/icons/apple-icon-144x144.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/apple-icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-icon-180x180.png">
-  <link rel="icon" type="image/png" sizes="192x192"  href="/static/icons/android-icon-192x192.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="/static/icons/favicon-96x96.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
-  <link rel="manifest" href="/static/icons/manifest.json">
+  <link rel="apple-touch-icon" sizes="57x57" href="{{.WebExternalUrl}}/static/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="{{.WebExternalUrl}}/static/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="{{.WebExternalUrl}}/static/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="{{.WebExternalUrl}}/static/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="{{.WebExternalUrl}}/static/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="{{.WebExternalUrl}}/static/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="{{.WebExternalUrl}}/static/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="{{.WebExternalUrl}}/static/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{.WebExternalUrl}}/static/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="{{.WebExternalUrl}}/static/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{.WebExternalUrl}}/static/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="{{.WebExternalUrl}}/static/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{.WebExternalUrl}}/static/icons/favicon-16x16.png">
+  <link rel="manifest" href="{{.WebExternalUrl}}/static/icons/manifest.json">
   <meta name="msapplication-TileColor" content="#ffffff">
-  <meta name="msapplication-TileImage" content="/static/icons/ms-icon-144x144.png">
+  <meta name="msapplication-TileImage" content="{{.WebExternalUrl}}/static/icons/ms-icon-144x144.png">
   <meta name="theme-color" content="#ffffff">
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
@@ -90,7 +90,7 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script src="/static/ace/ace.js"></script>
+  <script src="{{.WebExternalUrl}}/static/ace/ace.js"></script>
   <script>
     const YAML_SECRET = `# The 'apiVersion' and 'kind' should always be 'v1' and 'Secret'.
 apiVersion: v1
@@ -203,7 +203,7 @@ type: Opaque`
       },
       methods : {
         seal() {
-          axios.post('/api/seal', {secret: this.editor1Content}).then(res => {
+          axios.post('{{.WebExternalUrl}}/api/seal', {secret: this.editor1Content}).then(res => {
             this.editor2Content = res.data.secret
             this.editor2.setValue(this.editor2Content, 1)
           }).catch(err => {
@@ -211,7 +211,7 @@ type: Opaque`
           });
         },
         loadSecrets() {
-          axios.get('/api/secrets').then(res => {
+          axios.get('{{.WebExternalUrl}}/api/secrets').then(res => {
             this.secrets = res.data
             this.dialogVisible = true
           }).catch(err => {
@@ -219,7 +219,7 @@ type: Opaque`
           });
         },
         loadSecret(namespace, name) {
-          axios.put('/api/secrets', {namespace, name}).then(res => {
+          axios.put('{{.WebExternalUrl}}/api/secrets', {namespace, name}).then(res => {
             this.editor1Content = res.data.secret
             this.editor1.setValue(this.editor1Content, 1)
             this.dialogVisible = false
@@ -228,7 +228,7 @@ type: Opaque`
           });
         },
         encode() {
-          axios.post('/api/secrets', {encode: true, secret: this.editor1Content}).then(res => {
+          axios.post('{{.WebExternalUrl}}/api/secrets', {encode: true, secret: this.editor1Content}).then(res => {
             this.editor1Content = res.data.secret
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {
@@ -236,7 +236,7 @@ type: Opaque`
           });
         },
         decode() {
-          axios.post('/api/secrets', {encode: false, secret: this.editor1Content}).then(res => {
+          axios.post('{{.WebExternalUrl}}/api/secrets', {encode: false, secret: this.editor1Content}).then(res => {
             this.editor1Content = res.data.secret
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {

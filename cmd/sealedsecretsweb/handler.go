@@ -17,9 +17,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		OutputFormat       string
 		DisableLoadSecrets bool
+		WebExternalUrl     string
 	}{
 		*outputFormat,
 		*disableLoadSecrets,
+		*webExternalUrl,
 	}
 
 	indexTmpl.Execute(w, data)

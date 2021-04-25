@@ -24,9 +24,10 @@ const (
 
 var (
 	disableLoadSecrets = flag.Bool("disable-load-secrets", false, "Disable the loading of existing secrets")
-	kubesealArgs   = flag.String("kubeseal-arguments", "", "Arguments which are passed to kubeseal")
-	outputFormat   = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
-	printVersion   = flag.Bool("version", false, "Print version information and exit")
+	kubesealArgs       = flag.String("kubeseal-arguments", "", "Arguments which are passed to kubeseal")
+	outputFormat       = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
+	webExternalUrl     = flag.String("web-external-url", "", "The URL under which the Sealed Secrets Web Interface is externally reachable (for example, if it is served via a reverse proxy).")
+	printVersion       = flag.Bool("version", false, "Print version information and exit")
 
 	clientConfig clientcmd.ClientConfig
 	sHandler     *secrets.Handler
