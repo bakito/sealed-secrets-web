@@ -15,7 +15,7 @@ HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD curl --fail http://local
 
 RUN addgroup -g 1000 sealedsecretsweb && \
     adduser -D -u 1000 -G sealedsecretsweb sealedsecretsweb
-USER sealedsecretsweb
+USER 1000
 
 COPY ./bin/sealedsecretsweb-linux-amd64  /bin/sealedsecretsweb
 COPY ./static/ /static/
