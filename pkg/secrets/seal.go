@@ -20,10 +20,5 @@ func Seal(secret string, kubesealArgs string) ([]byte, error) {
 		io.WriteString(stdin, secret)
 	}()
 
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return nil, err
-	}
-
-	return out, err
+	return cmd.CombinedOutput()
 }
