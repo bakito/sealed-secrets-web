@@ -29,5 +29,41 @@ helm upgrade --install sealed-secrets-web ricoberger/sealed-secrets-web
 To modify the settings for Sealed Secrets you can modify the arguments for the Docker image with the `--set` flag. For example you can set a different `controller-name` during the installation with the following command:
 
 ```sh
-helm upgrade --install sealed-secrets-web ricoberger/sealed-secrets-web --set image.args={"--controller-name=sealed-secrets"}
+helm upgrade --install sealed-secrets-web ricoberger/sealed-secrets-web --set image.args={"--kubeseal-arguments=--controller-name=sealed-secrets"}
+```
+
+## Development
+
+For development we are using a local Kubernetes cluster using kind. When the cluster is created we install **Sealed Secrets** using Helm:
+
+```sh
+./kind.sh
+
+helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+helm install sealed-secrets sealed-secrets/sealed-secrets --namespace kube-system
+
+# Test the installation:
+echo -n bar | kubectl create secret generic mysecret --dry-run=client --from-file=foo=/dev/stdin -o json >mysecret.json
+kubeseal <mysecret.json >mysealedsecret.json --controller-name sealed-secrets
+kubectl create -f mysealedsecret.json
+kubectl get secret mysecret
+```
+
+Then we can build the Docker image and push it to the local registry:
+
+```sh
+make build-linux-amd64
+docker build -f cmd/sealedsecretsweb/Dockerfile -t localhost:5000/sealed-secrets-web:dev .
+docker push localhost:5000/sealed-secrets-web:dev
+```
+
+Finally we can install **Sealed Secrets Web** using the provided Helm chart:
+
+```sh
+kubectl create namespace sealed-secrets-web
+
+helm upgrade --install sealed-secrets-web ricoberger/sealed-secrets-web --namespace sealed-secrets-web --set image.args={"--kubeseal-arguments=--controller-name=sealed-secrets"} --set image.repository=localhost:5000/sealed-secrets-web --set image.tag=dev --set image.pullPolicy=Always
+
+# Access the Web UI:
+kubectl port-forward svc/sealed-secrets-web 8080:80
 ```
