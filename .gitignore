@@ -116,3 +116,6 @@ bin
 
 # Kubeconfig
 /kubeconfig*
+
+# idea
+/.idea

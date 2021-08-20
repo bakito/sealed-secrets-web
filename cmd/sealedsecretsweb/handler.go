@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"github.com/ricoberger/sealed-secrets-web/pkg/secrets"
+	"gopkg.in/yaml.v2"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
-	return
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +25,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	indexTmpl.Execute(w, data)
-	return
 }
 
 func sealHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +46,18 @@ func sealHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if *outputFormat == "yaml" {
+		// unmarshal result to json
+		sec := make(map[string]interface{})
+		if err := json.Unmarshal(ss, &sec); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		// marshal to yaml
+		if ss, err = yaml.Marshal(sec); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+
 	data.Secret = string(ss)
 
 	js, err := json.Marshal(data)
@@ -57,7 +68,6 @@ func sealHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
-	return
 }
 
 func secretsHandler(w http.ResponseWriter, r *http.Request) {
@@ -175,7 +185,6 @@ func secretsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Error(w, "invalid method", http.StatusInternalServerError)
-	return
 }
 
 func base64Handler(w http.ResponseWriter, r *http.Request) {
@@ -203,5 +212,4 @@ func base64Handler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
-	return
 }
