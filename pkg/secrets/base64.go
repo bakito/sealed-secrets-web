@@ -10,8 +10,7 @@ import (
 
 // Encode encodes the data field in a secret.
 func (h *Handler) Encode(data string) ([]byte, error) {
-	var secretData map[string]interface{}
-	secretData = make(map[string]interface{})
+	secretData := make(map[string]interface{})
 
 	if h.outputFormat == "yaml" {
 		err := yaml.Unmarshal([]byte(data), &secretData)
@@ -42,8 +41,7 @@ func (h *Handler) Encode(data string) ([]byte, error) {
 
 // Decode decodes the data field in a secret.
 func (h *Handler) Decode(data string) ([]byte, error) {
-	var secretData map[string]interface{}
-	secretData = make(map[string]interface{})
+	secretData := make(map[string]interface{})
 
 	if h.outputFormat == "yaml" {
 		err := yaml.Unmarshal([]byte(data), &secretData)
