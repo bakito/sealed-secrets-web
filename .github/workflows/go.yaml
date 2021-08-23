@@ -1,5 +1,10 @@
 name: Go
-on: [pull_request, release]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
   build-release:
     name: Build
@@ -19,6 +24,3 @@ jobs:
 
     - name: Test
       run: go test ./...
-
-    - name: Build
-      run: make build

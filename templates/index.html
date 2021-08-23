@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Sealed Secrets</title>
+
+  <link rel="apple-touch-icon" sizes="57x57" href="{{.WebExternalUrl}}/static/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="{{.WebExternalUrl}}/static/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="{{.WebExternalUrl}}/static/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="{{.WebExternalUrl}}/static/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="{{.WebExternalUrl}}/static/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="{{.WebExternalUrl}}/static/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="{{.WebExternalUrl}}/static/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="{{.WebExternalUrl}}/static/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{.WebExternalUrl}}/static/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="{{.WebExternalUrl}}/static/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{.WebExternalUrl}}/static/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="{{.WebExternalUrl}}/static/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{.WebExternalUrl}}/static/icons/favicon-16x16.png">
+  <link rel="manifest" href="{{.WebExternalUrl}}/static/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="{{.WebExternalUrl}}/static/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css">
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-app-bar app color="primary" dark>
+        <v-toolbar-title>Sealed Secrets</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn @click="encode" text>Encode</v-btn>
+        <v-btn @click="decode" text>Decode</v-btn>
+        {{ if eq .DisableLoadSecrets false}}<v-btn @click="loadSecrets" text>Secrets</v-btn>{{end}}
+        <v-btn @click="seal" text>Seal</v-btn>
+      </v-app-bar>
+
+      <v-main>
+        <v-container fluid fill-height grid-list-xl>
+          <v-layout wrap>
+            <v-flex xs6>
+              <v-card height="100%">
+                <v-card-title>Secret</v-card-title>
+                <v-card-text style="height: calc(100% - 56px)">
+                  <div id="editor1" style="width: 100%; height: 100%;"></div>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+            <v-flex xs6>
+              <v-card height="100%">
+                <v-card-title>Sealed Secret</v-card-title>
+                <v-card-text style="height: calc(100% - 56px)">
+                  <div id="editor2" style="width: 100%; height: 100%;"></div>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </v-main>
+
+      <v-dialog v-model="showDialog">
+        <v-card>
+          <v-card-title class="headline" primary-title>Secrets</v-card-title>
+          <v-card-text>
+            <v-list>
+              <v-list-item v-for="(namespace, name) in secrets" :key="name + '_' + namespace" @click="loadSecret(namespace, name)">
+                <v-list-item-content>
+                  <v-list-item-title>{{"{{name}}"}}</v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-icon>
+                  <v-chip color="primary">{{"{{namespace}}"}}</v-chip>
+                </v-list-item-icon>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+
+      <v-snackbar :bottom="true" :multi-line="true" :right="true" :timeout="5000" v-model="snackbar" color="error">
+          {{"{{error}}"}}
+        <v-btn @click="error = ''" dark text>Close</v-btn>
+      </v-snackbar>
+      <v-footer color="primary" padless >
+          <v-col class="primary py-1 text-center white--text text-caption" cols="12" >
+            Sealed Secrets Web ({{.Version}})
+            <v-btn text icon color="blue lighten-2" href="https://github.com/bakito/sealed-secrets-web" target="_blank" >
+              <v-icon>mdi-github</v-icon>
+            </v-btn>
+          </v-col>
+      </v-footer>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="{{.WebExternalUrl}}/static/ace/ace.js"></script>
+  <script>
+    const INITIAL_SECRET = "{{.InitialSecret}}"
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data () {
+        return {
+          secrets: Object,
+          dialogVisible: false,
+          error: '',
+          editor1: Object,
+          editor2: Object,
+          editor1Content: INITIAL_SECRET,
+          editor2Content: '',
+          options: {
+            selectionStyle: "line",
+            highlightActiveLine: true,
+            highlightSelectedWord: false,
+            readOnly: false,
+            cursorStyle: "ace",
+            behavioursEnabled: true,
+            wrapBehavioursEnabled: true,
+            autoScrollEditorIntoView: false,
+            copyWithEmptySelection: false,
+            navigateWithinSoftTabs: true,
+            enableMultiselect: false,
+            showPrintMargin: false,
+            newLineMode: "unix",
+            useSoftTabs: true,
+            tabSize: 2,
+            displayIndentGuides: true,
+          }
+        }
+      },
+      computed: {
+        snackbar: {
+          get() {
+            return this.error !== ''
+          },
+          set(newValue) {
+            if (newValue === false) {
+              this.error = ''
+            }
+          }
+        },
+        showDialog: {
+          get() {
+            return this.dialogVisible
+          },
+          set(newValue) {
+            this.dialogVisible = newValue
+          }
+        }
+      },
+      mounted () {
+        this.editor1 = window.ace.edit('editor1')
+        this.editor1.setValue(this.editor1Content, 1)
+        this.editor1.setOptions(this.options)
+        this.editor1.getSession().setMode('ace/mode/{{.OutputFormat}}')
+        this.editor1.setTheme('ace/theme/dracula')
+        this.editor1.on('change', () => {
+          this.editor1Content = this.editor1.getValue()
+        })
+
+        this.editor2 = window.ace.edit('editor2')
+        this.editor2.setValue(this.editor2Content, 1)
+        this.editor2.setOptions(this.options)
+        this.editor2.getSession().setMode('ace/mode/{{.OutputFormat}}')
+        this.editor2.setTheme('ace/theme/dracula')
+        this.editor2.on('change', () => {
+          this.editor2Content = this.editor2.getValue()
+        })
+      },
+      methods : {
+        seal() {
+          axios.post('{{.WebExternalUrl}}/api/seal', {secret: this.editor1Content}).then(res => {
+            this.editor2Content = res.data.secret
+            this.editor2.setValue(this.editor2Content, 1)
+          }).catch(err => {
+            this.error = err.response.data
+          });
+        },
+        loadSecrets() {
+          axios.get('{{.WebExternalUrl}}/api/secrets').then(res => {
+            this.secrets = res.data
+            this.dialogVisible = true
+          }).catch(err => {
+            this.error = err.response.data
+          });
+        },
+        loadSecret(namespace, name) {
+          axios.get("{{.WebExternalUrl}}/api/secret/" + namespace + "/" + name).then(res => {
+            this.editor1Content = res.data.secret
+            this.editor1.setValue(this.editor1Content, 1)
+            this.dialogVisible = false
+          }).catch(err => {
+            this.error = err.response.data
+          });
+        },
+        encode() {
+          axios.post('{{.WebExternalUrl}}/api/encode', {secret: this.editor1Content}).then(res => {
+            this.editor1Content = res.data.secret
+            this.editor1.setValue(this.editor1Content, 1)
+          }).catch(err => {
+            this.error = err.response.data
+          });
+        },
+        decode() {
+          axios.post('{{.WebExternalUrl}}/api/decode', {secret: this.editor1Content}).then(res => {
+            this.editor1Content = res.data.secret
+            this.editor1.setValue(this.editor1Content, 1)
+          }).catch(err => {
+            this.error = err.response.data
+          });
+        }
+      }
+    })
+  </script>
+</body>
+</html>

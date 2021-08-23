@@ -20,16 +20,16 @@
 **sealed-secrets-web** can be installed via our Helm chart:
 
 ```sh
-helm repo add ricoberger https://ricoberger.github.io/helm-charts
+helm repo add bakito https://bakito.github.io/helm-charts
 helm up
 
-helm upgrade --install sealed-secrets-web ricoberger/sealed-secrets-web
+helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web
 ```
 
 To modify the settings for Sealed Secrets you can modify the arguments for the Docker image with the `--set` flag. For example you can set a different `controller-name` during the installation with the following command:
 
 ```sh
-helm upgrade --install sealed-secrets-web ricoberger/sealed-secrets-web --set image.args={"--kubeseal-arguments=--controller-name=sealed-secrets"}
+helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web --set image.args={"--kubeseal-arguments=--controller-name=sealed-secrets"}
 ```
 
 ## Development
@@ -62,7 +62,7 @@ Finally we can install **Sealed Secrets Web** using the provided Helm chart:
 ```sh
 kubectl create namespace sealed-secrets-web
 
-helm upgrade --install sealed-secrets-web ricoberger/sealed-secrets-web --namespace sealed-secrets-web --set image.args={"--kubeseal-arguments=--controller-name=sealed-secrets"} --set image.repository=localhost:5000/sealed-secrets-web --set image.tag=dev --set image.pullPolicy=Always
+helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web --namespace sealed-secrets-web --set image.args={"--kubeseal-arguments=--controller-name=sealed-secrets"} --set image.repository=localhost:5000/sealed-secrets-web --set image.tag=dev --set image.pullPolicy=Always
 
 # Access the Web UI:
 kubectl port-forward svc/sealed-secrets-web 8080:80

@@ -1,0 +1,16 @@
+before:
+  hooks:
+    - helm package ./charts/sealed-secrets-web/ --version {{ .Version }} --app-version {{ .Version }} -d {{ .Env.CR_PACKAGE_PATH }}
+builds:
+  - skip: true
+    main: ./main.go
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
