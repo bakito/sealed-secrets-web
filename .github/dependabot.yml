@@ -1,0 +1,9 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: k8s.io/client-go
+      - dependency-name: k8s.io/apimachinery

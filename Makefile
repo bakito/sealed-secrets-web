@@ -17,7 +17,7 @@ build:
 			-X ${REPO}/pkg/version.Branch=${BRANCH} \
 			-X ${REPO}/pkg/version.BuildUser=${BUILDUSER} \
 			-X ${REPO}/pkg/version.BuildDate=${BUILDTIME}" \
-			-o ./bin/$$target ./cmd/$$target; \
+			-o ./bin/$$target ./$$target; \
 	done
 
 build-darwin-amd64:
@@ -27,7 +27,7 @@ build-darwin-amd64:
 			-X ${REPO}/pkg/version.Branch=${BRANCH} \
 			-X ${REPO}/pkg/version.BuildUser=${BUILDUSER} \
 			-X ${REPO}/pkg/version.BuildDate=${BUILDTIME}" \
-			-o ./bin/$$target-darwin-amd64 ./cmd/$$target; \
+			-o ./bin/$$target-darwin-amd64 ./$$target; \
 	done
 
 build-linux-amd64:
@@ -37,7 +37,7 @@ build-linux-amd64:
 			-X ${REPO}/pkg/version.Branch=${BRANCH} \
 			-X ${REPO}/pkg/version.BuildUser=${BUILDUSER} \
 			-X ${REPO}/pkg/version.BuildDate=${BUILDTIME}" \
-			-o ./bin/$$target-linux-amd64 ./cmd/$$target; \
+			-o ./bin/$$target-linux-amd64 ./$$target; \
 	done
 
 build-windows-amd64:
@@ -47,7 +47,7 @@ build-windows-amd64:
 			-X ${REPO}/pkg/version.Branch=${BRANCH} \
 			-X ${REPO}/pkg/version.BuildUser=${BUILDUSER} \
 			-X ${REPO}/pkg/version.BuildDate=${BUILDTIME}" \
-			-o ./bin/$$target-windows-amd64.exe ./cmd/$$target; \
+			-o ./bin/$$target-windows-amd64.exe ./$$target; \
 	done
 
 clean:
