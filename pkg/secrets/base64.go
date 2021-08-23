@@ -32,6 +32,9 @@ func (h *Handler) Encode(data string) ([]byte, error) {
 }
 
 func encodeData(secretData map[string]interface{}) {
+	if _, ok := secretData["data"]; ok {
+		return
+	}
 	secretData["data"] = make(map[string]interface{})
 	for key, value := range secretData["stringData"].(map[string]interface{}) {
 		secretData["data"].(map[string]interface{})[key] = base64.StdEncoding.EncodeToString([]byte(value.(string)))
@@ -71,6 +74,9 @@ func (h *Handler) Decode(data string) ([]byte, error) {
 }
 
 func decodeData(secretData map[string]interface{}) error {
+	if _, ok := secretData["stringData"]; ok {
+		return nil
+	}
 	secretData["stringData"] = make(map[string]interface{})
 	for key, value := range secretData["data"].(map[string]interface{}) {
 		decoded, err := base64.StdEncoding.DecodeString(value.(string))

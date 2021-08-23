@@ -9,11 +9,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
+func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(200)
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
+func indexHandler(w http.ResponseWriter, _ *http.Request) {
 	data := struct {
 		OutputFormat       string
 		DisableLoadSecrets bool
@@ -24,7 +24,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		*webExternalUrl,
 	}
 
-	indexTmpl.Execute(w, data)
+	_ = indexTmpl.Execute(w, data)
 }
 
 func sealHandler(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +67,7 @@ func sealHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	_, _ = w.Write(js)
 }
 
 func secretsHandler(w http.ResponseWriter, r *http.Request) {
@@ -78,16 +78,16 @@ func secretsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// List all secrets.
-		secrets, err := sHandler.List()
+		sec, err := sHandler.List()
 
-		js, err := json.Marshal(secrets)
+		js, err := json.Marshal(sec)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(js)
+		_, _ = w.Write(js)
 		return
 	} else if r.Method == http.MethodPost {
 		// Encode / Decode the 'data' field of a secret.
@@ -121,7 +121,7 @@ func secretsHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			w.Header().Set("Content-Type", "application/json")
-			w.Write(js)
+			_, _ = w.Write(js)
 			return
 		}
 
@@ -140,7 +140,7 @@ func secretsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(js)
+		_, _ = w.Write(js)
 		return
 	} else if r.Method == http.MethodPut {
 		if *disableLoadSecrets {
@@ -180,36 +180,9 @@ func secretsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(js)
+		_, _ = w.Write(js)
 		return
 	}
 
 	http.Error(w, "invalid method", http.StatusInternalServerError)
-}
-
-func base64Handler(w http.ResponseWriter, r *http.Request) {
-	data := struct {
-		Secret string `json:"secret"`
-		Encode bool   `json:"encode"`
-	}{
-		"",
-		false,
-	}
-
-	err := json.NewDecoder(r.Body).Decode(&data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// TODO: Encode/Decode secret data
-
-	js, err := json.Marshal(data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
 }

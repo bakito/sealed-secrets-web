@@ -57,7 +57,7 @@ func main() {
 	// We are using the same flags as the kubeseal command-line tool.
 	// The flags are passed to the kubeseal client to seal the secrets.
 	flag.Parse()
-	goflag.CommandLine.Parse([]string{})
+	_ = goflag.CommandLine.Parse([]string{})
 
 	if *printVersion {
 		v, err := version.Print("sealed secrets web")
@@ -79,7 +79,6 @@ func main() {
 	http.HandleFunc("/_health", healthHandler)
 	http.HandleFunc("/api/seal", sealHandler)
 	http.HandleFunc("/api/secrets", secretsHandler)
-	http.HandleFunc("/api/base64", base64Handler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 

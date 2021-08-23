@@ -26,7 +26,7 @@ func NewHandler(clientConfig clientcmd.ClientConfig, outputFormat string) (*Hand
 		return nil, err
 	}
 
-	ssClient, err := ssClient.NewForConfig(conf)
+	ssCl, err := ssClient.NewForConfig(conf)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func NewHandler(clientConfig clientcmd.ClientConfig, outputFormat string) (*Hand
 	return &Handler{
 		clientConfig: clientConfig,
 		outputFormat: outputFormat,
-		ssClient:     ssClient,
+		ssClient:     ssCl,
 		restClient:   restClient,
 	}, nil
 }
