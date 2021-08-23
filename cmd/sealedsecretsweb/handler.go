@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/ricoberger/sealed-secrets-web/pkg/secrets"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {

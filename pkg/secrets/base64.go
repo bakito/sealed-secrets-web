@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // Encode encodes the data field in a secret.
@@ -17,26 +17,26 @@ func (h *Handler) Encode(data string) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-
-		for key, value := range secretData["data"].(map[interface{}]interface{}) {
-			secretData["data"].(map[interface{}]interface{})[key] = base64.StdEncoding.EncodeToString([]byte(value.(string)))
-		}
-
+		encodeData(secretData)
 		return yaml.Marshal(secretData)
 	} else if h.outputFormat == "json" {
 		err := json.Unmarshal([]byte(data), &secretData)
 		if err != nil {
 			return nil, err
 		}
-
-		for key, value := range secretData["data"].(map[string]interface{}) {
-			secretData["data"].(map[string]interface{})[key] = base64.StdEncoding.EncodeToString([]byte(value.(string)))
-		}
-
-		return json.Marshal(secretData)
+		encodeData(secretData)
+		return json.MarshalIndent(secretData, "", "  ")
 	}
 
 	return nil, fmt.Errorf("unsupported output format: %s", h.outputFormat)
+}
+
+func encodeData(secretData map[string]interface{}) {
+	secretData["data"] = make(map[string]interface{})
+	for key, value := range secretData["stringData"].(map[string]interface{}) {
+		secretData["data"].(map[string]interface{})[key] = base64.StdEncoding.EncodeToString([]byte(value.(string)))
+	}
+	delete(secretData, "stringData")
 }
 
 // Decode decodes the data field in a secret.
@@ -49,13 +49,8 @@ func (h *Handler) Decode(data string) ([]byte, error) {
 			return nil, err
 		}
 
-		for key, value := range secretData["data"].(map[interface{}]interface{}) {
-			decoded, err := base64.StdEncoding.DecodeString(value.(string))
-			if err != nil {
-				return nil, err
-			}
-
-			secretData["data"].(map[interface{}]interface{})[key] = string(decoded)
+		if err = decodeData(secretData); err != nil {
+			return nil, err
 		}
 
 		return yaml.Marshal(secretData)
@@ -65,17 +60,25 @@ func (h *Handler) Decode(data string) ([]byte, error) {
 			return nil, err
 		}
 
-		for key, value := range secretData["data"].(map[string]interface{}) {
-			decoded, err := base64.StdEncoding.DecodeString(value.(string))
-			if err != nil {
-				return nil, err
-			}
-
-			secretData["data"].(map[string]interface{})[key] = string(decoded)
+		if err = decodeData(secretData); err != nil {
+			return nil, err
 		}
 
-		return json.Marshal(secretData)
+		return json.MarshalIndent(secretData, "", "  ")
 	}
 
 	return nil, fmt.Errorf("unsupported output format: %s", h.outputFormat)
+}
+
+func decodeData(secretData map[string]interface{}) error {
+	secretData["stringData"] = make(map[string]interface{})
+	for key, value := range secretData["data"].(map[string]interface{}) {
+		decoded, err := base64.StdEncoding.DecodeString(value.(string))
+		if err != nil {
+			return err
+		}
+		secretData["stringData"].(map[string]interface{})[key] = string(decoded)
+	}
+	delete(secretData, "data")
+	return nil
 }

@@ -103,7 +103,7 @@ metadata:
   name: mysecretname
   namespace: mysecretnamespace
 # All fields in the 'data' section will be encoded, decoded or encryped.
-data:
+stringData:
   username: admin
   password: admin
   values.yaml: |
@@ -122,7 +122,7 @@ type: Opaque`
     "name": "mysecretname",
     "namespace": "mysecretnamespace"
   },
-  "data": {
+  "stringData": {
     "username": "admin",
     "password": "admin",
     "values.yaml": "\\"secretName\\": \\"mysecretname\\", \\"secretValue\\": \\"mysecretvalue\\", \\"subSecrets\\": {\\"key\\": \\"value\\"}"
