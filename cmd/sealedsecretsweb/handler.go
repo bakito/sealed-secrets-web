@@ -7,6 +7,7 @@ import (
 
 	"github.com/ricoberger/sealed-secrets-web/pkg/secrets"
 	"gopkg.in/yaml.v3"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 func healthHandler(w http.ResponseWriter, _ *http.Request) {
@@ -45,15 +46,23 @@ func sealHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("kubeseal error: %s\n\n%s", err.Error(), string(ss)), http.StatusBadRequest)
 		return
 	}
+	// unmarshal result to json
+	sec := make(map[string]interface{})
+	if err := json.Unmarshal(ss, &sec); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	removeFieldIfNull(sec, "metadata", "creationTimestamp")
+	removeFieldIfNull(sec, "spec", "template", "data")
+	removeFieldIfNull(sec, "spec", "template", "metadata", "creationTimestamp")
 
 	if *outputFormat == "yaml" {
-		// unmarshal result to json
-		sec := make(map[string]interface{})
-		if err := json.Unmarshal(ss, &sec); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
 		// marshal to yaml
 		if ss, err = yaml.Marshal(sec); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	} else {
+		if ss, err = json.MarshalIndent(sec, "", "  "); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
@@ -68,6 +77,18 @@ func sealHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	_, _ = w.Write(js)
+}
+
+func removeFieldIfNull(sec map[string]interface{}, fields ...string) {
+	path := fields[:len(fields)-1]
+	name := fields[len(fields)-1]
+	if m, ok, _ := unstructured.NestedMap(sec, path...); ok {
+		f := m[name]
+		if f == nil {
+			delete(m, name)
+			_ = unstructured.SetNestedMap(sec, m, path...)
+		}
+	}
 }
 
 func secretsHandler(w http.ResponseWriter, r *http.Request) {
