@@ -228,7 +228,7 @@ type: Opaque`
           });
         },
         encode() {
-          axios.post('{{.WebExternalUrl}}/api/secrets', {encode: true, secret: this.editor1Content}).then(res => {
+          axios.post('{{.WebExternalUrl}}/api/encode', {secret: this.editor1Content}).then(res => {
             this.editor1Content = res.data.secret
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {
@@ -236,7 +236,7 @@ type: Opaque`
           });
         },
         decode() {
-          axios.post('{{.WebExternalUrl}}/api/secrets', {encode: false, secret: this.editor1Content}).then(res => {
+          axios.post('{{.WebExternalUrl}}/api/decode', {secret: this.editor1Content}).then(res => {
             this.editor1Content = res.data.secret
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {
