@@ -38,7 +38,8 @@ WORKDIR /opt/go
 
 LABEL maintainer="bakito <github@bakito.ch>"
 EXPOSE 8080
-ENTRYPOINT ["/opt/go/sealed-secrets-web"]
+RUN apk add --no-cache dumb-init
+ENTRYPOINT ["/usr/bin/dumb-init", "--","/opt/go/sealed-secrets-web"]
 COPY --from=builder /go/src/app/sealed-secrets-web /opt/go/sealed-secrets-web
 COPY --from=builder /tmp/kubeseal /usr/local/bin/kubeseal
 USER 1001

@@ -37,8 +37,6 @@ var (
 	static      embed.FS
 	staticFS, _ = fs.Sub(static, "static")
 
-	port = 8080
-
 	clientConfig clientcmd.ClientConfig
 
 	disableLoadSecrets = flag.Bool("disable-load-secrets", false, "Disable the loading of existing secrets")
@@ -47,6 +45,7 @@ var (
 	initialSecretFile  = flag.String("initial-secret-file", "", "Define a file with the initial secret to be displayed. If empty, defaults are used.")
 	webExternalUrl     = flag.String("web-external-url", "", "The URL under which the Sealed Secrets Web Interface is externally reachable (for example, if it is served via a reverse proxy).")
 	printVersion       = flag.Bool("version", false, "Print version information and exit")
+	port               = flag.Int("port", 8080, "Define the port to run the application on. (default: 8080)")
 )
 
 func init() {
@@ -99,8 +98,8 @@ func main() {
 	api.GET("/secrets", sHandler.AllSecrets)
 
 	r.NoRoute(h.RedirectToIndex)
-	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, port)
-	_ = r.Run(fmt.Sprintf(":%d", port))
+	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, *port)
+	_ = r.Run(fmt.Sprintf(":%d", *port))
 }
 
 func renderIndexHTML(outputFormat string, disableLoadSecrets bool, webExternalUrl string) (string, error) {

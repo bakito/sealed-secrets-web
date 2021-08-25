@@ -25,6 +25,11 @@ type Handler struct {
 
 // NewHandler creates a new secrets handler.
 func NewHandler(clientConfig clientcmd.ClientConfig, outputFormat string, disableLoadSecrets bool) (*Handler, error) {
+	if disableLoadSecrets {
+		return &Handler{
+			disableLoadSecrets: disableLoadSecrets,
+		}, nil
+	}
 	conf, err := clientConfig.ClientConfig()
 	if err != nil {
 		return nil, err
@@ -51,13 +56,14 @@ func NewHandler(clientConfig clientcmd.ClientConfig, outputFormat string, disabl
 
 // List returns a list of all secrets.
 func (h *Handler) List() (map[string]interface{}, error) {
+	secrets := make(map[string]interface{})
+	if h.disableLoadSecrets {
+		return secrets, nil
+	}
 	ssList, err := h.ssClient.SealedSecrets("").List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
-
-	var secrets map[string]interface{}
-	secrets = make(map[string]interface{})
 
 	for _, item := range ssList.Items {
 		secrets[item.Name] = item.Namespace
@@ -68,6 +74,9 @@ func (h *Handler) List() (map[string]interface{}, error) {
 
 // GetSecret returns a secret by name in the given namespace.
 func (h *Handler) GetSecret(namespace, name string) ([]byte, error) {
+	if h.disableLoadSecrets {
+		return nil, nil
+	}
 	secret, err := h.restClient.Secrets(namespace).Get(name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -84,8 +93,7 @@ func (h *Handler) GetSecret(namespace, name string) ([]byte, error) {
 	}
 
 	if strings.EqualFold(h.outputFormat, "yaml") {
-		var secretMap map[string]interface{}
-		secretMap = make(map[string]interface{})
+		secretMap := make(map[string]interface{})
 
 		err = json.Unmarshal(jsonData, &secretMap)
 		if err != nil {
