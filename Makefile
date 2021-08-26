@@ -88,3 +88,18 @@ release-patch:
 	git pull
 	git tag -a $(PATCHVERSION) -m 'release $(PATCHVERSION)'
 	git push origin --tags
+
+
+
+release: semver
+	@version=$$(semver); \
+	git tag -s $$version -m"Release $$version"
+	goreleaser --rm-dist
+
+test-release:
+	goreleaser --skip-publish --snapshot --rm-dist
+
+semver:
+ifeq (, $(shell which semver))
+ $(shell go get -u github.com/bakito/semver)
+endif
