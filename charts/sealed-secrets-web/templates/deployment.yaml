@@ -23,7 +23,7 @@ spec:
       serviceAccountName: {{ template "sealed-secrets-web.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             {{- toYaml .Values.image.args | nindent 12 }}

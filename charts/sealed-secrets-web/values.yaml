@@ -2,7 +2,8 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/bakito/sealed-secrets-web
-  tag: v2.5.0-rc1
+  # default version .Chart.AppVersion
+  tag:
   pullPolicy: IfNotPresent
   args: []
 

@@ -1,6 +1,6 @@
 before:
   hooks:
-    - helm package ./helm/example-batch-job-controller/ --version v{{ .Version }} --app-version v{{ .Version }} -d ./
+    - helm package ./charts/sealed-secrets-web/ --version v{{ .Version }} --app-version v{{ .Version }} -d {{ .Env.CR_PACKAGE_PATH }}
 builds:
   - skip: true
     main: ./main.go
