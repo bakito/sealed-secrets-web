@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: ricoberger/sealed-secrets-web
-  tag: 2.4.0
+  repository: ghcr.io/bakito/sealed-secrets-web
+  tag: 2.5.0
   pullPolicy: IfNotPresent
   args: []
 

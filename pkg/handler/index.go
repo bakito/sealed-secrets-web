@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ricoberger/sealed-secrets-web/pkg/marshal"
-	"github.com/ricoberger/sealed-secrets-web/pkg/version"
+	"github.com/bakito/sealed-secrets-web/pkg/marshal"
+	"github.com/bakito/sealed-secrets-web/pkg/version"
 	"net/http"
 )
 

@@ -28,7 +28,7 @@ RUN export KUBESEAL_VERSION=$(cat /tmp/go.mod  | grep github.com/bitnami-labs/se
 
 ADD . /go/src/app/
 
-RUN go build -a -installsuffix cgo -ldflags="-w -s -X github.com/ricoberger/sealed-secrets-web/pkg/version.Version=${VERSION} -X github.com/ricoberger/sealed-secrets-web/pkg/version.Build=${BUILD}" -o sealed-secrets-web . && \
+RUN go build -a -installsuffix cgo -ldflags="-w -s -X github.com/bakito/sealed-secrets-web/pkg/version.Version=${VERSION} -X github.com/bakito/sealed-secrets-web/pkg/version.Build=${BUILD}" -o sealed-secrets-web . && \
     upx -q sealed-secrets-web
 
 

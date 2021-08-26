@@ -16,11 +16,11 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ricoberger/sealed-secrets-web/pkg/handler"
-	"github.com/ricoberger/sealed-secrets-web/pkg/marshal"
-	"github.com/ricoberger/sealed-secrets-web/pkg/seal"
-	"github.com/ricoberger/sealed-secrets-web/pkg/secrets"
-	"github.com/ricoberger/sealed-secrets-web/pkg/version"
+	"github.com/bakito/sealed-secrets-web/pkg/handler"
+	"github.com/bakito/sealed-secrets-web/pkg/marshal"
+	"github.com/bakito/sealed-secrets-web/pkg/seal"
+	"github.com/bakito/sealed-secrets-web/pkg/secrets"
+	"github.com/bakito/sealed-secrets-web/pkg/version"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 )

@@ -4,7 +4,7 @@ BRANCH       ?= $(shell git rev-parse --abbrev-ref HEAD)
 BUILDTIME    ?= $(shell date '+%Y%m%d-%H:%M:%S')
 BUILDUSER    ?= $(shell id -un)
 PWD          ?= $(shell pwd)
-REPO         ?= github.com/ricoberger/sealed-secrets-web
+REPO         ?= github.com/bakito/sealed-secrets-web
 REVISION     ?= $(shell git rev-parse HEAD)
 VERSION      ?= $(shell git describe --tags)
 
@@ -61,9 +61,9 @@ docker-build: build-linux-amd64
 docker-publish:
 	for target in $(WHAT); do \
 		docker tag $$target:${VERSION} ricoberger/sealed-secrets-web:${VERSION}; \
-		docker tag $$target:${VERSION} docker.pkg.github.com/ricoberger/sealed-secrets-web/sealed-secrets-web:${VERSION}; \
+		docker tag $$target:${VERSION} docker.pkg.github.com/bakito/sealed-secrets-web/sealed-secrets-web:${VERSION}; \
 		docker push ricoberger/sealed-secrets-web:${VERSION}; \
-		docker push docker.pkg.github.com/ricoberger/sealed-secrets-web/sealed-secrets-web:${VERSION}; \
+		docker push docker.pkg.github.com/bakito/sealed-secrets-web/sealed-secrets-web:${VERSION}; \
 	done
 
 release: clean docker-build docker-publish
