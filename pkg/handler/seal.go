@@ -15,13 +15,13 @@ type secret struct {
 func (h *Handler) Seal(c *gin.Context) {
 	data := &secret{}
 	if err := c.ShouldBindJSON(&data); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ss, err := h.seal(data.Secret)
+	ss, err := h.sealer.Secret(data.Secret)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	// unmarshal result to json

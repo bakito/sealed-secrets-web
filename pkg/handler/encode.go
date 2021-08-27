@@ -2,9 +2,10 @@ package handler
 
 import (
 	"encoding/base64"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"net/http"
 )
 
 func (h *Handler) Encode(c *gin.Context) {

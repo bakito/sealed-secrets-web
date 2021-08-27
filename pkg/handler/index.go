@@ -1,23 +1,25 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/bakito/sealed-secrets-web/pkg/marshal"
-	"github.com/bakito/sealed-secrets-web/pkg/version"
 	"net/http"
+
+	"github.com/bakito/sealed-secrets-web/pkg/marshal"
+	"github.com/bakito/sealed-secrets-web/pkg/seal"
+	"github.com/bakito/sealed-secrets-web/pkg/version"
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	seal               func(secret string) ([]byte, error)
+	sealer             seal.Sealer
 	indexHTML          string
 	disableLoadSecrets bool
 	marshaller         marshal.Marshaller
 }
 
-func New(indexHTML string, marshaller marshal.Marshaller, sealer func(secret string) ([]byte, error)) *Handler {
+func New(indexHTML string, marshaller marshal.Marshaller, sealer seal.Sealer) *Handler {
 	return &Handler{
 		marshaller: marshaller,
-		seal:       sealer,
+		sealer:     sealer,
 		indexHTML:  indexHTML,
 	}
 }

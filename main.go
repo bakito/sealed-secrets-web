@@ -67,7 +67,7 @@ func main() {
 	}
 
 	m := marshal.For(*outputFormat)
-	sealer := seal.With(*kubesealArgs)
+	sealer := seal.New(*kubesealArgs)
 
 	indexHTML, err := renderIndexHTML(*outputFormat, *disableLoadSecrets, *webExternalUrl)
 	if err != nil {
@@ -91,6 +91,7 @@ func main() {
 
 	api.GET("/version", h.Version)
 	api.POST("/seal", h.Seal)
+	api.POST("/raw", h.Raw)
 	api.POST("/encode", h.Encode)
 	api.POST("/decode", h.Decode)
 
