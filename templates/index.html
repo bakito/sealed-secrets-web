@@ -24,10 +24,10 @@
   <meta name="msapplication-TileImage" content="{{.WebExternalUrl}}/static/icons/ms-icon-144x144.png">
   <meta name="theme-color" content="#ffffff">
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css">
+  <link rel="stylesheet" href="{{.WebExternalUrl}}/static/styles/roboto.css">
+  <link rel="stylesheet" href="{{.WebExternalUrl}}/static/styles/material-icons.css">
+  <link rel="stylesheet" href="{{.WebExternalUrl}}/static/styles/materialdesignicons.css">
+  <link rel="stylesheet" href="{{.WebExternalUrl}}/static/styles/vuetify.min.css">
 </head>
 <body>
   <div id="app">
@@ -97,9 +97,9 @@
     </v-app>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="{{.WebExternalUrl}}/static/scripts/vue.min.js"></script>
+  <script src="{{.WebExternalUrl}}/static/scripts/vuetify.min.js"></script>
+  <script src="{{.WebExternalUrl}}/static/scripts/axios.min.js"></script>
   <script src="{{.WebExternalUrl}}/static/ace/ace.js"></script>
   <script>
     const INITIAL_SECRET = "{{.InitialSecret}}"
