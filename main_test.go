@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -8,24 +9,43 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/bakito/sealed-secrets-web/pkg/mocks/core"
+	"github.com/bakito/sealed-secrets-web/pkg/mocks/ssclient"
+	"github.com/bitnami-labs/sealed-secrets/pkg/apis/sealed-secrets/v1alpha1"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var _ = Describe("Main", func() {
 
 	Context("the router is initialized successfully", func() {
 		var (
-			w      *httptest.ResponseRecorder
-			router *gin.Engine
+			name         string
+			namespace    string
+			w            *httptest.ResponseRecorder
+			router       *gin.Engine
+			mock         *gomock.Controller
+			alpha1Client *ssclient.MockBitnamiV1alpha1Interface
+			ssClient     *ssclient.MockSealedSecretInterface
+			coreClient   *core.MockCoreV1Interface
+			secrets      *core.MockSecretInterface
 		)
 
 		BeforeEach(func() {
+			name = uuid.NewString()
+			namespace = uuid.NewString()
 			w = httptest.NewRecorder()
 			format := "yaml"
 			outputFormat = &format
-			disabled := true
-			disableLoadSecrets = &disabled
-			router = setupRouter()
+			mock = gomock.NewController(GinkgoT())
+			alpha1Client = ssclient.NewMockBitnamiV1alpha1Interface(mock)
+			ssClient = ssclient.NewMockSealedSecretInterface(mock)
+			coreClient = core.NewMockCoreV1Interface(mock)
+			secrets = core.NewMockSecretInterface(mock)
+			router = setupRouter(coreClient, alpha1Client)
 		})
 		It("return OK on health", func() {
 			req, _ := http.NewRequest("GET", "/_health", nil)
@@ -67,11 +87,41 @@ var _ = Describe("Main", func() {
 			Ω(w.Body.String()).Should(Equal(encodeBody))
 		})
 
-		It("decode secrets endpoints are disabled", func() {
+		It("list sealed secrets", func() {
+			alpha1Client.EXPECT().SealedSecrets("").Return(ssClient)
+			ssClient.EXPECT().List(gomock.Any()).Return(&v1alpha1.SealedSecretList{
+				Items: []v1alpha1.SealedSecret{
+					{
+						ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Name: name},
+						Spec:       v1alpha1.SealedSecretSpec{Template: v1alpha1.SecretTemplateSpec{}},
+					},
+				},
+			}, nil)
+			req, _ := http.NewRequest("GET", "/api/secrets", nil)
+			router.ServeHTTP(w, req)
+			Ω(w.Code).Should(Equal(200))
+			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{"%s":"%s"}`, name, namespace)))
+		})
+
+		It("list secret of namespace", func() {
+			coreClient.EXPECT().Secrets(namespace).Return(secrets)
+			secrets.EXPECT().Get(name, gomock.Any()).Return(&corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Name: name},
+			}, nil)
+			req, _ := http.NewRequest("GET", fmt.Sprintf("/api/secret/%s/%s", namespace, name), nil)
+			router.ServeHTTP(w, req)
+			Ω(w.Code).Should(Equal(200))
+			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{"secret":"apiVersion: v1\nkind: Secret\nmetadata:\n    creationTimestamp: null\n    name: %s\n    namespace: %s\n"}`, name, namespace)))
+		})
+
+		It("secrets endpoints are disabled", func() {
+			disabled := true
+			disableLoadSecrets = &disabled
+			router = setupRouter(coreClient, alpha1Client)
 			req, _ := http.NewRequest("GET", "/api/secrets", nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(403))
-			req, _ = http.NewRequest("GET", "/api/secrets/namespace/name", nil)
+			req, _ = http.NewRequest("GET", "/api/secret/namespace/name", nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(403))
 		})

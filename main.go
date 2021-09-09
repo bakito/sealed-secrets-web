@@ -19,7 +19,9 @@ import (
 	"github.com/bakito/sealed-secrets-web/pkg/seal"
 	"github.com/bakito/sealed-secrets-web/pkg/secrets"
 	"github.com/bakito/sealed-secrets-web/pkg/version"
+	ssClient "github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealed-secrets/v1alpha1"
 	"github.com/gin-gonic/gin"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -65,11 +67,16 @@ func main() {
 		return
 	}
 
+	coreClient, ssClient, err := secrets.BuildClients(clientConfig, *disableLoadSecrets)
+	if err != nil {
+		log.Fatalf("Could build k8s clients:%v", err.Error())
+	}
+
 	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, *port)
-	_ = setupRouter().Run(fmt.Sprintf(":%d", *port))
+	_ = setupRouter(coreClient, ssClient).Run(fmt.Sprintf(":%d", *port))
 }
 
-func setupRouter() *gin.Engine {
+func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1alpha1Interface) *gin.Engine {
 	m := marshal.For(*outputFormat)
 	sealer := seal.New(*kubesealArgs)
 
@@ -77,7 +84,8 @@ func setupRouter() *gin.Engine {
 	if err != nil {
 		log.Fatalf("Could not render the index html template: %s", err.Error())
 	}
-	sHandler, err := secrets.NewHandler(clientConfig, *outputFormat, *disableLoadSecrets)
+
+	sHandler, err := secrets.NewHandler(coreClient, ssClient, *outputFormat, *disableLoadSecrets)
 	if err != nil {
 		log.Fatalf("Could not initialize secrets handler: %s", err.Error())
 	}

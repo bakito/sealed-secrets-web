@@ -14,42 +14,45 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// Handler handles our secrets operations.
-type Handler struct {
-	clientConfig       clientcmd.ClientConfig
-	outputFormat       string
-	restClient         *corev1.CoreV1Client
-	ssClient           *ssClient.BitnamiV1alpha1Client
-	disableLoadSecrets bool
-}
-
-// NewHandler creates a new secrets handler.
-func NewHandler(clientConfig clientcmd.ClientConfig, outputFormat string, disableLoadSecrets bool) (*Handler, error) {
+// BuildClients build the  k82 clients
+func BuildClients(clientConfig clientcmd.ClientConfig, disableLoadSecrets bool) (corev1.CoreV1Interface, ssClient.BitnamiV1alpha1Interface, error) {
 	if disableLoadSecrets {
-		return &Handler{
-			disableLoadSecrets: disableLoadSecrets,
-		}, nil
+		return nil, nil, nil
 	}
 	conf, err := clientConfig.ClientConfig()
 	if err != nil {
-		return nil, err
-	}
-
-	ssCl, err := ssClient.NewForConfig(conf)
-	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	restClient, err := corev1.NewForConfig(conf)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
+	ssCl, err := ssClient.NewForConfig(conf)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return restClient, ssCl, nil
+
+}
+
+// Handler handles our secrets operations.
+type Handler struct {
+	clientConfig       clientcmd.ClientConfig
+	outputFormat       string
+	coreClient         corev1.CoreV1Interface
+	ssClient           ssClient.BitnamiV1alpha1Interface
+	disableLoadSecrets bool
+}
+
+// NewHandler creates a new secrets handler.
+func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, outputFormat string, disableLoadSecrets bool) (*Handler, error) {
 	return &Handler{
-		clientConfig:       clientConfig,
 		outputFormat:       outputFormat,
 		ssClient:           ssCl,
-		restClient:         restClient,
+		coreClient:         coreClient,
 		disableLoadSecrets: disableLoadSecrets,
 	}, nil
 }
@@ -77,7 +80,7 @@ func (h *Handler) GetSecret(namespace, name string) ([]byte, error) {
 	if h.disableLoadSecrets {
 		return nil, nil
 	}
-	secret, err := h.restClient.Secrets(namespace).Get(name, metav1.GetOptions{})
+	secret, err := h.coreClient.Secrets(namespace).Get(name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
