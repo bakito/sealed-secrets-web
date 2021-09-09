@@ -31,9 +31,7 @@ func (h *Handler) Seal(c *gin.Context) {
 		return
 	}
 
-	removeFieldIfNull(sec, "metadata", "creationTimestamp")
-	removeFieldIfNull(sec, "spec", "template", "data")
-	removeFieldIfNull(sec, "spec", "template", "metadata", "creationTimestamp")
+	removeNullFields(sec)
 
 	if ss, err = h.marshaller.Marshal(sec); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -42,6 +40,12 @@ func (h *Handler) Seal(c *gin.Context) {
 
 	data.Secret = string(ss)
 	c.JSON(http.StatusOK, data)
+}
+
+func removeNullFields(sec map[string]interface{}) {
+	removeFieldIfNull(sec, "metadata", "creationTimestamp")
+	removeFieldIfNull(sec, "spec", "template", "data")
+	removeFieldIfNull(sec, "spec", "template", "metadata", "creationTimestamp")
 }
 
 func removeFieldIfNull(sec map[string]interface{}, fields ...string) {
