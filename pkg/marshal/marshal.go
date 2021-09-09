@@ -1,6 +1,7 @@
 package marshal
 
 import (
+	"bytes"
 	"encoding/json"
 	"gopkg.in/yaml.v3"
 	"strings"
@@ -21,7 +22,11 @@ func For(format string) Marshaller {
 type yamlMarshaller struct{}
 
 func (m yamlMarshaller) Marshal(in interface{}) ([]byte, error) {
-	return yaml.Marshal(in)
+	var b bytes.Buffer
+	yamlEncoder := yaml.NewEncoder(&b)
+	yamlEncoder.SetIndent(2)
+	err := yamlEncoder.Encode(in)
+	return b.Bytes(), err
 }
 
 func (m yamlMarshaller) Unmarshal(in []byte, out interface{}) error {
