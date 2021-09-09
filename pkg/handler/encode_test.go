@@ -7,7 +7,6 @@ import (
 
 var _ = Describe("Encode", func() {
 	Context("encodeData", func() {
-
 		It("should convert stringData to data and decode the values", func() {
 			secretData := map[string]interface{}{
 				"stringData": map[string]interface{}{

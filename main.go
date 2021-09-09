@@ -1,19 +1,18 @@
 package main
 
 import (
-	_ "embed"
-	"flag"
-	"io/ioutil"
-	"strings"
-
 	"bytes"
 	"embed"
+	_ "embed"
+	"flag"
 	"fmt"
 	"html/template"
 	"io/fs"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/bakito/sealed-secrets-web/pkg/handler"
 	"github.com/bakito/sealed-secrets-web/pkg/marshal"
@@ -66,6 +65,11 @@ func main() {
 		return
 	}
 
+	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, *port)
+	_ = setupRouter().Run(fmt.Sprintf(":%d", *port))
+}
+
+func setupRouter() *gin.Engine {
 	m := marshal.For(*outputFormat)
 	sealer := seal.New(*kubesealArgs)
 
@@ -78,10 +82,9 @@ func main() {
 		log.Fatalf("Could not initialize secrets handler: %s", err.Error())
 	}
 
-	h := handler.New(indexHTML, m, sealer)
-
 	r := gin.New()
 	r.Use(gin.Recovery())
+	h := handler.New(indexHTML, m, sealer)
 
 	r.GET("/", h.Index)
 	r.StaticFS("/static", http.FS(staticFS))
@@ -99,8 +102,7 @@ func main() {
 	api.GET("/secrets", sHandler.AllSecrets)
 
 	r.NoRoute(h.RedirectToIndex)
-	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, *port)
-	_ = r.Run(fmt.Sprintf(":%d", *port))
+	return r
 }
 
 func renderIndexHTML(outputFormat string, disableLoadSecrets bool, webExternalUrl string) (string, error) {
