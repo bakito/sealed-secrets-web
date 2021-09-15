@@ -1,0 +1,33 @@
+kubesealArgs:
+  - "--cert=testdata/cert.pem"
+
+web:
+  port: 8080
+  externalUrl:
+outputFormat: yaml
+
+disableLoadSecrets: false
+initialSecret: |
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: mysecretname
+    namespace: mysecretnamespace
+  stringData:
+    username: admin
+    password: admin
+  type: Opaque
+
+fieldFilter:
+  skip:
+    - [ "metadata", "creationTimestamp" ]
+    - [ "metadata", "managedFields" ]
+    - [ "metadata", "resourceVersion" ]
+    - [ "metadata", "selfLink" ]
+    - [ "metadata", "uid" ]
+    - [ "metadata", "annotations", "kubectl.kubernetes.io/last-applied-configuration" ]
+  skipIfNil:
+    - [ "metadata", "creationTimestamp" ]
+    - [ "spec", "template", "data" ]
+    - [ "spec", "template", "metadata", "creationTimestamp" ]
+

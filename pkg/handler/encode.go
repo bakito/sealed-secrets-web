@@ -25,13 +25,16 @@ func (h *Handler) Encode(c *gin.Context) {
 }
 
 func (h *Handler) encode(data string) ([]byte, error) {
-	secretData := make(map[string]interface{})
-	if err := h.marshaller.Unmarshal([]byte(data), &secretData); err != nil {
+	sec := make(map[string]interface{})
+	if err := h.marshaller.Unmarshal([]byte(data), &sec); err != nil {
 		return nil, err
 	}
-	encodeData(secretData)
 
-	return h.marshaller.Marshal(secretData)
+	h.filter.Apply(sec)
+
+	encodeData(sec)
+
+	return h.marshaller.Marshal(sec)
 }
 
 func encodeData(secretData map[string]interface{}) {

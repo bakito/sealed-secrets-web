@@ -4,18 +4,16 @@ import (
 	"bytes"
 	"embed"
 	_ "embed"
-	"flag"
 	"fmt"
 	"html/template"
 	"io/fs"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 
+	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/handler"
-	"github.com/bakito/sealed-secrets-web/pkg/marshal"
 	"github.com/bakito/sealed-secrets-web/pkg/seal"
 	"github.com/bakito/sealed-secrets-web/pkg/secrets"
 	"github.com/bakito/sealed-secrets-web/pkg/version"
@@ -39,14 +37,6 @@ var (
 	staticFS, _ = fs.Sub(static, "static")
 
 	clientConfig clientcmd.ClientConfig
-
-	disableLoadSecrets = flag.Bool("disable-load-secrets", false, "Disable the loading of existing secrets")
-	kubesealArgs       = flag.String("kubeseal-arguments", "", "Arguments which are passed to kubeseal")
-	outputFormat       = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
-	initialSecretFile  = flag.String("initial-secret-file", "", "Define a file with the initial secret to be displayed. If empty, defaults are used.")
-	webExternalUrl     = flag.String("web-external-url", "", "The URL under which the Sealed Secrets Web Interface is externally reachable (for example, if it is served via a reverse proxy).")
-	printVersion       = flag.Bool("version", false, "Print version information and exit")
-	port               = flag.Int("port", 8080, "Define the port to run the application on. (default: 8080)")
 )
 
 func init() {
@@ -58,41 +48,45 @@ func init() {
 	overrides := clientcmd.ConfigOverrides{}
 	clientConfig = clientcmd.NewInteractiveDeferredLoadingClientConfig(loadingRules, &overrides, os.Stdin)
 }
+
 func main() {
 
-	flag.Parse()
+	cfg, err := config.Parse()
+	if err != nil {
+		log.Fatalf("Could not read the config: %s", err.Error())
+	}
 
-	if *printVersion {
+	if cfg.PrintVersion {
 		fmt.Println(version.Print("sealed secrets web"))
 		return
 	}
 
-	coreClient, ssClient, err := secrets.BuildClients(clientConfig, *disableLoadSecrets)
+	coreClient, ssClient, err := secrets.BuildClients(clientConfig, cfg.DisableLoadSecrets)
 	if err != nil {
 		log.Fatalf("Could build k8s clients:%v", err.Error())
 	}
 
-	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, *port)
-	_ = setupRouter(coreClient, ssClient).Run(fmt.Sprintf(":%d", *port))
+	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, cfg.Web.Port)
+	_ = setupRouter(coreClient, ssClient, cfg).Run(fmt.Sprintf(":%d", cfg.Web.Port))
 }
 
-func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1alpha1Interface) *gin.Engine {
-	m := marshal.For(*outputFormat)
-	sealer := seal.New(*kubesealArgs)
+func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *gin.Engine {
 
-	indexHTML, err := renderIndexHTML(*outputFormat, *disableLoadSecrets, *webExternalUrl)
+	sealer := seal.New(cfg.KubesealArgs)
+
+	indexHTML, err := renderIndexHTML(cfg)
 	if err != nil {
 		log.Fatalf("Could not render the index html template: %s", err.Error())
 	}
 
-	sHandler, err := secrets.NewHandler(coreClient, ssClient, *outputFormat, *disableLoadSecrets)
+	sHandler, err := secrets.NewHandler(coreClient, ssClient, cfg)
 	if err != nil {
 		log.Fatalf("Could not initialize secrets handler: %s", err.Error())
 	}
 
 	r := gin.New()
 	r.Use(gin.Recovery())
-	h := handler.New(indexHTML, m, sealer)
+	h := handler.New(indexHTML, sealer, cfg)
 
 	r.GET("/", h.Index)
 	r.StaticFS("/static", http.FS(staticFS))
@@ -113,23 +107,19 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	return r
 }
 
-func renderIndexHTML(outputFormat string, disableLoadSecrets bool, webExternalUrl string) (string, error) {
+func renderIndexHTML(cfg *config.Config) (string, error) {
 	indexTmpl := template.Must(template.New("index.html").Parse(indexTemplate))
 	initialSecret := initialSecretJSON
-	if initialSecretFile != nil && strings.TrimSpace(*initialSecretFile) != "" {
-		b, err := ioutil.ReadFile(*initialSecretFile)
-		if err != nil {
-			return "", err
-		}
-		initialSecret = string(b)
-	} else if strings.EqualFold(outputFormat, "yaml") {
+	if cfg.InitialSecret != "" {
+		initialSecret = cfg.InitialSecret
+	} else if strings.EqualFold(cfg.OutputFormat, "yaml") {
 		initialSecret = initialSecretYAML
 	}
 
 	data := map[string]interface{}{
-		"OutputFormat":       outputFormat,
-		"DisableLoadSecrets": disableLoadSecrets,
-		"WebExternalUrl":     webExternalUrl,
+		"OutputFormat":       cfg.OutputFormat,
+		"DisableLoadSecrets": cfg.DisableLoadSecrets,
+		"WebExternalUrl":     cfg.Web.ExternalUrl,
 		"InitialSecret":      initialSecret,
 		"Version":            version.Version,
 	}

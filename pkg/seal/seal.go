@@ -13,14 +13,14 @@ type Sealer interface {
 }
 
 // New create a new sealer
-func New(args string) Sealer {
+func New(args []string) Sealer {
 	return &sealer{
 		args: args,
 	}
 }
 
 type sealer struct {
-	args string
+	args []string
 }
 
 func (s *sealer) Secret(secret string) ([]byte, error) {
@@ -39,7 +39,7 @@ func (s *sealer) Raw(data Raw) ([]byte, error) {
 }
 
 func (s *sealer) kubeseal(value string, additionalArgs ...string) ([]byte, error) {
-	args := strings.Split(s.args, " ")
+	args := s.args
 	args = append(args, additionalArgs...)
 	cmd := exec.Command("kubeseal", args...)
 	stdin, err := cmd.StdinPipe()

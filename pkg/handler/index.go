@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/marshal"
 	"github.com/bakito/sealed-secrets-web/pkg/seal"
 	"github.com/bakito/sealed-secrets-web/pkg/version"
@@ -14,13 +15,15 @@ type Handler struct {
 	indexHTML          string
 	disableLoadSecrets bool
 	marshaller         marshal.Marshaller
+	filter             *config.FieldFilter
 }
 
-func New(indexHTML string, marshaller marshal.Marshaller, sealer seal.Sealer) *Handler {
+func New(indexHTML string, sealer seal.Sealer, cfg *config.Config) *Handler {
 	return &Handler{
-		marshaller: marshaller,
+		marshaller: cfg.Marshaller,
 		sealer:     sealer,
 		indexHTML:  indexHTML,
+		filter:     cfg.FieldFilter,
 	}
 }
 

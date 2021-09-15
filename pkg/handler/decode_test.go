@@ -1,6 +1,7 @@
 package handler
 
 import (
+	. "github.com/bakito/sealed-secrets-web/pkg/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -19,8 +20,8 @@ var _ = Describe("Decode", func() {
 			Ω(secretData).Should(HaveKey("stringData"))
 			Ω(secretData).ShouldNot(HaveKey("data"))
 
-			Ω(subMap(secretData, "stringData")["username"]).Should(Equal("foo"))
-			Ω(subMap(secretData, "stringData")["password"]).Should(Equal("bar"))
+			Ω(SubMap(secretData, "stringData")["username"]).Should(Equal("foo"))
+			Ω(SubMap(secretData, "stringData")["password"]).Should(Equal("bar"))
 		})
 		It("should not change stringData", func() {
 			secretData := map[string]interface{}{
@@ -34,8 +35,8 @@ var _ = Describe("Decode", func() {
 			Ω(secretData).Should(HaveKey("stringData"))
 			Ω(secretData).ShouldNot(HaveKey("data"))
 
-			Ω(subMap(secretData, "stringData")["username"]).Should(Equal("foo"))
-			Ω(subMap(secretData, "stringData")["password"]).Should(Equal("bar"))
+			Ω(SubMap(secretData, "stringData")["username"]).Should(Equal("foo"))
+			Ω(SubMap(secretData, "stringData")["password"]).Should(Equal("bar"))
 		})
 	})
 })

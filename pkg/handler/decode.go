@@ -26,18 +26,20 @@ func (h *Handler) Decode(c *gin.Context) {
 
 func (h *Handler) decode(data string) ([]byte, error) {
 
-	secretData := make(map[string]interface{})
+	sec := make(map[string]interface{})
 
-	err := h.marshaller.Unmarshal([]byte(data), &secretData)
+	err := h.marshaller.Unmarshal([]byte(data), &sec)
 	if err != nil {
 		return nil, err
 	}
 
-	if err = decodeData(secretData); err != nil {
+	h.filter.Apply(sec)
+
+	if err = decodeData(sec); err != nil {
 		return nil, err
 	}
 
-	return h.marshaller.Marshal(secretData)
+	return h.marshaller.Marshal(sec)
 }
 
 func decodeData(secretData map[string]interface{}) error {

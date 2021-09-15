@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/bakito/sealed-secrets-web/pkg/config"
 	ssClient "github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealed-secrets/v1alpha1"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v3"
@@ -48,12 +49,12 @@ type Handler struct {
 }
 
 // NewHandler creates a new secrets handler.
-func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, outputFormat string, disableLoadSecrets bool) (*Handler, error) {
+func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, cfg *config.Config) (*Handler, error) {
 	return &Handler{
-		outputFormat:       outputFormat,
+		outputFormat:       cfg.OutputFormat,
 		ssClient:           ssCl,
 		coreClient:         coreClient,
-		disableLoadSecrets: disableLoadSecrets,
+		disableLoadSecrets: cfg.DisableLoadSecrets,
 	}, nil
 }
 

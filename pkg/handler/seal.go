@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 type secret struct {
@@ -31,7 +30,7 @@ func (h *Handler) Seal(c *gin.Context) {
 		return
 	}
 
-	removeNullFields(sec)
+	h.filter.Apply(sec)
 
 	if ss, err = h.marshaller.Marshal(sec); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -40,22 +39,4 @@ func (h *Handler) Seal(c *gin.Context) {
 
 	data.Secret = string(ss)
 	c.JSON(http.StatusOK, data)
-}
-
-func removeNullFields(sec map[string]interface{}) {
-	removeFieldIfNull(sec, "metadata", "creationTimestamp")
-	removeFieldIfNull(sec, "spec", "template", "data")
-	removeFieldIfNull(sec, "spec", "template", "metadata", "creationTimestamp")
-}
-
-func removeFieldIfNull(sec map[string]interface{}, fields ...string) {
-	path := fields[:len(fields)-1]
-	name := fields[len(fields)-1]
-	if m, ok, _ := unstructured.NestedMap(sec, path...); ok {
-		f := m[name]
-		if f == nil {
-			delete(m, name)
-			_ = unstructured.SetNestedMap(sec, m, path...)
-		}
-	}
 }

@@ -9,6 +9,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/bakito/sealed-secrets-web/pkg/config"
+	"github.com/bakito/sealed-secrets-web/pkg/marshal"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/core"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/ssclient"
 	"github.com/bitnami-labs/sealed-secrets/pkg/apis/sealed-secrets/v1alpha1"
@@ -32,20 +34,24 @@ var _ = Describe("Main", func() {
 			ssClient     *ssclient.MockSealedSecretInterface
 			coreClient   *core.MockCoreV1Interface
 			secrets      *core.MockSecretInterface
+			cfg          *config.Config
 		)
 
 		BeforeEach(func() {
+			cfg = &config.Config{
+				OutputFormat: "yaml",
+				FieldFilter:  &config.FieldFilter{},
+				Marshaller:   marshal.For("yaml"),
+			}
 			name = uuid.NewString()
 			namespace = uuid.NewString()
 			w = httptest.NewRecorder()
-			format := "yaml"
-			outputFormat = &format
 			mock = gomock.NewController(GinkgoT())
 			alpha1Client = ssclient.NewMockBitnamiV1alpha1Interface(mock)
 			ssClient = ssclient.NewMockSealedSecretInterface(mock)
 			coreClient = core.NewMockCoreV1Interface(mock)
 			secrets = core.NewMockSecretInterface(mock)
-			router = setupRouter(coreClient, alpha1Client)
+			router = setupRouter(coreClient, alpha1Client, cfg)
 		})
 		It("return OK on health", func() {
 			req, _ := http.NewRequest("GET", "/_health", nil)
@@ -115,9 +121,8 @@ var _ = Describe("Main", func() {
 		})
 
 		It("secrets endpoints are disabled", func() {
-			disabled := true
-			disableLoadSecrets = &disabled
-			router = setupRouter(coreClient, alpha1Client)
+			cfg.DisableLoadSecrets = true
+			router = setupRouter(coreClient, alpha1Client, cfg)
 			req, _ := http.NewRequest("GET", "/api/secrets", nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(403))

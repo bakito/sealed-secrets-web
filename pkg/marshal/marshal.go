@@ -3,8 +3,9 @@ package marshal
 import (
 	"bytes"
 	"encoding/json"
-	"gopkg.in/yaml.v3"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Marshaller interface {
