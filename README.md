@@ -21,7 +21,7 @@
 
 ```sh
 helm repo add bakito https://bakito.github.io/helm-charts
-helm up
+helm repo update
 
 helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web
 ```

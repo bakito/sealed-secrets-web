@@ -122,3 +122,6 @@ bin
 /dist
 
 gomock*
+
+mysecret.json
+mysealedsecret.json

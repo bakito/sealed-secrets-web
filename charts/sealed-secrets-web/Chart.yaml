@@ -7,4 +7,4 @@ maintainers:
   - name: bakito
     url: https://github.com/bakito
 name: sealed-secrets-web
-version: 2.5.0
+version: 2.6.0
