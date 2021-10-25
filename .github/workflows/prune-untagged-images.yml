@@ -1,0 +1,21 @@
+name: prune-images
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prune
+        uses: bakito/action-ghcr-prune@main
+        with:
+          token: ${{ secrets.PRUNE_IMAGE_TOKEN }}
+          user: bakito
+          container: sealed-secrets-web
+          dry-run: true # Dry-run first, then change to `false`
+          older-than: 7 # days
+          keep-last: 2
+          untagged: true
