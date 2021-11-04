@@ -10,10 +10,9 @@ jobs:
 
     steps:
       - name: Prune
-        uses: bakito/action-ghcr-prune@minified-user
+        uses: vlaurin/action-ghcr-prune@main
         with:
           token: ${{ secrets.PRUNE_IMAGE_TOKEN }}
-          user: bakito
           container: sealed-secrets-web
           dry-run: false # Dry-run first, then change to `false`
           older-than: 7 # days
