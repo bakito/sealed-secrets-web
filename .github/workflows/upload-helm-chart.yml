@@ -1,0 +1,45 @@
+name: Upload Helm Chart
+
+on:
+  release:
+    types:
+      - published
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+
+      - name: Build chart
+        run: |
+          VERSION=$(echo "${{github.event.release.tag_name }}" | sed 's/v//g')
+          helm package ./charts/sealed-secrets-web/ --version $VERSION --app-version v$VERSION -d dist
+
+      - name: Install chart-releaser
+        uses: engineerd/configurator@v0.0.8
+        with:
+          name: cr
+          url: https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz
+          pathInArchive: cr
+
+      - name: Upload Chart
+        run: cr upload
+        env:
+          CR_OWNER: "${{github.repository_owner}}"
+          CR_TOKEN: "${{secrets.CR_TOKEN}}"
+          CR_GIT_REPO: "helm-charts"
+          CR_PACKAGE_PATH: dist

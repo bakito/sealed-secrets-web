@@ -1,6 +1,3 @@
-before:
-  hooks:
-    - helm package ./charts/sealed-secrets-web/ --version {{ .Version }} --app-version v{{ .Version }} -d {{ .Env.CR_PACKAGE_PATH }}
 builds:
   - skip: true
     main: ./main.go
