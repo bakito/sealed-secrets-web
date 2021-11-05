@@ -56,3 +56,12 @@ jobs:
             BUILD=${{ steps.date.outputs.date }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Prune ghcr images
+        uses: vlaurin/action-ghcr-prune@main
+        with:
+          token: ${{ secrets.PRUNE_IMAGE_TOKEN }}
+          container: ${{github.event.repository.name}}
+          dry-run: false # Dry-run first, then change to `false`
+          older-than: 7 # days
+          untagged: true
