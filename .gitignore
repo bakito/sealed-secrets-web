@@ -125,3 +125,5 @@ gomock*
 
 mysecret.json
 mysealedsecret.json
+
+static/ace/ace-builds

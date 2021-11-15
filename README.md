@@ -52,8 +52,7 @@ kubectl get secret mysecret
 Then we can build the Docker image and push it to the local registry:
 
 ```sh
-make build-linux-amd64
-docker build -f cmd/sealedsecretsweb/Dockerfile -t localhost:5000/sealed-secrets-web:dev .
+docker build -f Dockerfile -t localhost:5000/sealed-secrets-web:dev .
 docker push localhost:5000/sealed-secrets-web:dev
 ```
 
