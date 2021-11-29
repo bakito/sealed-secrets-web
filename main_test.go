@@ -6,9 +6,6 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/marshal"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/core"
@@ -17,12 +14,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var _ = Describe("Main", func() {
-
 	Context("the router is initialized successfully", func() {
 		var (
 			name         string

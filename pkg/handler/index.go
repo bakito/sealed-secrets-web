@@ -11,11 +11,10 @@ import (
 )
 
 type Handler struct {
-	sealer             seal.Sealer
-	indexHTML          string
-	disableLoadSecrets bool
-	marshaller         marshal.Marshaller
-	filter             *config.FieldFilter
+	sealer     seal.Sealer
+	indexHTML  string
+	marshaller marshal.Marshaller
+	filter     *config.FieldFilter
 }
 
 func New(indexHTML string, sealer seal.Sealer, cfg *config.Config) *Handler {

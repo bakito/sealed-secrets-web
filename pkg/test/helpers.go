@@ -1,13 +1,13 @@
 package test
 
 import (
-	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega"
 )
 
 func SubMap(data map[string]interface{}, fields ...string) map[string]interface{} {
-	Ω(fields).ShouldNot(BeEmpty())
+	gomega.Ω(fields).ShouldNot(gomega.BeEmpty())
 	value := data[fields[0]]
-	Ω(value).Should(BeAssignableToTypeOf(make(map[string]interface{})))
+	gomega.Ω(value).Should(gomega.BeAssignableToTypeOf(make(map[string]interface{})))
 	sm := value.(map[string]interface{})
 	if len(fields) == 1 {
 		return sm

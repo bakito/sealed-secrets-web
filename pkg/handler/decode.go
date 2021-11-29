@@ -25,7 +25,6 @@ func (h *Handler) Decode(c *gin.Context) {
 }
 
 func (h *Handler) decode(data string) ([]byte, error) {
-
 	sec := make(map[string]interface{})
 
 	err := h.marshaller.Unmarshal([]byte(data), &sec)

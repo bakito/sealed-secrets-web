@@ -6,9 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var (
-	testConfigFile = "../../testdata/config.yaml"
-)
+var testConfigFile = "../../testdata/config.yaml"
 
 var _ = Describe("Filter", func() {
 	Context("removeNullFields", func() {

@@ -1,15 +1,10 @@
 # Run go fmt against code
 fmt:
-	go fmt ./...
-	gofmt -s -w .
+	golangci-lint run --fix
 
 # Run go vet against code
 vet:
 	go vet ./...
-
-# Run golangci-lint
-lint:
-	golangci-lint run
 
 # Run go mod tidy
 tidy:

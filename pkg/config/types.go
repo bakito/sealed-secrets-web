@@ -3,10 +3,11 @@ package config
 import (
 	"flag"
 	"fmt"
-	"github.com/bakito/sealed-secrets-web/pkg/marshal"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"strings"
+
+	"github.com/bakito/sealed-secrets-web/pkg/marshal"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -14,19 +15,18 @@ var (
 	kubesealArgs       = flag.String("kubeseal-arguments", "", "Arguments which are passed to kubeseal")
 	outputFormat       = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
 	initialSecretFile  = flag.String("initial-secret-file", "", "Define a file with the initial secret to be displayed. If empty, defaults are used.")
-	webExternalUrl     = flag.String("web-external-url", "", "The URL under which the Sealed Secrets Web Interface is externally reachable (for example, if it is served via a reverse proxy).")
+	webExternalURL     = flag.String("web-external-url", "", "The URL under which the Sealed Secrets Web Interface is externally reachable (for example, if it is served via a reverse proxy).")
 	printVersion       = flag.Bool("version", false, "Print version information and exit")
 	port               = flag.Int("port", 8080, "Define the port to run the application on. (default: 8080)")
 	config             = flag.String("config", "", "Define the config file")
 )
 
 func Parse() (*Config, error) {
-
 	flag.Parse()
 	cfg := &Config{
 		Web: Web{
 			Port:        *port,
-			ExternalUrl: *webExternalUrl,
+			ExternalURL: *webExternalURL,
 		},
 		PrintVersion:       *printVersion,
 		OutputFormat:       *outputFormat,
@@ -72,7 +72,7 @@ func Parse() (*Config, error) {
 		// Read and format the initial secret with the default marshaller
 		sec := make(map[string]interface{})
 		if err := cfg.Marshaller.Unmarshal([]byte(cfg.InitialSecret), sec); err != nil {
-			return nil, fmt.Errorf("could not parse the initial secret: %v", err)
+			return nil, fmt.Errorf("could not parse the initial secret: %w", err)
 		}
 		v, _ := cfg.Marshaller.Marshal(sec)
 		cfg.InitialSecret = string(v)
@@ -93,5 +93,5 @@ type Config struct {
 
 type Web struct {
 	Port        int    `yaml:"port"`
-	ExternalUrl string `yaml:"externalUrl"`
+	ExternalURL string `yaml:"externalUrl"`
 }

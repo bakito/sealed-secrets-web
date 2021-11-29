@@ -38,7 +38,6 @@ func (h *Handler) encode(data string) ([]byte, error) {
 }
 
 func encodeData(secretData map[string]interface{}) {
-
 	if _, ok := secretData["data"]; ok {
 		// already encoded
 		return

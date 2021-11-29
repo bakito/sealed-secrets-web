@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"embed"
-	_ "embed"
 	"fmt"
 	"html/template"
 	"io/fs"
@@ -50,7 +49,6 @@ func init() {
 }
 
 func main() {
-
 	cfg, err := config.Parse()
 	if err != nil {
 		log.Fatalf("Could not read the config: %s", err.Error())
@@ -61,17 +59,16 @@ func main() {
 		return
 	}
 
-	coreClient, ssClient, err := secrets.BuildClients(clientConfig, cfg.DisableLoadSecrets)
+	coreClient, ssc, err := secrets.BuildClients(clientConfig, cfg.DisableLoadSecrets)
 	if err != nil {
 		log.Fatalf("Could build k8s clients:%v", err.Error())
 	}
 
 	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, cfg.Web.Port)
-	_ = setupRouter(coreClient, ssClient, cfg).Run(fmt.Sprintf(":%d", cfg.Web.Port))
+	_ = setupRouter(coreClient, ssc, cfg).Run(fmt.Sprintf(":%d", cfg.Web.Port))
 }
 
 func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *gin.Engine {
-
 	sealer := seal.New(cfg.KubesealArgs)
 
 	indexHTML, err := renderIndexHTML(cfg)
@@ -119,7 +116,7 @@ func renderIndexHTML(cfg *config.Config) (string, error) {
 	data := map[string]interface{}{
 		"OutputFormat":       cfg.OutputFormat,
 		"DisableLoadSecrets": cfg.DisableLoadSecrets,
-		"WebExternalUrl":     cfg.Web.ExternalUrl,
+		"WebExternalUrl":     cfg.Web.ExternalURL,
 		"InitialSecret":      initialSecret,
 		"Version":            version.Version,
 	}

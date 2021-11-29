@@ -36,12 +36,10 @@ func BuildClients(clientConfig clientcmd.ClientConfig, disableLoadSecrets bool) 
 	}
 
 	return restClient, ssCl, nil
-
 }
 
 // Handler handles our secrets operations.
 type Handler struct {
-	clientConfig       clientcmd.ClientConfig
 	outputFormat       string
 	coreClient         corev1.CoreV1Interface
 	ssClient           ssClient.BitnamiV1alpha1Interface
@@ -119,14 +117,12 @@ func (h *Handler) AllSecrets(c *gin.Context) {
 	}
 
 	sec, err := h.List()
-
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, sec)
-
 }
 
 func (h *Handler) Secret(c *gin.Context) {
