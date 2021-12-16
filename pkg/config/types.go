@@ -77,6 +77,13 @@ func Parse() (*Config, error) {
 		v, _ := cfg.Marshaller.Marshal(sec)
 		cfg.InitialSecret = string(v)
 	}
+
+	for _, arg := range cfg.KubesealArgs {
+		if strings.HasPrefix(arg, "--format") {
+			return nil, fmt.Errorf("'--format' is now allowed as kubeseal argument")
+		}
+	}
+
 	return cfg, nil
 }
 
