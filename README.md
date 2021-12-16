@@ -34,7 +34,7 @@ helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web --set image.
 
 ## Development
 
-For development we are using a local Kubernetes cluster using kind. When the cluster is created we install **Sealed Secrets** using Helm:
+For development, we are using a local Kubernetes cluster using kind. When the cluster is created we install **Sealed Secrets** using Helm:
 
 ```sh
 ./kind.sh
@@ -47,6 +47,13 @@ echo -n bar | kubectl create secret generic mysecret --dry-run=client --from-fil
 kubeseal <mysecret.json >mysealedsecret.json --controller-name sealed-secrets
 kubectl create -f mysealedsecret.json
 kubectl get secret mysecret
+```
+
+if the service is not found, export the api and use the cert path
+```sh
+kubectl -n kube-system port-forward deployment/sealed-secrets 9090:8080
+
+kubeseal <mysecret.json >mysealedsecret.json --cert=http://localhost:9090/v1/cert.pem
 ```
 
 Then we can build the Docker image and push it to the local registry:

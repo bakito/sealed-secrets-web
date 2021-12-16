@@ -3,16 +3,16 @@ module github.com/bakito/sealed-secrets-web
 go 1.17
 
 require (
-	github.com/bitnami-labs/sealed-secrets v0.16.0
+	github.com/bitnami-labs/sealed-secrets v0.17.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.17.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
-	k8s.io/api v0.16.8
-	k8s.io/apimachinery v0.16.8
-	k8s.io/client-go v0.16.8
+	k8s.io/api v0.17.11
+	k8s.io/apimachinery v0.17.11
+	k8s.io/client-go v0.17.11
 )
 
 require (
@@ -56,7 +56,7 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/klog v1.0.0 // indirect
-	k8s.io/utils v0.0.0-20190801114015-581e00157fb1 // indirect
+	k8s.io/utils v0.0.0-20191114184206-e782cd3c129f // indirect
 	sigs.k8s.io/yaml v1.1.0 // indirect
 )
 

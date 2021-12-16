@@ -14,14 +14,10 @@ ENV GO111MODULE=on \
 ADD ./go.mod /tmp/go.mod
 RUN export KUBESEAL_VERSION=$(cat /tmp/go.mod  | grep github.com/bitnami-labs/sealed-secrets | awk '{print $2}') && \
     export KUBESEAL_ARCH=$(dpkg --print-architecture) && \
-    if [ "${KUBESEAL_ARCH}" = "arm64" ]; then  \
-      export KUBESEAL_FILE="kubeseal-${KUBESEAL_ARCH}"; \
-    else \
-      export KUBESEAL_FILE="kubeseal-linux-${KUBESEAL_ARCH}"; \
-    fi && \
-    export KUBESEAL_URL="https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/${KUBESEAL_FILE}"; \
+    export KUBESEAL_FILE="kubeseal-${KUBESEAL_VERSION#?}-linux-${KUBESEAL_ARCH}"; \
+    export KUBESEAL_URL="https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/${KUBESEAL_FILE}.tar.gz"; \
     echo "Download kubeseal ${KUBESEAL_VERSION}/${KUBESEAL_ARCH} from ${KUBESEAL_URL}" && \
-    curl -L ${KUBESEAL_URL} -o /tmp/kubeseal && \
+    curl -L ${KUBESEAL_URL} | tar -xz -C /tmp && \
     chmod +x /tmp/kubeseal && \
     upx -q /tmp/kubeseal
 
