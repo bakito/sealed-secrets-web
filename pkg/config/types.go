@@ -81,6 +81,8 @@ func Parse() (*Config, error) {
 	for _, arg := range cfg.KubesealArgs {
 		if strings.HasPrefix(arg, "--format") {
 			return nil, fmt.Errorf("'--format' is now allowed as kubeseal argument")
+		} else if strings.HasPrefix(arg, "-o") {
+			return nil, fmt.Errorf("'-o' is now allowed as kubeseal argument")
 		}
 	}
 
