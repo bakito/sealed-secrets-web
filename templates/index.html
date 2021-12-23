@@ -53,12 +53,12 @@
           <v-card-title class="headline" primary-title>Secrets</v-card-title>
           <v-card-text>
             <v-list>
-              <v-list-item v-for="(namespace, name) in secrets" :key="name + '_' + namespace" @click="loadSecret(namespace, name)">
+              <v-list-item v-for="sec in secrets" :key="sec.name + '_' + sec.namespace" @click="loadSecret(sec.namespace, sec.name)">
                 <v-list-item-content>
-                  <v-list-item-title>{{"{{name}}"}}</v-list-item-title>
+                  <v-list-item-title>{{"{{sec.name}}"}}</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-icon>
-                  <v-chip color="primary">{{"{{namespace}}"}}</v-chip>
+                  <v-chip color="primary">{{"{{sec.namespace}}"}}</v-chip>
                 </v-list-item-icon>
               </v-list-item>
             </v-list>

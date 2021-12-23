@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
@@ -57,8 +58,8 @@ func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1
 }
 
 // List returns a list of all secrets.
-func (h *Handler) List() (map[string]interface{}, error) {
-	secrets := make(map[string]interface{})
+func (h *Handler) list() ([]Secret, error) {
+	var secrets []Secret
 	if h.disableLoadSecrets {
 		return secrets, nil
 	}
@@ -68,8 +69,15 @@ func (h *Handler) List() (map[string]interface{}, error) {
 	}
 
 	for _, item := range ssList.Items {
-		secrets[item.Name] = item.Namespace
+		secrets = append(secrets, Secret{Namespace: item.Namespace, Name: item.Name})
 	}
+
+	sort.Slice(secrets, func(i, j int) bool {
+		if secrets[i].Namespace == secrets[j].Namespace {
+			return secrets[i].Name < secrets[j].Name
+		}
+		return secrets[i].Namespace < secrets[j].Namespace
+	})
 
 	return secrets, nil
 }
@@ -116,7 +124,7 @@ func (h *Handler) AllSecrets(c *gin.Context) {
 		return
 	}
 
-	sec, err := h.List()
+	sec, err := h.list()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -147,4 +155,9 @@ func (h *Handler) Secret(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, &data)
+}
+
+type Secret struct {
+	Namespace string `json:"namespace" yaml:"namespace"`
+	Name      string `json:"name" yaml:"name"`
 }
