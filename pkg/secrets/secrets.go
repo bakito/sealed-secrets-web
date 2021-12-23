@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
@@ -44,34 +45,45 @@ type Handler struct {
 	coreClient         corev1.CoreV1Interface
 	ssClient           ssClient.BitnamiV1alpha1Interface
 	disableLoadSecrets bool
-	namespace          string
+	includeNamespaces  map[string]bool
 }
 
 // NewHandler creates a new secrets handler.
 func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, cfg *config.Config) (*Handler, error) {
+	inMap := make(map[string]bool)
+	for _, n := range cfg.IncludeNamespaces {
+		inMap[n] = true
+	}
 	return &Handler{
 		outputFormat:       cfg.OutputFormat,
 		ssClient:           ssCl,
 		coreClient:         coreClient,
 		disableLoadSecrets: cfg.DisableLoadSecrets,
-		namespace:          cfg.LocalNamespace,
+		includeNamespaces:  inMap,
 	}, nil
 }
 
 // List returns a list of all secrets.
-func (h *Handler) List() (map[string]interface{}, error) {
-	secrets := make(map[string]interface{})
+func (h *Handler) list() ([]Secret, error) {
+	var secrets []Secret
 	if h.disableLoadSecrets {
 		return secrets, nil
 	}
-	ssList, err := h.ssClient.SealedSecrets(h.namespace).List(metav1.ListOptions{})
+	ssList, err := h.ssClient.SealedSecrets("").List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 
 	for _, item := range ssList.Items {
-		secrets[item.Name] = item.Namespace
+		secrets = append(secrets, Secret{Namespace: item.Namespace, Name: item.Name})
 	}
+
+	sort.Slice(secrets, func(i, j int) bool {
+		if secrets[i].Namespace == secrets[j].Namespace {
+			return secrets[i].Name < secrets[j].Name
+		}
+		return secrets[i].Namespace < secrets[j].Namespace
+	})
 
 	return secrets, nil
 }
@@ -81,8 +93,8 @@ func (h *Handler) GetSecret(namespace, name string) ([]byte, error) {
 	if h.disableLoadSecrets {
 		return nil, nil
 	}
-	if h.namespace != "" && h.namespace != namespace {
-		return nil, fmt.Errorf("invalid namespace %q", namespace)
+	if len(h.includeNamespaces) > 0 && !h.includeNamespaces[namespace] {
+		return nil, fmt.Errorf("namespace %q is not allowed", namespace)
 	}
 	secret, err := h.coreClient.Secrets(namespace).Get(name, metav1.GetOptions{})
 	if err != nil {
@@ -121,7 +133,7 @@ func (h *Handler) AllSecrets(c *gin.Context) {
 		return
 	}
 
-	sec, err := h.List()
+	sec, err := h.list()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -152,4 +164,9 @@ func (h *Handler) Secret(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, &data)
+}
+
+type Secret struct {
+	Namespace string `json:"namespace" yaml:"namespace"`
+	Name      string `json:"name" yaml:"name"`
 }
