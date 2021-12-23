@@ -49,7 +49,7 @@ type Handler struct {
 }
 
 // NewHandler creates a new secrets handler.
-func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, cfg *config.Config) (*Handler, error) {
+func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *Handler {
 	inMap := make(map[string]bool)
 	for _, n := range cfg.IncludeNamespaces {
 		inMap[n] = true
@@ -60,7 +60,7 @@ func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1
 		coreClient:         coreClient,
 		disableLoadSecrets: cfg.DisableLoadSecrets,
 		includeNamespaces:  inMap,
-	}, nil
+	}
 }
 
 // List returns a list of all secrets.
@@ -75,7 +75,9 @@ func (h *Handler) list() ([]Secret, error) {
 	}
 
 	for _, item := range ssList.Items {
-		secrets = append(secrets, Secret{Namespace: item.Namespace, Name: item.Name})
+		if len(h.includeNamespaces) == 0 || h.includeNamespaces[item.Namespace] {
+			secrets = append(secrets, Secret{Namespace: item.Namespace, Name: item.Name})
+		}
 	}
 
 	sort.Slice(secrets, func(i, j int) bool {
@@ -94,7 +96,7 @@ func (h *Handler) GetSecret(namespace, name string) ([]byte, error) {
 		return nil, nil
 	}
 	if len(h.includeNamespaces) > 0 && !h.includeNamespaces[namespace] {
-		return nil, fmt.Errorf("namespace %q is not allowed", namespace)
+		return nil, fmt.Errorf("namespace '%s' is not allowed", namespace)
 	}
 	secret, err := h.coreClient.Secrets(namespace).Get(name, metav1.GetOptions{})
 	if err != nil {

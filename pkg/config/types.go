@@ -38,7 +38,7 @@ func Parse() (*Config, error) {
 		cfg.KubesealArgs = strings.Split(*kubesealArgs, " ")
 	}
 	if *includeNamespaces != "" {
-		cfg.KubesealArgs = strings.Split(*includeNamespaces, " ")
+		cfg.IncludeNamespaces = strings.Split(*includeNamespaces, " ")
 	}
 	if *initialSecretFile != "" {
 		b, err := ioutil.ReadFile(*initialSecretFile)
