@@ -44,6 +44,7 @@ type Handler struct {
 	coreClient         corev1.CoreV1Interface
 	ssClient           ssClient.BitnamiV1alpha1Interface
 	disableLoadSecrets bool
+	namespace          string
 }
 
 // NewHandler creates a new secrets handler.
@@ -53,6 +54,7 @@ func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1
 		ssClient:           ssCl,
 		coreClient:         coreClient,
 		disableLoadSecrets: cfg.DisableLoadSecrets,
+		namespace:          cfg.LocalNamespace,
 	}, nil
 }
 
@@ -62,7 +64,7 @@ func (h *Handler) List() (map[string]interface{}, error) {
 	if h.disableLoadSecrets {
 		return secrets, nil
 	}
-	ssList, err := h.ssClient.SealedSecrets("").List(metav1.ListOptions{})
+	ssList, err := h.ssClient.SealedSecrets(h.namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +80,9 @@ func (h *Handler) List() (map[string]interface{}, error) {
 func (h *Handler) GetSecret(namespace, name string) ([]byte, error) {
 	if h.disableLoadSecrets {
 		return nil, nil
+	}
+	if h.namespace != "" && h.namespace != namespace {
+		return nil, fmt.Errorf("invalid namespace %q", namespace)
 	}
 	secret, err := h.coreClient.Secrets(namespace).Get(name, metav1.GetOptions{})
 	if err != nil {

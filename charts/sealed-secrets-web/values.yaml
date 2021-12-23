@@ -1,13 +1,14 @@
 replicaCount: 1
+localNamespaceOnly: false
 
 image:
   repository: ghcr.io/bakito/sealed-secrets-web
   # default version .Chart.AppVersion
   tag:
   pullPolicy: IfNotPresent
-  args: []
+  args: [ ]
 
-imagePullSecrets: []
+imagePullSecrets: [ ]
 nameOverride: ""
 fullnameOverride: ""
 
@@ -24,23 +25,23 @@ service:
 
 ingress:
   enabled: false
-  annotations: {}
+  annotations: { }
   hosts:
     - host: sealed-secrets-web.local
-      paths: []
+      paths: [ ]
 
-  tls: []
+  tls: [ ]
 
-resources: {}
+resources: { }
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
   # requests:
   #   cpu: 100m
-  #   memory: 128Mi
+#   memory: 128Mi
 
-nodeSelector: {}
+nodeSelector: { }
 
-tolerations: []
+tolerations: [ ]
 
-affinity: {}
+affinity: { }

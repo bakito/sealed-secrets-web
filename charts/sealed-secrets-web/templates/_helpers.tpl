@@ -54,3 +54,15 @@ Create the name of the service account to use.
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+
+{{/*
+Generate image args
+*/}}
+{{- define "sealed-secrets-web.imageArgs" -}}
+{{- $args := .Values.image.args -}}
+{{- if .Values.localNamespaceOnly }}
+{{- $args = append $args (printf "--local-namespace=%s" .Release.Namespace) }}
+{{- end }}
+  {{- toYaml $args }}
+{{- end -}}
