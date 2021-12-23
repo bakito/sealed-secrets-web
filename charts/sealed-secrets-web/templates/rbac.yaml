@@ -1,6 +1,6 @@
 {{ if .Values.rbac.create }}
 apiVersion: rbac.authorization.k8s.io/v1
-{{- if .Values.localNamespaceOnly }}
+{{- if .Values.includeLocalNamespaceOnly }}
 kind: Role
 {{- else }}
 kind: ClusterRole
@@ -33,7 +33,7 @@ rules:
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
-{{ if .Values.localNamespaceOnly }}
+{{ if .Values.includeLocalNamespaceOnly }}
 kind: RoleBinding
 {{- else }}
 kind: ClusterRoleBinding
@@ -44,7 +44,7 @@ metadata:
 {{ include "sealed-secrets-web.labels" . | indent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  {{ if .Values.localNamespaceOnly }}
+  {{ if .Values.includeLocalNamespaceOnly }}
   kind: Role
   {{- else }}
   kind: ClusterRole
