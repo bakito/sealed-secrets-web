@@ -104,7 +104,7 @@ var _ = Describe("Main", func() {
 			req, _ := http.NewRequest("GET", "/api/secrets", nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(200))
-			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{"%s":"%s"}`, name, namespace)))
+			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`[{"namespace":"%s","name":"%s"}]`, namespace, name)))
 		})
 
 		It("list secret of namespace", func() {
