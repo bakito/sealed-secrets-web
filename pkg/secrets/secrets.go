@@ -69,15 +69,21 @@ func (h *Handler) list() ([]Secret, error) {
 	if h.disableLoadSecrets {
 		return secrets, nil
 	}
-	ssList, err := h.ssClient.SealedSecrets("").List(metav1.ListOptions{})
-	if err != nil {
-		return nil, err
-	}
 
-	for _, item := range ssList.Items {
-		if len(h.includeNamespaces) == 0 || h.includeNamespaces[item.Namespace] {
-			secrets = append(secrets, Secret{Namespace: item.Namespace, Name: item.Name})
+	if len(h.includeNamespaces) > 0 {
+		for ns := range h.includeNamespaces {
+			list, err := h.listForNamespace(ns)
+			if err != nil {
+				return nil, err
+			}
+			secrets = append(secrets, list...)
 		}
+	} else {
+		list, err := h.listForNamespace("")
+		if err != nil {
+			return nil, err
+		}
+		secrets = append(secrets, list...)
 	}
 
 	sort.Slice(secrets, func(i, j int) bool {
@@ -87,6 +93,18 @@ func (h *Handler) list() ([]Secret, error) {
 		return secrets[i].Namespace < secrets[j].Namespace
 	})
 
+	return secrets, nil
+}
+
+func (h *Handler) listForNamespace(ns string) ([]Secret, error) {
+	var secrets []Secret
+	ssList, err := h.ssClient.SealedSecrets(ns).List(metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	for _, item := range ssList.Items {
+		secrets = append(secrets, Secret{Namespace: item.Namespace, Name: item.Name})
+	}
 	return secrets, nil
 }
 
