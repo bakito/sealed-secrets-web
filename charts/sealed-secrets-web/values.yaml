@@ -24,11 +24,20 @@ service:
 
 ingress:
   enabled: false
+  className: ""
   annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
   hosts:
     - host: sealed-secrets-web.local
-      paths: []
-
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+  # set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
+  defaultTls: false
   tls: []
 
 resources: {}
