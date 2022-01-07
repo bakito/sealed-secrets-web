@@ -62,7 +62,7 @@ Generate image args
 {{- define "sealed-secrets-web.imageArgs" -}}
 {{- $args := .Values.image.args -}}
 {{- if .Values.includeLocalNamespaceOnly }}
-{{- $args = append $args (printf "--local-namespace=%s" .Release.Namespace) }}
+{{- $args = append $args (printf "--include-namespaces=%s" .Release.Namespace) }}
 {{- end }}
   {{- toYaml $args }}
 {{- end -}}
