@@ -27,8 +27,11 @@ ingress:
   annotations: {}
   hosts:
     - host: sealed-secrets-web.local
-      paths: []
-
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  # set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
+  defaultTls: false
   tls: []
 
 resources: {}
