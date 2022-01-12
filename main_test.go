@@ -91,7 +91,8 @@ var _ = Describe("Main", func() {
 			Ω(w.Body.String()).Should(Equal(encodeBody))
 		})
 
-		It("list sealed secrets", func() {
+		It("list sealed secrets for all namespaces", func() {
+			cfg.IncludeNamespaces = nil
 			alpha1Client.EXPECT().SealedSecrets("").Return(ssClient)
 			ssClient.EXPECT().List(gomock.Any()).Return(&v1alpha1.SealedSecretList{
 				Items: []v1alpha1.SealedSecret{
@@ -105,6 +106,33 @@ var _ = Describe("Main", func() {
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(200))
 			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`[{"namespace":"%s","name":"%s"}]`, namespace, name)))
+		})
+
+		It("list sealed secrets only for given namespaces", func() {
+			cfg.IncludeNamespaces = []string{"a", "b"}
+			router = setupRouter(coreClient, alpha1Client, cfg)
+			alpha1Client.EXPECT().SealedSecrets("a").Return(ssClient)
+			ssClient.EXPECT().List(gomock.Any()).Return(&v1alpha1.SealedSecretList{
+				Items: []v1alpha1.SealedSecret{
+					{
+						ObjectMeta: metav1.ObjectMeta{Namespace: "a", Name: name},
+						Spec:       v1alpha1.SealedSecretSpec{Template: v1alpha1.SecretTemplateSpec{}},
+					},
+				},
+			}, nil)
+			alpha1Client.EXPECT().SealedSecrets("b").Return(ssClient)
+			ssClient.EXPECT().List(gomock.Any()).Return(&v1alpha1.SealedSecretList{
+				Items: []v1alpha1.SealedSecret{
+					{
+						ObjectMeta: metav1.ObjectMeta{Namespace: "b", Name: name},
+						Spec:       v1alpha1.SealedSecretSpec{Template: v1alpha1.SecretTemplateSpec{}},
+					},
+				},
+			}, nil)
+			req, _ := http.NewRequest("GET", "/api/secrets", nil)
+			router.ServeHTTP(w, req)
+			Ω(w.Code).Should(Equal(200))
+			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`[{"namespace":"%s","name":"%s"},{"namespace":"%s","name":"%s"}]`, "a", name, "b", name)))
 		})
 
 		It("list secret of namespace", func() {

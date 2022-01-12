@@ -45,16 +45,22 @@ type Handler struct {
 	coreClient         corev1.CoreV1Interface
 	ssClient           ssClient.BitnamiV1alpha1Interface
 	disableLoadSecrets bool
+	includeNamespaces  map[string]bool
 }
 
 // NewHandler creates a new secrets handler.
-func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, cfg *config.Config) (*Handler, error) {
+func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *Handler {
+	inMap := make(map[string]bool)
+	for _, n := range cfg.IncludeNamespaces {
+		inMap[n] = true
+	}
 	return &Handler{
 		outputFormat:       cfg.OutputFormat,
 		ssClient:           ssCl,
 		coreClient:         coreClient,
 		disableLoadSecrets: cfg.DisableLoadSecrets,
-	}, nil
+		includeNamespaces:  inMap,
+	}
 }
 
 // List returns a list of all secrets.
@@ -63,13 +69,21 @@ func (h *Handler) list() ([]Secret, error) {
 	if h.disableLoadSecrets {
 		return secrets, nil
 	}
-	ssList, err := h.ssClient.SealedSecrets("").List(metav1.ListOptions{})
-	if err != nil {
-		return nil, err
-	}
 
-	for _, item := range ssList.Items {
-		secrets = append(secrets, Secret{Namespace: item.Namespace, Name: item.Name})
+	if len(h.includeNamespaces) > 0 {
+		for ns := range h.includeNamespaces {
+			list, err := h.listForNamespace(ns)
+			if err != nil {
+				return nil, err
+			}
+			secrets = append(secrets, list...)
+		}
+	} else {
+		list, err := h.listForNamespace("")
+		if err != nil {
+			return nil, err
+		}
+		secrets = append(secrets, list...)
 	}
 
 	sort.Slice(secrets, func(i, j int) bool {
@@ -82,10 +96,25 @@ func (h *Handler) list() ([]Secret, error) {
 	return secrets, nil
 }
 
+func (h *Handler) listForNamespace(ns string) ([]Secret, error) {
+	var secrets []Secret
+	ssList, err := h.ssClient.SealedSecrets(ns).List(metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	for _, item := range ssList.Items {
+		secrets = append(secrets, Secret{Namespace: item.Namespace, Name: item.Name})
+	}
+	return secrets, nil
+}
+
 // GetSecret returns a secret by name in the given namespace.
 func (h *Handler) GetSecret(namespace, name string) ([]byte, error) {
 	if h.disableLoadSecrets {
 		return nil, nil
+	}
+	if len(h.includeNamespaces) > 0 && !h.includeNamespaces[namespace] {
+		return nil, fmt.Errorf("namespace '%s' is not allowed", namespace)
 	}
 	secret, err := h.coreClient.Secrets(namespace).Get(name, metav1.GetOptions{})
 	if err != nil {

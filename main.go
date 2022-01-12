@@ -76,10 +76,7 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 		log.Fatalf("Could not render the index html template: %s", err.Error())
 	}
 
-	sHandler, err := secrets.NewHandler(coreClient, ssClient, cfg)
-	if err != nil {
-		log.Fatalf("Could not initialize secrets handler: %s", err.Error())
-	}
+	sHandler := secrets.NewHandler(coreClient, ssClient, cfg)
 
 	r := gin.New()
 	r.Use(gin.Recovery())

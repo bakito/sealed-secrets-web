@@ -12,6 +12,7 @@ import (
 
 var (
 	disableLoadSecrets = flag.Bool("disable-load-secrets", false, "Disable the loading of existing secrets")
+	includeNamespaces  = flag.String("include-namespaces", "", "Optional space separated list if namespaces to be included in the sealed secret search")
 	kubesealArgs       = flag.String("kubeseal-arguments", "", "Arguments which are passed to kubeseal")
 	outputFormat       = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
 	initialSecretFile  = flag.String("initial-secret-file", "", "Define a file with the initial secret to be displayed. If empty, defaults are used.")
@@ -35,6 +36,9 @@ func Parse() (*Config, error) {
 
 	if *kubesealArgs != "" {
 		cfg.KubesealArgs = strings.Split(*kubesealArgs, " ")
+	}
+	if *includeNamespaces != "" {
+		cfg.IncludeNamespaces = strings.Split(*includeNamespaces, " ")
 	}
 	if *initialSecretFile != "" {
 		b, err := ioutil.ReadFile(*initialSecretFile)
@@ -94,6 +98,7 @@ type Config struct {
 	FieldFilter        *FieldFilter       `yaml:"fieldFilter,omitempty"`
 	PrintVersion       bool               `yaml:"printVersion"`
 	DisableLoadSecrets bool               `yaml:"disableLoadSecrets"`
+	IncludeNamespaces  []string           `yaml:"includeNamespaces"`
 	OutputFormat       string             `yaml:"outputFormat"`
 	KubesealArgs       []string           `yaml:"kubesealArgs"`
 	InitialSecret      string             `yaml:"initialSecret"`

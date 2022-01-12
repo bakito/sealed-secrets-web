@@ -26,7 +26,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-            {{- toYaml .Values.image.args | nindent 12 }}
+          {{- include "sealed-secrets-web.imageArgs" . | nindent 12 }}
           ports:
             - name: http
               containerPort: 8080
