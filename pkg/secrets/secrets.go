@@ -1,6 +1,7 @@
 package secrets
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -109,14 +110,14 @@ func (h *Handler) listForNamespace(ns string) ([]Secret, error) {
 }
 
 // GetSecret returns a secret by name in the given namespace.
-func (h *Handler) GetSecret(namespace, name string) ([]byte, error) {
+func (h *Handler) GetSecret(ctx context.Context, namespace, name string) ([]byte, error) {
 	if h.disableLoadSecrets {
 		return nil, nil
 	}
 	if len(h.includeNamespaces) > 0 && !h.includeNamespaces[namespace] {
 		return nil, fmt.Errorf("namespace '%s' is not allowed", namespace)
 	}
-	secret, err := h.coreClient.Secrets(namespace).Get(name, metav1.GetOptions{})
+	secret, err := h.coreClient.Secrets(namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +172,7 @@ func (h *Handler) Secret(c *gin.Context) {
 	// Load existing secret.
 	namespace := c.Param("namespace")
 	name := c.Param("name")
-	secret, err := h.GetSecret(namespace, name)
+	secret, err := h.GetSecret(c, namespace, name)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

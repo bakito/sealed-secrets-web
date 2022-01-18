@@ -137,7 +137,7 @@ var _ = Describe("Main", func() {
 
 		It("list secret of namespace", func() {
 			coreClient.EXPECT().Secrets(namespace).Return(secrets)
-			secrets.EXPECT().Get(name, gomock.Any()).Return(&corev1.Secret{
+			secrets.EXPECT().Get(gomock.Any(), name, gomock.Any()).Return(&corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Name: name},
 			}, nil)
 			req, _ := http.NewRequest("GET", fmt.Sprintf("/api/secret/%s/%s", namespace, name), nil)
