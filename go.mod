@@ -13,6 +13,7 @@ require (
 	k8s.io/api v0.23.1
 	k8s.io/apimachinery v0.23.1
 	k8s.io/client-go v0.22.1
+
 )
 
 require (
@@ -66,4 +67,7 @@ require (
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
-replace github.com/dgrijalva/jwt-go v3.2.0+incompatible => github.com/form3tech-oss/jwt-go v3.2.2+incompatible
+replace (
+	github.com/apache/thrift v0.13.0 => github.com/apache/thrift v0.14.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible => github.com/form3tech-oss/jwt-go v3.2.2+incompatible
+)

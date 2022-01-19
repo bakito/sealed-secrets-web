@@ -11,7 +11,7 @@ ENV GO111MODULE=on \
   CGO_ENABLED=0 \
   GOOS=linux
 
-ADD ./go.mod /tmp/go.mod
+COPY ./go.mod /tmp/go.mod
 RUN export KUBESEAL_VERSION=$(cat /tmp/go.mod  | grep github.com/bitnami-labs/sealed-secrets | awk '{print $2}') && \
     export KUBESEAL_ARCH=$(dpkg --print-architecture) && \
     export KUBESEAL_FILE="kubeseal-${KUBESEAL_VERSION#?}-linux-${KUBESEAL_ARCH}"; \
@@ -21,7 +21,7 @@ RUN export KUBESEAL_VERSION=$(cat /tmp/go.mod  | grep github.com/bitnami-labs/se
     chmod +x /tmp/kubeseal && \
     upx -q /tmp/kubeseal
 
-ADD . /go/src/app/
+COPY . /go/src/app/
 
 RUN go build -a -installsuffix cgo -ldflags="-w -s -X github.com/bakito/sealed-secrets-web/pkg/version.Version=${VERSION} -X github.com/bakito/sealed-secrets-web/pkg/version.Build=${BUILD}" -o sealed-secrets-web . && \
     upx -q sealed-secrets-web
