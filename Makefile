@@ -36,3 +36,9 @@ semver:
 ifeq (, $(shell which semver))
  $(shell go get -u github.com/bakito/semver)
 endif
+
+build:
+	podman build --build-arg VERSION=dev --build-arg BUILD=dev --build-arg TARGETPLATFORM=linux/amd64 -t sealed-secrets-web .
+
+build-arm:
+	podman build --build-arg VERSION=dev --build-arg BUILD=dev --build-arg TARGETPLATFORM=linux/arm64 -t sealed-secrets-web .
