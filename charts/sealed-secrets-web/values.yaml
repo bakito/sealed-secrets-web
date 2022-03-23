@@ -1,6 +1,8 @@
 replicaCount: 1
 # if set to true, the application has only the permission to view sealed secrets in the current namespace
 includeLocalNamespaceOnly: false
+disableLoadSecrets: false
+format: yaml
 
 image:
   repository: ghcr.io/bakito/sealed-secrets-web

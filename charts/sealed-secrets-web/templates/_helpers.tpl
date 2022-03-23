@@ -64,5 +64,9 @@ Generate image args
 {{- if .Values.includeLocalNamespaceOnly }}
 {{- $args = append $args (printf "--include-namespaces=%s" .Release.Namespace) }}
 {{- end }}
+{{- if .Values.disableLoadSecrets  }}
+{{- $args = append $args "--disable-load-secrets" }}
+{{- end }}
+{{- $args = append $args (printf "--format=%s" .Values.format) }}
   {{- toYaml $args }}
 {{- end -}}
