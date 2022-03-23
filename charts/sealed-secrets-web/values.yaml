@@ -1,7 +1,11 @@
 replicaCount: 1
 # if set to true, the application has only the permission to view sealed secrets in the current namespace
 includeLocalNamespaceOnly: false
+
+# if set to true secrets cannot be read from this tool, only seal new ones
 disableLoadSecrets: false
+
+# either json or yaml
 format: yaml
 
 image:

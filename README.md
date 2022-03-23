@@ -32,6 +32,14 @@ To modify the settings for Sealed Secrets you can modify the arguments for the D
 helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web --set image.args={"--kubeseal-arguments=--controller-name=sealed-secrets"}
 ```
 
+or if you want to disable ability to load existing secrets, and use the tool purelly to seal new ones you can use:
+```sh
+helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web --set disableLoadSecrets=true
+```
+
+You can check helm values available at https://github.com/bakito/sealed-secrets-web/blob/main/charts/sealed-secrets-web/values.yaml
+Also, check available application options at https://github.com/bakito/sealed-secrets-web/blob/main/pkg/config/types.go#L14-L22
+
 ## Development
 
 For development, we are using a local Kubernetes cluster using kind. When the cluster is created we install **Sealed Secrets** using Helm:
