@@ -10,6 +10,7 @@ metadata:
   labels:
 {{ include "sealed-secrets-web.labels" . | indent 4 }}
 rules:
+{{- if not .Values.disableLoadSecrets }}
   - apiGroups:
       - bitnami.com
     resources:
@@ -23,6 +24,7 @@ rules:
       - secrets
     verbs:
       - get
+{{- end }}
   - apiGroups:
       - ""
     resources:
