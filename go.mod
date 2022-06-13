@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/bitnami-labs/sealed-secrets v0.18.0
-	github.com/gin-gonic/gin v1.8.0
+	github.com/gin-gonic/gin v1.8.1
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/onsi/ginkgo v1.16.5
