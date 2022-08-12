@@ -3,7 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/bakito/sealed-secrets-web/pkg/marshal"
@@ -41,7 +41,7 @@ func Parse() (*Config, error) {
 		cfg.IncludeNamespaces = strings.Split(*includeNamespaces, " ")
 	}
 	if *initialSecretFile != "" {
-		b, err := ioutil.ReadFile(*initialSecretFile)
+		b, err := os.ReadFile(*initialSecretFile)
 		if err != nil {
 			return nil, err
 		}
@@ -49,7 +49,7 @@ func Parse() (*Config, error) {
 	}
 
 	if *config != "" {
-		b, err := ioutil.ReadFile(*config)
+		b, err := os.ReadFile(*config)
 		if err != nil {
 			return nil, err
 		}
