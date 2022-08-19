@@ -1,15 +1,15 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "sealed-secrets-web.fullname" . -}}
-{{- $cleanSemVersion := trimPrefix "v" .Capabilities.KubeVersion.Version }}
+{{- $cleanSemVersion := semver .Capabilities.KubeVersion.Version }}
 {{- $svcPort := .Values.service.port -}}
-{{- if and .Values.ingress.className (not (semverCompare ">=1.18.0" $cleanSemVersion)) }}
+{{- if and .Values.ingress.className (not ($cleanSemVersion | (semver "1.18.0").Compare | toString | regexMatch "0|-1")) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
   {{- end }}
 {{- end }}
-{{- if semverCompare ">=1.19.0" $cleanSemVersion -}}
+{{- if $cleanSemVersion | (semver "1.19.0").Compare | toString | regexMatch "0|-1" -}}
 apiVersion: networking.k8s.io/v1
-{{- else if semverCompare ">=1.14.0" $cleanSemVersion -}}
+{{- else if $cleanSemVersion | (semver "1.14.0").Compare | toString | regexMatch "0|-1" -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else }}
 apiVersion: extensions/v1beta1
@@ -24,7 +24,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .Values.ingress.className (semverCompare ">=1.18.0" $cleanSemVersion) }}
+  {{- if and .Values.ingress.className ( $cleanSemVersion | (semver "1.18.0").Compare | toString | regexMatch "0|-1" ) }}
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
   {{- if .Values.ingress.tls }}
@@ -47,11 +47,11 @@ spec:
         paths:
           {{- range .paths }}
           - path: {{ .path }}
-            {{- if and .pathType (semverCompare ">=1.18.0" $cleanSemVersion) }}
+            {{- if and .pathType ( $cleanSemVersion | (semver "1.18.0").Compare | toString | regexMatch "0|-1" ) }}
             pathType: {{ .pathType }}
             {{- end }}
             backend:
-              {{- if semverCompare ">=1.19.0" $cleanSemVersion }}
+              {{- if $cleanSemVersion | (semver "1.19.0").Compare | toString | regexMatch "0|-1" }}
               service:
                 name: {{ $fullName }}
                 port:
