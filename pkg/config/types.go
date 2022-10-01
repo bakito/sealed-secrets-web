@@ -78,8 +78,6 @@ func Parse() (*Config, error) {
 		if err := cfg.Marshaller.Unmarshal([]byte(cfg.InitialSecret), sec); err != nil {
 			return nil, fmt.Errorf("could not parse the initial secret: %w", err)
 		}
-		v, _ := cfg.Marshaller.Marshal(sec)
-		cfg.InitialSecret = string(v)
 	}
 
 	for _, arg := range cfg.KubesealArgs {
