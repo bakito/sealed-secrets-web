@@ -99,7 +99,7 @@ func (h *Handler) list() ([]Secret, error) {
 
 func (h *Handler) listForNamespace(ns string) ([]Secret, error) {
 	var secrets []Secret
-	ssList, err := h.ssClient.SealedSecrets(ns).List(metav1.ListOptions{})
+	ssList, err := h.ssClient.SealedSecrets(ns).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
