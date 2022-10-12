@@ -16,7 +16,7 @@ import (
 	"github.com/bakito/sealed-secrets-web/pkg/seal"
 	"github.com/bakito/sealed-secrets-web/pkg/secrets"
 	"github.com/bakito/sealed-secrets-web/pkg/version"
-	ssClient "github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealed-secrets/v1alpha1"
+	ssClient "github.com/bitnami-labs/sealedsecrets/pkg/client/clientset/versioned/typed/sealed-secrets/v1alpha1"
 	"github.com/gin-gonic/gin"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
