@@ -10,7 +10,7 @@ import (
 	"github.com/bakito/sealed-secrets-web/pkg/marshal"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/core"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/ssclient"
-	"github.com/bitnami-labs/sealed-secrets/pkg/apis/sealed-secrets/v1alpha1"
+	"github.com/bitnami-labs/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
@@ -94,7 +94,7 @@ var _ = Describe("Main", func() {
 		It("list sealed secrets for all namespaces", func() {
 			cfg.IncludeNamespaces = nil
 			alpha1Client.EXPECT().SealedSecrets("").Return(ssClient)
-			ssClient.EXPECT().List(gomock.Any()).Return(&v1alpha1.SealedSecretList{
+			ssClient.EXPECT().List(gomock.Any(), gomock.Any()).Return(&v1alpha1.SealedSecretList{
 				Items: []v1alpha1.SealedSecret{
 					{
 						ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Name: name},
@@ -112,7 +112,7 @@ var _ = Describe("Main", func() {
 			cfg.IncludeNamespaces = []string{"a", "b"}
 			router = setupRouter(coreClient, alpha1Client, cfg)
 			alpha1Client.EXPECT().SealedSecrets("a").Return(ssClient)
-			ssClient.EXPECT().List(gomock.Any()).Return(&v1alpha1.SealedSecretList{
+			ssClient.EXPECT().List(gomock.Any(), gomock.Any()).Return(&v1alpha1.SealedSecretList{
 				Items: []v1alpha1.SealedSecret{
 					{
 						ObjectMeta: metav1.ObjectMeta{Namespace: "a", Name: name},
@@ -121,7 +121,7 @@ var _ = Describe("Main", func() {
 				},
 			}, nil)
 			alpha1Client.EXPECT().SealedSecrets("b").Return(ssClient)
-			ssClient.EXPECT().List(gomock.Any()).Return(&v1alpha1.SealedSecretList{
+			ssClient.EXPECT().List(gomock.Any(), gomock.Any()).Return(&v1alpha1.SealedSecretList{
 				Items: []v1alpha1.SealedSecret{
 					{
 						ObjectMeta: metav1.ObjectMeta{Namespace: "b", Name: name},

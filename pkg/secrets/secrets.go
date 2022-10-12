@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
-	ssClient "github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealed-secrets/v1alpha1"
+	ssClient "github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -99,7 +99,7 @@ func (h *Handler) list() ([]Secret, error) {
 
 func (h *Handler) listForNamespace(ns string) ([]Secret, error) {
 	var secrets []Secret
-	ssList, err := h.ssClient.SealedSecrets(ns).List(metav1.ListOptions{})
+	ssList, err := h.ssClient.SealedSecrets(ns).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
