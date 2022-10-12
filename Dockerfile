@@ -1,7 +1,7 @@
 FROM bitnami/golang:1.18 as builder
 WORKDIR /go/src/app
 
-RUN apt-get update && apt-get install -y upx
+RUN apt-get update && apt-get install -y upx curl
 
 ARG VERSION=main
 ARG BUILD="N/A"
