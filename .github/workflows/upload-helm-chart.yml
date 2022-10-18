@@ -29,6 +29,7 @@ jobs:
           VERSION=$(echo "${{github.event.release.tag_name }}" | sed 's/v//g')
           sed -i "s/^version:.*$/version: ${VERSION}/"        ./charts/sealed-secrets-web/Chart.yaml
           sed -i "s/^appVersion:.*$/appVersion: v${VERSION}/" ./charts/sealed-secrets-web/Chart.yaml
+          make docs
           helm package ./charts/sealed-secrets-web/ --version $VERSION --app-version v$VERSION -d dist
 
       - name: Install chart-releaser
