@@ -27,13 +27,15 @@ jobs:
       - name: Build chart
         run: |
           VERSION=$(echo "${{github.event.release.tag_name }}" | sed 's/v//g')
+          sed -i "s/^version:.*$/version: ${VERSION}/"        ./charts/sealed-secrets-web/Chart.yaml
+          sed -i "s/^appVersion:.*$/appVersion: v${VERSION}/" ./charts/sealed-secrets-web/Chart.yaml
           helm package ./charts/sealed-secrets-web/ --version $VERSION --app-version v$VERSION -d dist
 
       - name: Install chart-releaser
         uses: engineerd/configurator@v0.0.8
         with:
           name: cr
-          url: https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz
+          url: https://github.com/helm/chart-releaser/releases/download/v1.4.1/chart-releaser_1.4.1_linux_amd64.tar.gz
           pathInArchive: cr
 
       - name: Upload Chart

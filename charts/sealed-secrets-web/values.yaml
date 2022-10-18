@@ -1,63 +1,84 @@
+# -- The number of pods to run
 replicaCount: 1
-# if set to true, the application has only the permission to view sealed secrets in the current namespace
+# -- If set to true, the application has only the permission to view sealed secrets in the current namespace
 includeLocalNamespaceOnly: false
 
-# if set to true secrets cannot be read from this tool, only seal new ones
+# -- If set to true secrets cannot be read from this tool, only seal new ones
 disableLoadSecrets: false
 
-# either json or yaml
+# -- Secret format - either json or yaml
 format: yaml
 
 image:
+  # --  Repository to use
   repository: ghcr.io/bakito/sealed-secrets-web
-  # default version .Chart.AppVersion
+  # -- Overrides the image tag (default is the chart appVersion)
   tag:
+  # -- Image pull policy
   pullPolicy: IfNotPresent
-  args: []
+  # -- Additional command args
+  args: [ ]
+   # - "--kubeseal-arguments=--controller-name=sealed-secrets"
 
-imagePullSecrets: []
+# -- Secrets with credentials to pull images from a private registry. Registry secret names as an array.
+imagePullSecrets: [ ]
+
+# -- String to partially override "argo-rollouts.fullname" template
 nameOverride: ""
+
+# -- String to fully override "argo-rollouts.fullname" template
 fullnameOverride: ""
 
 rbac:
+  # -- Specifies whether rbac should be created
   create: true
 
 serviceAccount:
+  # -- Specifies whether a service account should be created
   create: true
+  # -- The name of the service account to use.
   name: sealed-secrets-web
 
 service:
+  # -- Sets the type of the Service
   type: ClusterIP
+  # -- Service port
   port: 80
 
 ingress:
+  # -- Enable ingress support
   enabled: false
+
+  # -- Ingress class name
   className: ""
-  annotations: {}
-  # kubernetes.io/ingress.class: nginx
-  # kubernetes.io/tls-acme: "true"
+  # -- Ingress annotations
+  annotations: { }
+  # -- Ingress hosts
   hosts:
     - host: sealed-secrets-web.local
       paths:
         - path: /
           pathType: ImplementationSpecific
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-  # set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
+  # -- set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
   defaultTls: false
-  tls: []
+  # -- Ingress tls
+  tls: [ ]
 
-resources: {}
+# -- Resource limits and requests for the pods.
+resources: { }
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
   # requests:
   #   cpu: 100m
-  #   memory: 128Mi
+#   memory: 128Mi
 
-nodeSelector: {}
 
-tolerations: []
+# -- [Node selector]
+nodeSelector: { }
 
-affinity: {}
+# -- [Tolerations] for use with node taints
+tolerations: [ ]
+
+# -- Assign custom [affinity] rules to the deployment
+affinity: { }
