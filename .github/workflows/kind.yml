@@ -44,36 +44,42 @@ jobs:
         run: kubectl port-forward svc/sealed-secrets-web -n sealed-secrets-web 8080:80 &
 
       - name: Test 'encode should encode a yaml stringData secret'
+        working-directory: testdata/e2e
         run: |
-          ./testdata/e2e/toSecret.sh stringData.yaml \
+          ./toSecret.sh stringData.yaml \
             | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/encode \
             | jq -r .secret \
-            | diff testdata/e2e/data.yaml -
+            | diff ./data.yaml -
+
 
       - name: Test 'encode should not re-encode a yaml data secret'
+        working-directory: testdata/e2e
         run: |
-          ./testdata/e2e/toSecret.sh data.yaml \
+          ./toSecret.sh data.yaml \
             | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/encode \
             | jq -r .secret \
-            | diff testdata/e2e/data.yaml -
+            | diff ./data.yaml -
 
       - name: Test 'decode should decode a yaml data secret'
+        working-directory: testdata/e2e
         run: |
-            ./testdata/e2e/toSecret.sh data.yaml \
+            ./toSecret.sh data.yaml \
               | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/decode \
               | jq -r .secret \
-              | diff testdata/e2e/stringData.yaml -
+              | diff ./stringData.yaml -
 
       - name: Test 'decode should not re-decode a yaml stringData secret'
+        working-directory: testdata/e2e
         run: |
-          ./testdata/e2e/toSecret.sh stringData.yaml \
+          ./toSecret.sh stringData.yaml \
             | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/decode \
             | jq -r .secret \
-            | diff testdata/e2e/stringData.yaml -
+            | diff ./stringData.yaml -
 
       - name: Test 'seal yaml'
+        working-directory: testdata/e2e
         run: |
-          ./testdata/e2e/toSecret.sh stringData.json \
+          ./toSecret.sh stringData.json \
             | curl -s --show-error -H "Content-Type: application/json" -X POST --data-binary @- localhost:8080/api/seal \
             | jq -r .secret > sealed.yaml
           cat sealed.yaml | yq .apiVersion | grep "bitnami.com/v1alpha1"
@@ -97,36 +103,41 @@ jobs:
         run: kubectl port-forward svc/sealed-secrets-web -n sealed-secrets-web 8080:80 &
 
       - name: Test 'encode should encode a json stringData secret'
+        working-directory: testdata/e2e
         run: |
-          ./testdata/e2e/toSecret.sh stringData.json \
+          ./toSecret.sh stringData.json \
             | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/encode \
             | jq -r .secret \
-            | diff testdata/e2e/data.json -
+            | diff ./data.json -
 
       - name: Test 'encode should not re-encode a json data secret'
+        working-directory: testdata/e2e
         run: |
-          ./testdata/e2e/toSecret.sh data.json \
+          ./toSecret.sh data.json \
             | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/encode \
             | jq -r .secret \
-            | diff testdata/e2e/data.json -
+            | diff ./data.json -
 
       - name: Test 'decode should decode a json data secret'
+        working-directory: testdata/e2e
         run: |
-          ./testdata/e2e/toSecret.sh data.json \
+          ./toSecret.sh data.json \
             | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/decode \
             | jq -r .secret \
-            | diff testdata/e2e/stringData.json -
+            | diff ./stringData.json -
 
       - name: Test 'decode should not re-decode a json stringData secret'
+        working-directory: testdata/e2e
         run: |
-          ./testdata/e2e/toSecret.sh stringData.json \
+          ./toSecret.sh stringData.json \
             | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/decode \
             | jq -r .secret \
-            | diff testdata/e2e/stringData.json -
+            | diff ./stringData.json -
 
       - name: Test 'seal json'
+        working-directory: testdata/e2e
         run: |
-          ./testdata/e2e/toSecret.sh stringData.json \
+          ./toSecret.sh stringData.json \
             | curl -s --show-error -H "Content-Type: application/json" -X POST --data-binary @- localhost:8080/api/seal \
             | jq -r .secret > sealed.json
           cat sealed.json | jq -r .apiVersion | grep "bitnami.com/v1alpha1"
