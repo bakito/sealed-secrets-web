@@ -1,4 +1,4 @@
-name: Test Chart
+name: end-2-end Helm Chart Tests
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - switch-to-sealed-secret-api
 
 jobs:
-  test:
+  e2e:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,6 +18,11 @@ jobs:
           kubectl_version: v1.24.0
       - name: Install Helm
         uses: azure/setup-helm@v3
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v1.0.0
+      - name: Install yq
+        uses: dcarbone/install-yq-action@v1.0.0
+
       - name: Install sealed-secrets
         run: |
           helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
@@ -25,10 +30,62 @@ jobs:
             --namespace sealed-secrets \
             --create-namespace \
             --atomic
-      - name: Install sealed-secrets-web
+      - name: Install sealed-secrets-web with yaml format
         run: |
           helm install sealed-secrets-web  charts/sealed-secrets-web \
             --namespace sealed-secrets-web \
             --create-namespace \
             --set image.tag=main \
+            --set format=yaml \
+            --set image.args[0]="--kubeseal-arguments=--controller-name=sealed-secrets --controller-namespace=sealed-secrets" \
             --atomic
+
+      - name: Start port-forwarding for svc/sealed-secrets-web
+        run: kubectl port-forward svc/sealed-secrets-web -n sealed-secrets-web 8080:80 &
+
+      - name: Test 'encode should encode a yaml stringData secret'
+        run: curl -s --data @testdata/e2e/yaml-stringData-secret.json localhost:8080/api/encode -w "\n" | diff testdata/e2e/yaml-data-secret.json -
+
+      - name: Test 'encode should not re-encode a yaml data secret'
+        run: curl -s --data @testdata/e2e/yaml-data-secret.json localhost:8080/api/encode -w "\n" | diff testdata/e2e/yaml-data-secret.json -
+
+      - name: Test 'decode should decode a yaml data secret'
+        run: curl -s --data @testdata/e2e/yaml-data-secret.json localhost:8080/api/decode -w "\n" | diff testdata/e2e/yaml-stringData-secret.json -
+
+      - name: Test 'decode should not re-decode a yaml stringData secret'
+        run: curl -s --data @testdata/e2e/yaml-stringData-secret.json localhost:8080/api/decode -w "\n" | diff testdata/e2e/yaml-stringData-secret.json -
+
+      - name: Test 'seal yaml'
+        run: |
+          curl -s --data @testdata/e2e/yaml-stringData-secret.json localhost:8080/api/seal -w "\n" | grep '{"secret":"apiVersion: bitnami.com/v1alpha1\nkind: SealedSecret\nmetadata:\n  name: mysecretname\n  namespace: mysecretnamespace\nspec:\n  encryptedData:'
+
+      - name: Install sealed-secrets-web with json format
+        run: |
+          pkill -f "port-forward svc/sealed-secrets-web"
+          helm delete sealed-secrets-web --namespace sealed-secrets-web
+          helm install sealed-secrets-web  charts/sealed-secrets-web \
+            --namespace sealed-secrets-web \
+            --create-namespace \
+            --set image.tag=main \
+            --set format=json \
+            --set image.args[0]="--kubeseal-arguments=--controller-name=sealed-secrets --controller-namespace=sealed-secrets" \
+            --atomic
+
+      - name: Start port-forwarding for svc/sealed-secrets-web
+        run: kubectl port-forward svc/sealed-secrets-web -n sealed-secrets-web 8080:80 &
+
+      - name: Test 'encode should encode a json stringData secret'
+        run: curl -s --data @testdata/e2e/json-stringData-secret.json localhost:8080/api/encode -w "\n" | diff testdata/e2e/json-data-secret.json -
+
+      - name: Test 'encode should not re-encode a json data secret'
+        run: curl -s --data @testdata/e2e/json-data-secret.json localhost:8080/api/encode -w "\n" | diff testdata/e2e/json-data-secret.json -
+
+      - name: Test 'decode should decode a json data secret'
+        run: curl -s --data @testdata/e2e/json-data-secret.json localhost:8080/api/decode -w "\n" | diff testdata/e2e/json-stringData-secret.json -
+
+      - name: Test 'decode should not re-decode a json stringData secret'
+        run: curl -s --data @testdata/e2e/json-stringData-secret.json localhost:8080/api/decode -w "\n" | diff testdata/e2e/json-stringData-secret.json -
+
+      - name: Test 'seal json'
+        run: |
+          curl -s --data @testdata/e2e/json-stringData-secret.json localhost:8080/api/seal -w "\n" | grep '{"secret":"{\\n  \"apiVersion\": \"bitnami.com/v1alpha1\",\\n  \"kind\": \"SealedSecret\",\\n  \"metadata\": {\\n    \"name\": \"mysecretname\",\\n    \"namespace\": \"mysecretnamespace\"\\n  },\\n  \"spec\": {\\n    \"encryptedData\":'
