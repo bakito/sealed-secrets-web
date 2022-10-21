@@ -24,3 +24,5 @@ jobs:
 
     - name: Test
       run: go test ./...
+      env:
+        KUBERNETES_MASTER: foo

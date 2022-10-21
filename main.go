@@ -64,15 +64,16 @@ func main() {
 		log.Fatalf("Could build k8s clients:%v", err.Error())
 	}
 
-	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, cfg.Web.Port)
-	_ = setupRouter(coreClient, ssc, cfg).Run(fmt.Sprintf(":%d", cfg.Web.Port))
-}
-
-func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *gin.Engine {
 	sealer, err := seal.NewAPISealer("sealed-secrets", "sealed-secrets", "")
 	if err != nil {
 		log.Fatalf("Setup sealer: %s", err.Error())
 	}
+
+	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, cfg.Web.Port)
+	_ = setupRouter(coreClient, ssc, cfg, sealer).Run(fmt.Sprintf(":%d", cfg.Web.Port))
+}
+
+func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1alpha1Interface, cfg *config.Config, sealer seal.Sealer) *gin.Engine {
 	indexHTML, err := renderIndexHTML(cfg)
 	if err != nil {
 		log.Fatalf("Could not render the index html template: %s", err.Error())
