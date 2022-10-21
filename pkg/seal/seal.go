@@ -1,10 +1,16 @@
 package seal
 
 import (
-	"errors"
-	"io"
-	"os/exec"
+	"bytes"
+	"context"
+	"crypto/rsa"
+	"os"
 	"strings"
+
+	"github.com/bitnami-labs/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
+	"github.com/bitnami-labs/sealed-secrets/pkg/kubeseal"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 type Sealer interface {
@@ -12,51 +18,65 @@ type Sealer interface {
 	Raw(data Raw) ([]byte, error)
 }
 
-// New create a new sealer
-func New(args []string) Sealer {
-	return &sealer{
-		args: args,
+var _ Sealer = &apiSealer{}
+
+func NewAPISealer(controllerNs string, controllerName string, certURL string) (Sealer, error) {
+	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+	loadingRules.DefaultClientConfig = &clientcmd.DefaultClientConfig
+	cc := clientcmd.NewInteractiveDeferredLoadingClientConfig(loadingRules, nil, os.Stdout)
+
+	f, err := kubeseal.OpenCert(context.TODO(), cc, controllerNs, controllerName, certURL)
+	if err != nil {
+		return nil, err
 	}
-}
-
-type sealer struct {
-	args []string
-}
-
-func (s *sealer) Secret(secret string) ([]byte, error) {
-	return s.kubeseal(secret)
-}
-
-func (s *sealer) Raw(data Raw) ([]byte, error) {
-	args := []string{"--raw", "--name", data.Name}
-	if strings.TrimSpace(data.Namespace) != "" {
-		args = append(args, "--namespace", data.Namespace)
-	}
-	if strings.TrimSpace(data.Scope) != "" {
-		args = append(args, "--scope", data.Scope)
-	}
-	return s.kubeseal(data.Value, args...)
-}
-
-func (s *sealer) kubeseal(value string, additionalArgs ...string) ([]byte, error) {
-	args := s.args
-	args = append(args, additionalArgs...)
-	cmd := exec.Command("kubeseal", args...)
-	stdin, err := cmd.StdinPipe()
+	defer func() { _ = f.Close() }()
+	pubKey, err := kubeseal.ParseKey(f)
 	if err != nil {
 		return nil, err
 	}
 
-	go func() {
-		defer stdin.Close()
-		_, _ = io.WriteString(stdin, value)
-	}()
+	return &apiSealer{
+		clientConfig: cc,
+		pubKey:       pubKey,
+	}, nil
+}
 
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		err = errors.New(strings.Replace(strings.TrimSpace(string(out)), "error: ", "", 1))
+type apiSealer struct {
+	clientConfig clientcmd.ClientConfig
+	pubKey       *rsa.PublicKey
+}
+
+func (a *apiSealer) Secret(secret string) ([]byte, error) {
+	var buf bytes.Buffer
+	if err := kubeseal.Seal(
+		a.clientConfig,
+		"json",
+		strings.NewReader(secret),
+		&buf,
+		scheme.Codecs,
+		a.pubKey,
+		v1alpha1.DefaultScope,
+		false,
+		"",
+		"",
+	); err != nil {
+		return nil, err
 	}
-	return out, err
+	return buf.Bytes(), nil
+}
+
+func (a *apiSealer) Raw(data Raw) ([]byte, error) {
+	var buf bytes.Buffer
+	scope := v1alpha1.DefaultScope
+	if data.Scope != "" {
+		_ = scope.Set(data.Scope)
+	}
+	if err := kubeseal.EncryptSecretItem(
+		&buf, data.Name, data.Namespace, []byte(data.Value),
+		v1alpha1.DefaultScope, a.pubKey); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 type Raw struct {

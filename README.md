@@ -52,7 +52,7 @@ helm install sealed-secrets sealed-secrets/sealed-secrets --namespace kube-syste
 
 # Test the installation:
 echo -n bar | kubectl create secret generic mysecret --dry-run=client --from-file=foo=/dev/stdin -o json >mysecret.json
-kubeseal <mysecret.json >mysealedsecret.json --controller-name sealed-secrets
+kubeseal <mysecret.json >mysealedsecret.json --controller-name sealed-secrets --controller-namespace sealed-secrets
 kubectl create -f mysealedsecret.json
 kubectl get secret mysecret
 ```
