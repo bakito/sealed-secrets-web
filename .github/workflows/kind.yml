@@ -1,9 +1,9 @@
-name: Build images
+name: Test Chart
 
 on:
   push:
     branches:
-      - kind-tests
+      - switch-to-sealed-secret-api
 
 jobs:
   test:
@@ -25,7 +25,7 @@ jobs:
             --namespace sealed-secrets \
             --create-namespace \
             --atomic
-      - name: Install sealed-secrets
+      - name: Install sealed-secrets-web
         run: |
           helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
           helm install sealed-secrets-web  charts/sealed-secrets-web \

@@ -69,8 +69,11 @@ func main() {
 }
 
 func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *gin.Engine {
-	sealer := seal.New(cfg.KubesealArgs)
-
+	// sealer := seal.New(cfg.KubesealArgs)
+	sealer, err := seal.NewAPISealer("sealed-secrets", "sealed-secrets", "")
+	if err != nil {
+		log.Fatalf("Setup sealer: %s", err.Error())
+	}
 	indexHTML, err := renderIndexHTML(cfg)
 	if err != nil {
 		log.Fatalf("Could not render the index html template: %s", err.Error())

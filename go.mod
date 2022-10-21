@@ -3,7 +3,7 @@ module github.com/bakito/sealed-secrets-web
 go 1.18
 
 require (
-	github.com/bitnami-labs/sealed-secrets v0.19.0
+	github.com/bitnami-labs/sealed-secrets v0.19.2-0.20221021070447-bcb00647e0d3
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
@@ -12,7 +12,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.25.3
 	k8s.io/apimachinery v0.25.3
-	k8s.io/client-go v0.25.0
+	k8s.io/client-go v0.25.3
 
 )
 
