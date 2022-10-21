@@ -127,3 +127,5 @@ mysecret.*
 mysealedsecret.*
 
 static/ace/ace-builds
+sealed.json
+sealed.yaml
