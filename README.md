@@ -57,7 +57,11 @@ kubectl create -f mysealedsecret.json
 kubectl get secret mysecret
 ```
 
-if the service is not found, export the api and use the cert path
+if the service is not found, export the api and use th
+      - name: Install sealed-secrets
+        run: |
+          helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+          helm install sealed-secrets sealed-secrets/sealed-secrets --namespace sealed-secrets --create-namespace --atomice cert path
 ```sh
 kubectl -n kube-system port-forward deployment/sealed-secrets 9090:8080
 
