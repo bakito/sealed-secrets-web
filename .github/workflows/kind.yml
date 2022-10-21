@@ -45,36 +45,20 @@ jobs:
 
       - name: Test 'encode should encode a yaml stringData secret'
         working-directory: testdata/e2e
-        run: |
-          ./toSecret.sh stringData.yaml \
-            | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/encode \
-            | jq -r .secret \
-            | diff ./data.yaml -
+        run: ./runCheck.sh encode stringData.yaml data.yaml
 
 
       - name: Test 'encode should not re-encode a yaml data secret'
         working-directory: testdata/e2e
-        run: |
-          ./toSecret.sh data.yaml \
-            | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/encode \
-            | jq -r .secret \
-            | diff ./data.yaml -
+        run: ./runCheck.sh encode data.yaml data.yaml
 
       - name: Test 'decode should decode a yaml data secret'
         working-directory: testdata/e2e
-        run: |
-            ./toSecret.sh data.yaml \
-              | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/decode \
-              | jq -r .secret \
-              | diff ./stringData.yaml -
+        run: ./runCheck.sh decode data.yaml stringData.yaml
 
       - name: Test 'decode should not re-decode a yaml stringData secret'
         working-directory: testdata/e2e
-        run: |
-          ./toSecret.sh stringData.yaml \
-            | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/decode \
-            | jq -r .secret \
-            | diff ./stringData.yaml -
+        run: ./runCheck.sh decode stringData.yaml stringData.yaml
 
       - name: Test 'seal yaml'
         working-directory: testdata/e2e
@@ -104,35 +88,19 @@ jobs:
 
       - name: Test 'encode should encode a json stringData secret'
         working-directory: testdata/e2e
-        run: |
-          ./toSecret.sh stringData.json \
-            | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/encode \
-            | jq -r .secret \
-            | diff ./data.json -
+        run: ./runCheck.sh encode stringData.json data.json
 
       - name: Test 'encode should not re-encode a json data secret'
         working-directory: testdata/e2e
-        run: |
-          ./toSecret.sh data.json \
-            | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/encode \
-            | jq -r .secret \
-            | diff ./data.json -
+        run: ./runCheck.sh encode data.json data.json
 
       - name: Test 'decode should decode a json data secret'
         working-directory: testdata/e2e
-        run: |
-          ./toSecret.sh data.json \
-            | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/decode \
-            | jq -r .secret \
-            | diff ./stringData.json -
+        run: ./runCheck.sh decode data.json stringData.json
 
       - name: Test 'decode should not re-decode a json stringData secret'
         working-directory: testdata/e2e
-        run: |
-          ./toSecret.sh stringData.json \
-            | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/decode \
-            | jq -r .secret \
-            | diff ./stringData.json -
+        run: ./runCheck.sh decode stringData.json stringData.json
 
       - name: Test 'seal json'
         working-directory: testdata/e2e
