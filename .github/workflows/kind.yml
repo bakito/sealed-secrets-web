@@ -27,7 +27,6 @@ jobs:
             --atomic
       - name: Install sealed-secrets-web
         run: |
-          helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
           helm install sealed-secrets-web  charts/sealed-secrets-web \
             --namespace sealed-secrets-web \
             --create-namespace \
