@@ -3,7 +3,10 @@ name: end-2-end Helm Chart Tests
 on:
   push:
     branches:
-      - switch-to-sealed-secret-api
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   e2e:
@@ -58,13 +61,9 @@ jobs:
       - name: Install sealed-secrets-web with yaml format
         run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml
 
-      - name: Start port-forwarding for svc/sealed-secrets-web
-        run: kubectl port-forward svc/sealed-secrets-web -n sealed-secrets-web 8080:80 &
-
       - name: Test 'encode should encode a yaml stringData secret'
         working-directory: testdata/e2e
         run: ./runCheck.sh encode stringData.yaml data.yaml
-
 
       - name: Test 'encode should not re-encode a yaml data secret'
         working-directory: testdata/e2e
@@ -86,12 +85,8 @@ jobs:
 
       - name: Install sealed-secrets-web with json format
         run: |
-          pkill -f "port-forward svc/sealed-secrets-web"
           helm delete sealed-secrets-web --namespace sealed-secrets-web
           ./testdata/e2e/installSealedSecretsWebChart.sh json
-
-      - name: Start port-forwarding for svc/sealed-secrets-web
-        run: kubectl port-forward svc/sealed-secrets-web -n sealed-secrets-web 8080:80 &
 
       - name: Test 'encode should encode a json stringData secret'
         working-directory: testdata/e2e

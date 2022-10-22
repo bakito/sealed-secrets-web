@@ -9,7 +9,7 @@ on:
       - published
 
 jobs:
-  main:
+  build-images:
     runs-on: ubuntu-latest
     steps:
       - name: Get current date

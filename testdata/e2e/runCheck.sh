@@ -5,7 +5,7 @@
 set -e
 
 ./toSecret.sh ${2} \
-  | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- localhost:8080/api/${1} \
+  | curl -s --show-error -H "Content-Type: application/json" -X POST --data @- http://localhost/ssw/api/${1} \
   | jq -r .secret \
   | diff ./${3} -
 
