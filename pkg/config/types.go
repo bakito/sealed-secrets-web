@@ -12,6 +12,7 @@ import (
 
 var (
 	disableLoadSecrets            = flag.Bool("disable-load-secrets", false, "Disable the loading of existing secrets")
+	enableWebLogs                 = flag.Bool("enable-web-logs", false, "Enable web logs")
 	includeNamespaces             = flag.String("include-namespaces", "", "Optional space separated list if namespaces to be included in the sealed secret search")
 	kubesealArgs                  = flag.String("kubeseal-arguments", "", "Deprecated use (sealed-secrets-service-name, sealed-secrets-service-namespace or sealed-secrets-cert-url)")
 	sealedSecretsServiceName      = flag.String("sealed-secrets-service-name", "sealed-secrets", "Name of the sealed secrets service")
@@ -32,6 +33,7 @@ func Parse() (*Config, error) {
 		Web: Web{
 			Port:    *port,
 			Context: *webContext,
+			Logger:  *enableWebLogs,
 		},
 		PrintVersion:       *printVersion,
 		OutputFormat:       *outputFormat,
@@ -114,6 +116,7 @@ type Config struct {
 type Web struct {
 	Port    int    `yaml:"port"`
 	Context string `yaml:"context"`
+	Logger  bool   `yaml:"logger"`
 }
 
 type SealedSecrets struct {

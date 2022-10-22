@@ -81,8 +81,10 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	sHandler := secrets.NewHandler(coreClient, ssClient, cfg)
 
 	r := gin.New()
-	// FIXME make logger configurable
-	r.Use(gin.Recovery(), gin.Logger())
+	r.Use(gin.Recovery())
+	if cfg.Web.Logger {
+		r.Use(gin.Logger())
+	}
 	h := handler.New(indexHTML, sealer, cfg)
 
 	r.GET("/", h.Index)

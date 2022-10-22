@@ -47,9 +47,7 @@ jobs:
             --timeout=90s
 
       - name: Build image
-        run: |
-          docker build -f Dockerfile -t localhost:5001/sealed-secrets-web:build .
-          docker push  localhost:5001/sealed-secrets-web:build
+        run: ./testdata/e2e/buildImage.sh
 
       - name: Install sealed-secrets
         run: |

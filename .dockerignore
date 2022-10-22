@@ -2,3 +2,6 @@
 .git
 .github
 charts
+testdata
+dist
+bin

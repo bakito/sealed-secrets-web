@@ -84,6 +84,9 @@ Generate image args
 {{- if .Values.disableLoadSecrets  }}
 {{- $args = append $args "--disable-load-secrets" }}
 {{- end }}
+{{- if .Values.webLogs  }}
+{{- $args = append $args "--enable-web-logs" }}
+{{- end }}
 
 {{- toYaml $args }}
 {{- end -}}
