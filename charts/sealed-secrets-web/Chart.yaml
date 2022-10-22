@@ -8,3 +8,7 @@ maintainers:
     url: https://github.com/bakito
 name: sealed-secrets-web
 version: 3.0.0
+annotations:
+  artifacthub.io/changes: |
+    - "Removed image.args in favour of new values. (initialSecretFile, sealedSecrets.namespace, sealedSecrets.serviceName, webContext)"
+    - "Add support for volume/volumeMounts"
