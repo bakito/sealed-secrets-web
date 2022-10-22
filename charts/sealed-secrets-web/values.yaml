@@ -35,6 +35,12 @@ image:
 # -- Secrets with credentials to pull images from a private registry. Registry secret names as an array.
 imagePullSecrets: [ ]
 
+# -- Additional volumeMounts to the image updater main container
+volumeMounts: []
+
+# -- Additional volumes to the image updater pod
+volumes: []
+
 # -- String to partially override "argo-rollouts.fullname" template
 nameOverride: ""
 
