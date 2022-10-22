@@ -100,7 +100,7 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	api.GET("/secret/:namespace/:name", sHandler.Secret)
 	api.GET("/secrets", sHandler.AllSecrets)
 
-	r.NoRoute(h.RedirectToIndex(cfg.Web.ExternalURL))
+	r.NoRoute(h.RedirectToIndex(cfg.Web.Context))
 	return r
 }
 
@@ -116,7 +116,7 @@ func renderIndexHTML(cfg *config.Config) (string, error) {
 	data := map[string]interface{}{
 		"OutputFormat":       cfg.OutputFormat,
 		"DisableLoadSecrets": cfg.DisableLoadSecrets,
-		"WebExternalUrl":     cfg.Web.ExternalURL,
+		"WebContext":         cfg.Web.Context,
 		"InitialSecret":      initialSecret,
 		"Version":            version.Version,
 	}

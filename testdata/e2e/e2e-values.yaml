@@ -15,3 +15,5 @@ ingress:
     - paths:
         - path: /ssw(/|$)(.*)
           pathType: Prefix
+
+webContext: ssw

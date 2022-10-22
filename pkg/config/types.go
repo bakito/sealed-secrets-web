@@ -19,7 +19,8 @@ var (
 	sealedSecretsCertURL          = flag.String("sealed-secrets-cert-url", "", "URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service)")
 	outputFormat                  = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
 	initialSecretFile             = flag.String("initial-secret-file", "", "Define a file with the initial secret to be displayed. If empty, defaults are used.")
-	webExternalURL                = flag.String("web-external-url", "", "The URL under which the Sealed Secrets Web Interface is externally reachable (for example, if it is served via a reverse proxy).")
+	webExternalURL                = flag.String("web-external-url", "", "Deprecated use (web-context)")
+	webContext                    = flag.String("web-context", "", "The context the application is running on. (for example, if it is served via a reverse proxy)")
 	printVersion                  = flag.Bool("version", false, "Print version information and exit")
 	port                          = flag.Int("port", 8080, "Define the port to run the application on. (default: 8080)")
 	config                        = flag.String("config", "", "Define the config file")
@@ -29,8 +30,8 @@ func Parse() (*Config, error) {
 	flag.Parse()
 	cfg := &Config{
 		Web: Web{
-			Port:        *port,
-			ExternalURL: *webExternalURL,
+			Port:    *port,
+			Context: *webContext,
 		},
 		PrintVersion:       *printVersion,
 		OutputFormat:       *outputFormat,
@@ -39,6 +40,9 @@ func Parse() (*Config, error) {
 
 	if *kubesealArgs != "" {
 		fmt.Println("Argument 'kubeseal-arguments' is deprecated use (sealed-secrets-service-name, sealed-secrets-service-namespace or sealed-secrets-cert-url).")
+	}
+	if *webExternalURL != "" {
+		fmt.Println("Argument 'web-external-url' is deprecated use (web-context).")
 	}
 	if *sealedSecretsServiceName != "" {
 		cfg.SealedSecrets.Service = *sealedSecretsServiceName
@@ -108,8 +112,8 @@ type Config struct {
 }
 
 type Web struct {
-	Port        int    `yaml:"port"`
-	ExternalURL string `yaml:"externalUrl"`
+	Port    int    `yaml:"port"`
+	Context string `yaml:"context"`
 }
 
 type SealedSecrets struct {

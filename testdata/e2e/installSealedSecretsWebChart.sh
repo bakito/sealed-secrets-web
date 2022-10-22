@@ -1,4 +1,4 @@
-In#!/bin/bash
+#!/bin/bash
 set -e
 
 helm upgrade --install sealed-secrets-web charts/sealed-secrets-web \

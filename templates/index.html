@@ -6,12 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Sealed Secrets</title>
 
-  <link rel="shortcut icon" type="image/x-icon" href="{{.WebExternalUrl}}/static/icons/favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="{{.WebContext}}/static/icons/favicon.ico">
   <meta name="theme-color" content="#ffffff">
-  <link rel="stylesheet" href="{{.WebExternalUrl}}/static/styles/roboto.css">
-  <link rel="stylesheet" href="{{.WebExternalUrl}}/static/styles/material-icons.css">
-  <link rel="stylesheet" href="{{.WebExternalUrl}}/static/styles/materialdesignicons.css">
-  <link rel="stylesheet" href="{{.WebExternalUrl}}/static/styles/vuetify.min.css">
+  <link rel="stylesheet" href="{{.WebContext}}/static/styles/roboto.css">
+  <link rel="stylesheet" href="{{.WebContext}}/static/styles/material-icons.css">
+  <link rel="stylesheet" href="{{.WebContext}}/static/styles/materialdesignicons.css">
+  <link rel="stylesheet" href="{{.WebContext}}/static/styles/vuetify.min.css">
 </head>
 <body>
   <div id="app">
@@ -81,10 +81,10 @@
     </v-app>
   </div>
 
-  <script src="{{.WebExternalUrl}}/static/scripts/vue.min.js"></script>
-  <script src="{{.WebExternalUrl}}/static/scripts/vuetify.min.js"></script>
-  <script src="{{.WebExternalUrl}}/static/scripts/axios.min.js"></script>
-  <script src="{{.WebExternalUrl}}/static/ace/ace.js"></script>
+  <script src="{{.WebContext}}/static/scripts/vue.min.js"></script>
+  <script src="{{.WebContext}}/static/scripts/vuetify.min.js"></script>
+  <script src="{{.WebContext}}/static/scripts/axios.min.js"></script>
+  <script src="{{.WebContext}}/static/ace/ace.js"></script>
   <script>
     const INITIAL_SECRET = "{{.InitialSecret}}"
     new Vue({
@@ -160,7 +160,7 @@
       },
       methods : {
         seal() {
-          axios.post('{{.WebExternalUrl}}/api/seal', {secret: this.editor1Content}).then(res => {
+          axios.post('{{.WebContext}}/api/seal', {secret: this.editor1Content}).then(res => {
             this.editor2Content = res.data.secret
             this.editor2.setValue(this.editor2Content, 1)
           }).catch(err => {
@@ -168,7 +168,7 @@
           });
         },
         loadSecrets() {
-          axios.get('{{.WebExternalUrl}}/api/secrets').then(res => {
+          axios.get('{{.WebContext}}/api/secrets').then(res => {
             this.secrets = res.data
             this.dialogVisible = true
           }).catch(err => {
@@ -176,7 +176,7 @@
           });
         },
         loadSecret(namespace, name) {
-          axios.get("{{.WebExternalUrl}}/api/secret/" + namespace + "/" + name).then(res => {
+          axios.get("{{.WebContext}}/api/secret/" + namespace + "/" + name).then(res => {
             this.editor1Content = res.data.secret
             this.editor1.setValue(this.editor1Content, 1)
             this.dialogVisible = false
@@ -185,7 +185,7 @@
           });
         },
         encode() {
-          axios.post('{{.WebExternalUrl}}/api/encode', {secret: this.editor1Content}).then(res => {
+          axios.post('{{.WebContext}}/api/encode', {secret: this.editor1Content}).then(res => {
             this.editor1Content = res.data.secret
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {
@@ -193,7 +193,7 @@
           });
         },
         decode() {
-          axios.post('{{.WebExternalUrl}}/api/decode', {secret: this.editor1Content}).then(res => {
+          axios.post('{{.WebContext}}/api/decode', {secret: this.editor1Content}).then(res => {
             this.editor1Content = res.data.secret
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {

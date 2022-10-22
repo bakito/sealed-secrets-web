@@ -60,13 +60,27 @@ Create the name of the service account to use.
 Generate image args
 */}}
 {{- define "sealed-secrets-web.imageArgs" -}}
-{{- $args := .Values.image.args -}}
+{{- $args := list -}}
 {{- if .Values.includeLocalNamespaceOnly }}
 {{- $args = append $args (printf "--include-namespaces=%s" .Release.Namespace) }}
+{{- end }}
+{{- $args = append $args (printf "--format=%s" .Values.format) }}
+{{- if .Values.sealedSecrets.certURL }}
+  {{- $args = append $args (printf "--sealed-secrets-cert-url=%s" .Values.sealedSecrets.certURL ) }}
+{{- else }}
+  {{- if .Values.sealedSecrets.namespace }}
+  {{- $args = append $args (printf "--sealed-secrets-service-namespace=%s" .Values.sealedSecrets.namespace ) }}
+  {{- end }}
+  {{- if .Values.sealedSecrets.serviceName  }}
+  {{- $args = append $args (printf "--sealed-secrets-service-name=%s" .Values.sealedSecrets.serviceName) }}
+  {{- end }}
+{{- end }}
+{{- if .Values.webContext }}
+{{- $args = append $args (printf "--web-context=%s" .Values.webContext) }}
 {{- end }}
 {{- if .Values.disableLoadSecrets  }}
 {{- $args = append $args "--disable-load-secrets" }}
 {{- end }}
-{{- $args = append $args (printf "--format=%s" .Values.format) }}
-  {{- toYaml $args }}
+
+{{- toYaml $args }}
 {{- end -}}
