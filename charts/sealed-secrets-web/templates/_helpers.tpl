@@ -78,6 +78,9 @@ Generate image args
 {{- if .Values.webContext }}
 {{- $args = append $args (printf "--web-context=%s" .Values.webContext) }}
 {{- end }}
+{{- if .Values.initialSecretFile }}
+{{- $args = append $args (printf "--initial-secret-file=%s" .Values.initialSecretFile) }}
+{{- end }}
 {{- if .Values.disableLoadSecrets  }}
 {{- $args = append $args "--disable-load-secrets" }}
 {{- end }}

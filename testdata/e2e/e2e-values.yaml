@@ -2,9 +2,7 @@ image:
   tag: build
   repository: localhost:5001/sealed-secrets-web
   pullPolicy: Always
-  args:
-    - "--kubeseal-arguments=--controller-name=sealed-secrets --controller-namespace=sealed-secrets"
-    - "--web-external-url=ssw"
+
 ingress:
   enabled: true
   className: "nginx"
