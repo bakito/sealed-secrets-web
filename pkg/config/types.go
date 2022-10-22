@@ -21,7 +21,7 @@ var (
 	outputFormat                  = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
 	initialSecretFile             = flag.String("initial-secret-file", "", "Define a file with the initial secret to be displayed. If empty, defaults are used.")
 	webExternalURL                = flag.String("web-external-url", "", "Deprecated use (web-context)")
-	webContext                    = flag.String("web-context", "", "The context the application is running on. (for example, if it is served via a reverse proxy)")
+	webContext                    = flag.String("web-context", "/", "The context the application is running on. (for example, if it is served via a reverse proxy)")
 	printVersion                  = flag.Bool("version", false, "Print version information and exit")
 	port                          = flag.Int("port", 8080, "Define the port to run the application on. (default: 8080)")
 	config                        = flag.String("config", "", "Define the config file")
@@ -96,6 +96,13 @@ func Parse() (*Config, error) {
 		if err := cfg.Marshaller.Unmarshal([]byte(cfg.InitialSecret), sec); err != nil {
 			return nil, fmt.Errorf("could not parse the initial secret: %w", err)
 		}
+	}
+
+	if !strings.HasPrefix(cfg.Web.Context, "/") {
+		cfg.Web.Context = "/" + cfg.Web.Context
+	}
+	if !strings.HasSuffix(cfg.Web.Context, "/") {
+		cfg.Web.Context = cfg.Web.Context + "/"
 	}
 
 	return cfg, nil

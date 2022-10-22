@@ -33,12 +33,7 @@ func (h *Handler) Index(c *gin.Context) {
 
 func (h *Handler) RedirectToIndex(context string) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
-		if context != "" {
-			ctx.Redirect(http.StatusMovedPermanently, context)
-		} else {
-			ctx.Redirect(http.StatusMovedPermanently, "/")
-		}
-
+		ctx.Redirect(http.StatusMovedPermanently, context)
 		ctx.Abort()
 	}
 }
