@@ -17,6 +17,8 @@ jobs:
 
       - name: Install Helm
         uses: azure/setup-helm@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install jq
         uses: dcarbone/install-jq-action@v1.0.0
       - name: Install yq
