@@ -63,8 +63,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could build k8s clients:%v", err.Error())
 	}
-	// FIXME use args
-	sealer, err := seal.NewAPISealer("sealed-secrets", "sealed-secrets", "")
+	sealer, err := seal.NewAPISealer(cfg.SealedSecrets)
 	if err != nil {
 		log.Fatalf("Setup sealer: %s", err.Error())
 	}

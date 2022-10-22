@@ -11,15 +11,18 @@ import (
 )
 
 var (
-	disableLoadSecrets = flag.Bool("disable-load-secrets", false, "Disable the loading of existing secrets")
-	includeNamespaces  = flag.String("include-namespaces", "", "Optional space separated list if namespaces to be included in the sealed secret search")
-	kubesealArgs       = flag.String("kubeseal-arguments", "", "Arguments which are passed to kubeseal")
-	outputFormat       = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
-	initialSecretFile  = flag.String("initial-secret-file", "", "Define a file with the initial secret to be displayed. If empty, defaults are used.")
-	webExternalURL     = flag.String("web-external-url", "", "The URL under which the Sealed Secrets Web Interface is externally reachable (for example, if it is served via a reverse proxy).")
-	printVersion       = flag.Bool("version", false, "Print version information and exit")
-	port               = flag.Int("port", 8080, "Define the port to run the application on. (default: 8080)")
-	config             = flag.String("config", "", "Define the config file")
+	disableLoadSecrets            = flag.Bool("disable-load-secrets", false, "Disable the loading of existing secrets")
+	includeNamespaces             = flag.String("include-namespaces", "", "Optional space separated list if namespaces to be included in the sealed secret search")
+	kubesealArgs                  = flag.String("kubeseal-arguments", "", "Deprecated use (sealed-secrets-service-name, sealed-secrets-service-namespace or sealed-secrets-cert-url)")
+	sealedSecretsServiceName      = flag.String("sealed-secrets-service-name", "sealed-secrets", "Name of the sealed secrets service")
+	sealedSecretsServiceNamespace = flag.String("sealed-secrets-service-namespace", "sealed-secrets", "Namespace of the sealed secrets service")
+	sealedSecretsCertURL          = flag.String("sealed-secrets-cert-url", "", "URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service)")
+	outputFormat                  = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
+	initialSecretFile             = flag.String("initial-secret-file", "", "Define a file with the initial secret to be displayed. If empty, defaults are used.")
+	webExternalURL                = flag.String("web-external-url", "", "The URL under which the Sealed Secrets Web Interface is externally reachable (for example, if it is served via a reverse proxy).")
+	printVersion                  = flag.Bool("version", false, "Print version information and exit")
+	port                          = flag.Int("port", 8080, "Define the port to run the application on. (default: 8080)")
+	config                        = flag.String("config", "", "Define the config file")
 )
 
 func Parse() (*Config, error) {
@@ -35,7 +38,16 @@ func Parse() (*Config, error) {
 	}
 
 	if *kubesealArgs != "" {
-		cfg.KubesealArgs = strings.Split(*kubesealArgs, " ")
+		fmt.Println("Argument 'kubeseal-arguments' is deprecated use (sealed-secrets-service-name, sealed-secrets-service-namespace or sealed-secrets-cert-url).")
+	}
+	if *sealedSecretsServiceName != "" {
+		cfg.SealedSecrets.Service = *sealedSecretsServiceName
+	}
+	if *sealedSecretsServiceNamespace != "" {
+		cfg.SealedSecrets.Namespace = *sealedSecretsServiceNamespace
+	}
+	if *sealedSecretsCertURL != "" {
+		cfg.SealedSecrets.CertURL = *sealedSecretsCertURL
 	}
 	if *includeNamespaces != "" {
 		cfg.IncludeNamespaces = strings.Split(*includeNamespaces, " ")
@@ -80,14 +92,6 @@ func Parse() (*Config, error) {
 		}
 	}
 
-	for _, arg := range cfg.KubesealArgs {
-		if strings.HasPrefix(arg, "--format") {
-			return nil, fmt.Errorf("'--format' is not allowed as kubeseal argument")
-		} else if strings.HasPrefix(arg, "-o") {
-			return nil, fmt.Errorf("'-o' is not allowed as kubeseal argument")
-		}
-	}
-
 	return cfg, nil
 }
 
@@ -98,7 +102,7 @@ type Config struct {
 	DisableLoadSecrets bool               `yaml:"disableLoadSecrets"`
 	IncludeNamespaces  []string           `yaml:"includeNamespaces"`
 	OutputFormat       string             `yaml:"outputFormat"`
-	KubesealArgs       []string           `yaml:"kubesealArgs"`
+	SealedSecrets      SealedSecrets      `yaml:"sealedSecrets"`
 	InitialSecret      string             `yaml:"initialSecret"`
 	Marshaller         marshal.Marshaller `yaml:"_"`
 }
@@ -106,4 +110,10 @@ type Config struct {
 type Web struct {
 	Port        int    `yaml:"port"`
 	ExternalURL string `yaml:"externalUrl"`
+}
+
+type SealedSecrets struct {
+	Service   string `yaml:"service"`
+	Namespace string `yaml:"namespace"`
+	CertURL   string `yaml:"certURL,omitempty"`
 }

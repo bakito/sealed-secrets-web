@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bitnami-labs/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
 	"github.com/bitnami-labs/sealed-secrets/pkg/kubeseal"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -20,12 +21,12 @@ type Sealer interface {
 
 var _ Sealer = &apiSealer{}
 
-func NewAPISealer(controllerNs string, controllerName string, certURL string) (Sealer, error) {
+func NewAPISealer(ss config.SealedSecrets) (Sealer, error) {
 	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 	loadingRules.DefaultClientConfig = &clientcmd.DefaultClientConfig
 	cc := clientcmd.NewInteractiveDeferredLoadingClientConfig(loadingRules, nil, os.Stdout)
 
-	f, err := kubeseal.OpenCert(context.TODO(), cc, controllerNs, controllerName, certURL)
+	f, err := kubeseal.OpenCert(context.TODO(), cc, ss.Namespace, ss.Service, ss.CertURL)
 	if err != nil {
 		return nil, err
 	}
