@@ -31,14 +31,7 @@ jobs:
             --create-namespace \
             --atomic
       - name: Install sealed-secrets-web with yaml format
-        run: |
-          helm install sealed-secrets-web  charts/sealed-secrets-web \
-            --namespace sealed-secrets-web \
-            --create-namespace \
-            --set image.tag=main \
-            --set format=yaml \
-            --set image.args[0]="--kubeseal-arguments=--controller-name=sealed-secrets --controller-namespace=sealed-secrets" \
-            --atomic
+        run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml
 
       - name: Start port-forwarding for svc/sealed-secrets-web
         run: kubectl port-forward svc/sealed-secrets-web -n sealed-secrets-web 8080:80 &
@@ -63,25 +56,14 @@ jobs:
       - name: Test 'seal yaml'
         working-directory: testdata/e2e
         run: |
-          ./toSecret.sh stringData.json \
-            | curl -s --show-error -H "Content-Type: application/json" -X POST --data-binary @- localhost:8080/api/seal \
-            | jq -r .secret > sealed.yaml
-          cat sealed.yaml | yq .apiVersion | grep "bitnami.com/v1alpha1"
-          cat sealed.yaml | yq .kind | grep "SealedSecret"
-          cat sealed.yaml | yq .metadata.name | grep "mysecretname"
-          cat sealed.yaml | yq .metadata.namespace | grep "mysecretnamespace"
+          ./seal.sh stringData.json sealed.yaml
+          ./verifySealedSecret.sh sealed.yaml
 
       - name: Install sealed-secrets-web with json format
         run: |
           pkill -f "port-forward svc/sealed-secrets-web"
           helm delete sealed-secrets-web --namespace sealed-secrets-web
-          helm install sealed-secrets-web  charts/sealed-secrets-web \
-            --namespace sealed-secrets-web \
-            --create-namespace \
-            --set image.tag=main \
-            --set format=json \
-            --set image.args[0]="--kubeseal-arguments=--controller-name=sealed-secrets --controller-namespace=sealed-secrets" \
-            --atomic
+          ./testdata/e2e/installSealedSecretsWebChart.sh json
 
       - name: Start port-forwarding for svc/sealed-secrets-web
         run: kubectl port-forward svc/sealed-secrets-web -n sealed-secrets-web 8080:80 &
@@ -105,10 +87,5 @@ jobs:
       - name: Test 'seal json'
         working-directory: testdata/e2e
         run: |
-          ./toSecret.sh stringData.json \
-            | curl -s --show-error -H "Content-Type: application/json" -X POST --data-binary @- localhost:8080/api/seal \
-            | jq -r .secret > sealed.json
-          cat sealed.json | jq -r .apiVersion | grep "bitnami.com/v1alpha1"
-          cat sealed.json | jq -r .kind | grep "SealedSecret"
-          cat sealed.json | jq -r .metadata.name | grep "mysecretname"
-          cat sealed.json | jq -r .metadata.namespace | grep "mysecretnamespace"
+          ./seal.sh stringData.json sealed.json
+          ./verifySealedSecret.sh sealed.json
