@@ -97,7 +97,7 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	api.GET("/secret/:namespace/:name", sHandler.Secret)
 	api.GET("/secrets", sHandler.AllSecrets)
 
-	r.NoRoute(h.RedirectToIndex)
+	r.NoRoute(h.RedirectToIndex(cfg.Web.ExternalURL))
 	return r
 }
 
