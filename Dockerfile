@@ -1,11 +1,11 @@
-FROM bitnami/golang:1.18 as builder
+FROM golang:1.18 as builder
 WORKDIR /go/src/app
 
 RUN apt-get update && apt-get install -y upx curl
 
 ARG VERSION=main
 ARG BUILD="N/A"
-ARG TARGETPLATFORM
+ARG TARGETPLATFORM=linux/amd64
 
 ENV GO111MODULE=on \
   CGO_ENABLED=0 \

@@ -1,0 +1,17 @@
+image:
+  tag: build
+  repository: localhost:5001/sealed-secrets-web
+  pullPolicy: Always
+  args:
+    - "--kubeseal-arguments=--controller-name=sealed-secrets --controller-namespace=sealed-secrets"
+    - "--web-external-url=ssw"
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  hosts:
+    - paths:
+        - path: /ssw(/|$)(.*)
+          pathType: Prefix

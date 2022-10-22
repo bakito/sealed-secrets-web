@@ -18,7 +18,7 @@ image:
   pullPolicy: IfNotPresent
   # -- Additional command args
   args: [ ]
-   # - "--kubeseal-arguments=--controller-name=sealed-secrets"
+  # - "--kubeseal-arguments=--controller-name=sealed-secrets"
 
 # -- Secrets with credentials to pull images from a private registry. Registry secret names as an array.
 imagePullSecrets: [ ]
@@ -53,12 +53,13 @@ ingress:
   className: ""
   # -- Ingress annotations
   annotations: { }
+    # nginx.ingress.kubernetes.io/rewrite-target: /$2
+    # nginx.ingress.kubernetes.io/use-regex: "true"
   # -- Ingress hosts
-  hosts:
-    - host: sealed-secrets-web.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
+  hosts: [ ]
+    #- paths:
+    #    - path: /ssw(/|$)(.*)
+  #      pathType: Prefix
   # -- set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
   defaultTls: false
   # -- Ingress tls
@@ -69,8 +70,8 @@ resources: { }
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
+# requests:
+#   cpu: 100m
 #   memory: 128Mi
 
 

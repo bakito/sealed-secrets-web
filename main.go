@@ -63,7 +63,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could build k8s clients:%v", err.Error())
 	}
-
+	// FIXME use args
 	sealer, err := seal.NewAPISealer("sealed-secrets", "sealed-secrets", "")
 	if err != nil {
 		log.Fatalf("Setup sealer: %s", err.Error())
@@ -82,7 +82,8 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	sHandler := secrets.NewHandler(coreClient, ssClient, cfg)
 
 	r := gin.New()
-	r.Use(gin.Recovery())
+	// FIXME make logger configurable
+	r.Use(gin.Recovery(), gin.Logger())
 	h := handler.New(indexHTML, sealer, cfg)
 
 	r.GET("/", h.Index)
@@ -100,7 +101,7 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	api.GET("/secret/:namespace/:name", sHandler.Secret)
 	api.GET("/secrets", sHandler.AllSecrets)
 
-	r.NoRoute(h.RedirectToIndex)
+	r.NoRoute(h.RedirectToIndex(cfg.Web.ExternalURL))
 	return r
 }
 

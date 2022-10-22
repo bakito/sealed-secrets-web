@@ -43,6 +43,11 @@ jobs:
             --selector=app.kubernetes.io/component=controller \
             --timeout=90s
 
+      - name: Build image
+        run: |
+          docker build -f Dockerfile -t localhost:5001/sealed-secrets-web:build .
+          docker push  localhost:5001/sealed-secrets-web:build
+
       - name: Install sealed-secrets
         run: |
           helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
