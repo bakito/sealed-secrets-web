@@ -1,6 +1,6 @@
 image:
-  tag: build
   repository: localhost:5001/sealed-secrets-web
+  tag: e2e
   pullPolicy: Always
 
 ingress:

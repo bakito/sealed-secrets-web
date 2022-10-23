@@ -16,7 +16,7 @@ COPY . /go/src/app/
 RUN export GOARCH=$(basename ${TARGETPLATFORM}) && \
     echo "GOARCH ${GOARCH}" && \
     go build -a -installsuffix cgo -ldflags="-w -s -X github.com/bakito/sealed-secrets-web/pkg/version.Version=${VERSION} -X github.com/bakito/sealed-secrets-web/pkg/version.Build=${BUILD}" -o sealed-secrets-web . && \
-    /go/src/app/hack/upx-compress.sh sealed-secrets-web
+    upx -q sealed-secrets-web
 
 
 # application image
