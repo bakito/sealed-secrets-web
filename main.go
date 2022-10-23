@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/handler"
@@ -83,7 +84,7 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	r := gin.New()
 	r.Use(gin.Recovery())
 	if cfg.Web.Logger {
-		r.Use(gin.Logger())
+		r.Use(gin.LoggerWithFormatter(ginLogFormatter()))
 	}
 	h := handler.New(indexHTML, sealer, cfg)
 
@@ -129,4 +130,28 @@ func renderIndexHTML(cfg *config.Config) (string, error) {
 	}
 	indexHTML := tpl.String()
 	return indexHTML, nil
+}
+
+func ginLogFormatter() func(param gin.LogFormatterParams) string {
+	return func(param gin.LogFormatterParams) string {
+		var statusColor, methodColor, resetColor string
+		if param.IsOutputColor() {
+			statusColor = param.StatusCodeColor()
+			methodColor = param.MethodColor()
+			resetColor = param.ResetColor()
+		}
+
+		if param.Latency > time.Minute {
+			param.Latency = param.Latency.Truncate(time.Second)
+		}
+		return fmt.Sprintf("%v |%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
+			param.TimeStamp.Format("2006/01/02 15:04:05"),
+			statusColor, param.StatusCode, resetColor,
+			param.Latency,
+			param.ClientIP,
+			methodColor, param.Method, resetColor,
+			param.Path,
+			param.ErrorMessage,
+		)
+	}
 }

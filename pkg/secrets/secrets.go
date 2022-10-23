@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"sort"
 	"strings"
@@ -156,6 +157,7 @@ func (h *Handler) AllSecrets(c *gin.Context) {
 
 	sec, err := h.list()
 	if err != nil {
+		log.Printf("Error in %s: %v\n", c.Request.URL.Path, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -174,6 +176,7 @@ func (h *Handler) Secret(c *gin.Context) {
 	name := c.Param("name")
 	secret, err := h.GetSecret(c, namespace, name)
 	if err != nil {
+		log.Printf("Error in %s: %v\n", c.Request.URL.Path, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

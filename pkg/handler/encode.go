@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/base64"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,11 +12,13 @@ import (
 func (h *Handler) Encode(c *gin.Context) {
 	data := &secret{}
 	if err := c.ShouldBindJSON(&data); err != nil {
+		log.Printf("Error in %s: %v\n", c.Request.URL.Path, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	encoded, err := h.encode(data.Secret)
 	if err != nil {
+		log.Printf("Error in %s: %v\n", c.Request.URL.Path, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
