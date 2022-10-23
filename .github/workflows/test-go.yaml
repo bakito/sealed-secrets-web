@@ -9,7 +9,7 @@ on:
 
 jobs:
   go:
-    name: test
+    name: Go Tests
     runs-on: ubuntu-latest
     steps:
 
@@ -24,7 +24,7 @@ jobs:
       - name: Test
         run: go test ./...
   lint:
-    name: lint
+    name: Lint
     runs-on: ubuntu-latest
     steps:
 
@@ -38,3 +38,21 @@ jobs:
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
+
+  helm:
+    name: Helm Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lint
+        run: make helm-lint
+
+      - name: Template
+        run: make helm-template

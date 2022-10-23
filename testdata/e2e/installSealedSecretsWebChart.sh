@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-helm upgrade --install sealed-secrets-web charts/sealed-secrets-web \
+helm upgrade --install sealed-secrets-web chart \
   --namespace sealed-secrets-web \
   --create-namespace \
   -f testdata/e2e/e2e-values.yaml \

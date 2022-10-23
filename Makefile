@@ -65,3 +65,9 @@ build-arm:
 
 docs: helm-docs
 	@$(LOCALBIN)/helm-docs
+
+helm-lint:
+	helm lint ./chart
+
+helm-template:
+	helm template ./chart
