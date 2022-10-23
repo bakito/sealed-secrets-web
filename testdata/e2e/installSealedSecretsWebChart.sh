@@ -6,6 +6,7 @@ helm upgrade --install sealed-secrets-web charts/sealed-secrets-web \
   --create-namespace \
   -f testdata/e2e/e2e-values.yaml \
   --set format=${1} \
+  --set sealedSecrets.certURL=${2} \
   --atomic
 
 echo "Wait for service to respond"

@@ -59,7 +59,7 @@ jobs:
             --create-namespace \
             --atomic
       - name: Install sealed-secrets-web with yaml format
-        run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml
+        run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml ""
 
       - name: Test 'encode should encode a yaml stringData secret'
         working-directory: testdata/e2e
@@ -83,10 +83,10 @@ jobs:
           ./seal.sh stringData.json sealed.yaml
           ./verifySealedSecret.sh sealed.yaml
 
-      - name: Install sealed-secrets-web with json format
+      - name: Install sealed-secrets-web with json format and cert URL
         run: |
           helm delete sealed-secrets-web --namespace sealed-secrets-web
-          ./testdata/e2e/installSealedSecretsWebChart.sh json
+          ./testdata/e2e/installSealedSecretsWebChart.sh json http://sealed-secrets.sealed-secrets.svc:8080/v1/cert.pem
 
       - name: Test 'encode should encode a json stringData secret'
         working-directory: testdata/e2e
