@@ -150,7 +150,7 @@ func ginLogFormatter() func(param gin.LogFormatterParams) string {
 			param.Latency,
 			param.ClientIP,
 			methodColor, param.Method, resetColor,
-			param.Path,
+			handler.Sanitize(param.Path),
 			param.ErrorMessage,
 		)
 	}

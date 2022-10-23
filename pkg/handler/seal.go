@@ -15,21 +15,21 @@ type secret struct {
 func (h *Handler) Seal(c *gin.Context) {
 	data := &secret{}
 	if err := c.ShouldBindJSON(&data); err != nil {
-		log.Printf("Error in %s: %v\n", c.Request.URL.Path, err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	ss, err := h.sealer.Secret(data.Secret)
 	if err != nil {
-		log.Printf("Error in %s: %v\n", c.Request.URL.Path, err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	// unmarshal result to json
 	sec := make(map[string]interface{})
 	if err := json.Unmarshal(ss, &sec); err != nil {
-		log.Printf("Error in %s: %v\n", c.Request.URL.Path, err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -37,7 +37,7 @@ func (h *Handler) Seal(c *gin.Context) {
 	h.filter.Apply(sec)
 
 	if ss, err = h.marshaller.Marshal(sec); err != nil {
-		log.Printf("Error in %s: %v\n", c.Request.URL.Path, err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

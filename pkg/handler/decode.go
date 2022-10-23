@@ -12,13 +12,13 @@ import (
 func (h *Handler) Decode(c *gin.Context) {
 	data := &secret{}
 	if err := c.ShouldBindJSON(&data); err != nil {
-		log.Printf("Error in %s: %v\n", c.Request.URL.Path, err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	encoded, err := h.decode(data.Secret)
 	if err != nil {
-		log.Printf("Error in %s: %v\n", c.Request.URL.Path, err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
