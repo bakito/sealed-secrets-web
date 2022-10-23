@@ -6,7 +6,10 @@ kind: Role
 kind: ClusterRole
 {{- end }}
 metadata:
-  name: sealed-secrets-web
+  name: {{ template "sealed-secrets-web.fullname" . }}
+{{- if .Values.includeLocalNamespaceOnly }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}
   labels:
 {{ include "sealed-secrets-web.labels" . | indent 4 }}
 rules:
@@ -31,6 +34,8 @@ rules:
       - services/proxy
     verbs:
       - get
+    resourceNames:
+      - {{ .Values.sealedSecrets.serviceName }}
 
 ---
 
@@ -42,6 +47,9 @@ kind: ClusterRoleBinding
 {{- end }}
 metadata:
   name: {{ template "sealed-secrets-web.fullname" . }}
+{{- if .Values.includeLocalNamespaceOnly }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}
   labels:
 {{ include "sealed-secrets-web.labels" . | indent 4 }}
 roleRef:
@@ -51,7 +59,7 @@ roleRef:
   {{- else }}
   kind: ClusterRole
   {{- end }}
-  name: sealed-secrets-web
+  name: {{ template "sealed-secrets-web.fullname" . }}
 subjects:
   - apiGroup: ""
     kind: ServiceAccount

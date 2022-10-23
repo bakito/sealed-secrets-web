@@ -70,4 +70,4 @@ helm-lint:
 	helm lint ./chart
 
 helm-template:
-	helm template ./chart
+	helm template ./chart -n sealed-secrets-web
