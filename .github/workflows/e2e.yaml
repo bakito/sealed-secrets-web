@@ -113,4 +113,5 @@ jobs:
       - name: Test raw
         working-directory: testdata/e2e
         run: |
-          curl -s --show-error -H "Content-Type: application/json" -X POST --data @raw.json http://localhost/ssw/api/raw
+          curl -s --show-error -H "Content-Type: application/json" -X POST --data @raw.json http://localhost/ssw/api/raw \
+          | jq -r .secret
