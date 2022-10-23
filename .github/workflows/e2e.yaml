@@ -27,6 +27,10 @@ jobs:
       - name: Setup Registry Container
         run: |
           docker run -d --restart=always -p "127.0.0.1:5001:5000" --name kind-registry registry:2
+
+      - name: Build image
+        run: ./testdata/e2e/buildImage.sh
+
       - name: Create kind cluster
         uses: helm/kind-action@v1.4.0
         with:
@@ -47,9 +51,6 @@ jobs:
             --for=condition=ready pod \
             --selector=app.kubernetes.io/component=controller \
             --timeout=90s
-
-      - name: Build image
-        run: ./testdata/e2e/buildImage.sh
 
       - name: Install sealed-secrets
         run: |
