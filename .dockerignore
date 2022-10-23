@@ -1,8 +1,8 @@
-.idea
 .git
 .github
-charts
-testdata
-dist
-bin
+.idea
 assets
+bin
+charts
+dist
+testdata
