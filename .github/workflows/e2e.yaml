@@ -118,7 +118,7 @@ jobs:
         working-directory: testdata/e2e
         run: |
           curl -s --show-error -H "Content-Type: application/json" -X POST --data @raw.json http://localhost/ssw/api/raw \
-          | jq -r .secret
+          | jq -r -e .secret
 
       - name: Print logs
         run: kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web
