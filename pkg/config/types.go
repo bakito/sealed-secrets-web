@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -41,19 +42,21 @@ func Parse() (*Config, error) {
 	}
 
 	if *kubesealArgs != "" {
-		fmt.Println("Argument 'kubeseal-arguments' is deprecated use (sealed-secrets-service-name, sealed-secrets-service-namespace or sealed-secrets-cert-url).")
+		log.Println("Argument 'kubeseal-arguments' is deprecated use (sealed-secrets-service-name, sealed-secrets-service-namespace or sealed-secrets-cert-url).")
 	}
 	if *webExternalURL != "" {
-		fmt.Println("Argument 'web-external-url' is deprecated use (web-context).")
+		log.Println("Argument 'web-external-url' is deprecated use (web-context).")
 	}
-	if *sealedSecretsServiceName != "" {
-		cfg.SealedSecrets.Service = *sealedSecretsServiceName
-	}
-	if *sealedSecretsServiceNamespace != "" {
-		cfg.SealedSecrets.Namespace = *sealedSecretsServiceNamespace
-	}
+
 	if *sealedSecretsCertURL != "" {
 		cfg.SealedSecrets.CertURL = *sealedSecretsCertURL
+	} else {
+		if *sealedSecretsServiceName != "" {
+			cfg.SealedSecrets.Service = *sealedSecretsServiceName
+		}
+		if *sealedSecretsServiceNamespace != "" {
+			cfg.SealedSecrets.Namespace = *sealedSecretsServiceNamespace
+		}
 	}
 	if *includeNamespaces != "" {
 		cfg.IncludeNamespaces = strings.Split(*includeNamespaces, " ")
@@ -130,4 +133,11 @@ type SealedSecrets struct {
 	Service   string `yaml:"service"`
 	Namespace string `yaml:"namespace"`
 	CertURL   string `yaml:"certURL,omitempty"`
+}
+
+func (ss SealedSecrets) String() string {
+	if ss.CertURL != "" {
+		return fmt.Sprintf("Cert URL: %s", ss.CertURL)
+	}
+	return fmt.Sprintf("Namespace: %s / ServiceName: %s", ss.Namespace, ss.Service)
 }

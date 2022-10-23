@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rsa"
+	"log"
 	"os"
 	"strings"
 
@@ -22,6 +23,8 @@ type Sealer interface {
 var _ Sealer = &apiSealer{}
 
 func NewAPISealer(ss config.SealedSecrets) (Sealer, error) {
+	log.Printf("Connection to sealed secrets with (%s)\n", ss.String())
+
 	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 	loadingRules.DefaultClientConfig = &clientcmd.DefaultClientConfig
 	cc := clientcmd.NewInteractiveDeferredLoadingClientConfig(loadingRules, nil, os.Stdout)

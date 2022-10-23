@@ -83,6 +83,9 @@ jobs:
           ./seal.sh stringData.json sealed.yaml
           ./verifySealedSecret.sh sealed.yaml
 
+      - name: Print logs
+        run: kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web
+
       - name: Install sealed-secrets-web with json format and cert URL
         run: |
           helm delete sealed-secrets-web --namespace sealed-secrets-web
@@ -110,8 +113,11 @@ jobs:
           ./seal.sh stringData.json sealed.json
           ./verifySealedSecret.sh sealed.json
 
-      - name: Test raw
+      - name: Test 'raw'
         working-directory: testdata/e2e
         run: |
           curl -s --show-error -H "Content-Type: application/json" -X POST --data @raw.json http://localhost/ssw/api/raw \
           | jq -r .secret
+
+      - name: Print logs
+        run: kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web
