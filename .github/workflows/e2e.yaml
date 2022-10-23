@@ -109,3 +109,8 @@ jobs:
         run: |
           ./seal.sh stringData.json sealed.json
           ./verifySealedSecret.sh sealed.json
+
+      - name: Test raw
+        working-directory: testdata/e2e
+        run: |
+          curl -s --show-error -H "Content-Type: application/json" -X POST --data @raw.json http://localhost/ssw/api/raw
