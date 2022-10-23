@@ -71,3 +71,5 @@ helm-lint:
 
 helm-template:
 	helm template ./chart -n sealed-secrets-web
+	@echo "#######################"
+	helm template ./chart -n sealed-secrets-web --set disableLoadSecrets=true --set sealedSecrets.serviceName=

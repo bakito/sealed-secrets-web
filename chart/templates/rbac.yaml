@@ -1,4 +1,5 @@
 {{ if .Values.rbac.create }}
+{{- if or (eq (.Values.disableLoadSecrets | toString) "false") (.Values.sealedSecrets.serviceName) }}
 apiVersion: rbac.authorization.k8s.io/v1
 {{- if .Values.includeLocalNamespaceOnly }}
 kind: Role
@@ -13,7 +14,7 @@ metadata:
   labels:
 {{ include "sealed-secrets-web.labels" . | indent 4 }}
 rules:
-{{- if not .Values.disableLoadSecrets }}
+{{- if eq (.Values.disableLoadSecrets | toString) "false" }}
   - apiGroups:
       - bitnami.com
     resources:
@@ -28,6 +29,7 @@ rules:
     verbs:
       - get
 {{- end }}
+{{- if .Values.sealedSecrets.serviceName }}
   - apiGroups:
       - ""
     resources:
@@ -36,6 +38,7 @@ rules:
       - get
     resourceNames:
       - {{ .Values.sealedSecrets.serviceName }}
+{{- end }}
 
 ---
 
@@ -65,4 +68,5 @@ subjects:
     kind: ServiceAccount
     name: {{ template "sealed-secrets-web.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
+{{ end }}
 {{ end }}
