@@ -12,7 +12,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 {{- end }}
   labels:
-{{ include "sealed-secrets-web.labels" . | indent 4 }}
+    {{- include "sealed-secrets-web.labels" . | nindent 4 }}
 rules:
 {{- if eq (.Values.disableLoadSecrets | toString) "false" }}
   - apiGroups:
@@ -54,7 +54,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 {{- end }}
   labels:
-{{ include "sealed-secrets-web.labels" . | indent 4 }}
+    {{- include "sealed-secrets-web.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   {{ if .Values.includeLocalNamespaceOnly }}

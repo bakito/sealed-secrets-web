@@ -4,7 +4,7 @@ metadata:
   name: {{ include "sealed-secrets-web.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-{{ include "sealed-secrets-web.labels" . | indent 4 }}
+    {{- include "sealed-secrets-web.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
