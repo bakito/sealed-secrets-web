@@ -173,8 +173,8 @@ func (h *Handler) Secret(c *gin.Context) {
 	}
 
 	// Load existing secret.
-	namespace := c.Param("namespace")
-	name := c.Param("name")
+	namespace := handler.Sanitize(c.Param("namespace"))
+	name := handler.Sanitize(c.Param("name"))
 	secret, err := h.GetSecret(c, namespace, name)
 	if err != nil {
 		log.Printf("Error in %s: %v\n", handler.Sanitize(c.Request.URL.Path), err)

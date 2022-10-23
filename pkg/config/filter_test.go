@@ -2,7 +2,7 @@ package config
 
 import (
 	. "github.com/bakito/sealed-secrets-web/pkg/test"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
