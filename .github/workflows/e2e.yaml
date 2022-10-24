@@ -124,6 +124,6 @@ jobs:
       - name: Print logs
         run: |
           echo "Pod logs" >> $GITHUB_STEP_SUMMARY
-          echo ```yaml" >> $GITHUB_STEP_SUMMARY
+          echo "```yaml" >> $GITHUB_STEP_SUMMARY
           kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
-          echo ```" >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
