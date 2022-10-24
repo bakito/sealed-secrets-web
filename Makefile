@@ -11,7 +11,7 @@ tidy:
 	go mod tidy
 
 # Run tests
-test: mocks tidy fmt vet
+test: mocks tidy fmt vet helm-lint
 	go test ./...  -coverprofile=coverage.out
 	go tool cover -func=coverage.out
 
@@ -38,7 +38,7 @@ HELM_DOCS ?= $(LOCALBIN)/helm-docs
 MOCKGEN ?= $(LOCALBIN)/mockgen
 
 ## Tool Versions
-SEMVER_VERSION ?= latest
+SEMVER_VERSION ?= v1.1.0
 HELM_DOCS_VERSION ?= v1.11.0
 MOCKGEN_VERSION ?= v1.6.0
 
@@ -66,7 +66,12 @@ build-arm:
 docs: helm-docs
 	@$(LOCALBIN)/helm-docs
 
-helm-lint:
+update-docs:
+	@version=$$(semver -next); \
+	sed -i "s/^version:.*$$/version: $${version:1}/"     ./chart/Chart.yaml && \
+	sed -i "s/^appVersion:.*$$/appVersion: $${version}/" ./chart/Chart.yaml
+
+helm-lint: update-docs docs
 	helm lint ./chart
 
 helm-template:
