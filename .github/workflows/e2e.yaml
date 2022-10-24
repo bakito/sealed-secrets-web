@@ -60,7 +60,7 @@ jobs:
             --create-namespace \
             --atomic
       - name: Install sealed-secrets-web with yaml format
-        run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml ""
+        run: ./testdata/e2e/installSealedSecretsWebChart.sh e2e-values.yaml yaml ""
 
       - name: Test 'encode should encode a yaml stringData secret'
         working-directory: testdata/e2e
@@ -94,7 +94,7 @@ jobs:
       - name: Install sealed-secrets-web with json format and cert URL
         run: |
           helm delete sealed-secrets-web --namespace sealed-secrets-web
-          ./testdata/e2e/installSealedSecretsWebChart.sh json http://sealed-secrets.sealed-secrets.svc:8080/v1/cert.pem
+          ./testdata/e2e/installSealedSecretsWebChart.sh e2e-values.yaml json http://sealed-secrets.sealed-secrets.svc:8080/v1/cert.pem
 
       - name: Test 'encode should encode a json stringData secret'
         working-directory: testdata/e2e
@@ -127,6 +127,29 @@ jobs:
       - name: Print logs
         run: |
           echo 'Pod logs (json format and cert URL)' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Install sealed-secrets-web with yaml and tls
+        run: |
+          helm delete sealed-secrets-web --namespace sealed-secrets-web
+          kubectl create secret tls sealed-secrets-web-tls \
+            --namespace sealed-secrets-web \
+            --key ./testdata/e2e/tls/tls.key \
+            --cert ./testdata/e2e/tls/tls.crt
+          echo '127.0.0.1 my-domain.com' /etc/hosts
+          ./testdata/e2e/installSealedSecretsWebChart.sh e2e-tls-values.yaml yaml ""
+
+      - name: Test 'raw'
+        working-directory: testdata/e2e
+        run: |
+          curl -s -k --show-error -H "Content-Type: application/json" -H "Host: my-domain.com" -X POST --data @raw.json https://localhost/ssw/api/raw \
+          | jq -r -e .secret
+
+      - name: Print logs
+        run: |
+          echo 'Pod logs (yaml and TLS)' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
