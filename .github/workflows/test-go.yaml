@@ -56,6 +56,9 @@ jobs:
         with:
           go-version-file: "go.mod"
 
+      - name: Setup semver
+        run: make semver
+
       - name: Lint
         run: make helm-lint
 
