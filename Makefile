@@ -16,7 +16,7 @@ test: mocks tidy fmt vet helm-lint
 	go tool cover -func=coverage.out
 
 release: semver
-	@version=$$(semver); \
+	@version=$$($(LOCALBIN)/semver); \
 	git tag -s $$version -m"Release $$version"
 	goreleaser --rm-dist
 
@@ -67,7 +67,7 @@ docs: helm-docs
 	@$(LOCALBIN)/helm-docs
 
 update-docs: semver
-	@version=$$(semver -next); \
+	@version=$$($(LOCALBIN)/semver -next); \
 	sed -i "s/^version:.*$$/version: $${version:1}/"     ./chart/Chart.yaml && \
 	sed -i "s/^appVersion:.*$$/appVersion: $${version}/" ./chart/Chart.yaml
 
