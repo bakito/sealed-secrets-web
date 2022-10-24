@@ -36,10 +36,10 @@ image:
 imagePullSecrets: [ ]
 
 # -- Additional volumeMounts to the image updater main container
-volumeMounts: []
+volumeMounts: [ ]
 
 # -- Additional volumes to the image updater pod
-volumes: []
+volumes: [ ]
 
 # -- String to partially override "argo-rollouts.fullname" template
 nameOverride: ""
@@ -69,10 +69,13 @@ ingress:
 
   # -- Ingress class name
   className: ""
+
   # -- Ingress annotations
   annotations: { }
   # nginx.ingress.kubernetes.io/rewrite-target: /$2
   # nginx.ingress.kubernetes.io/use-regex: "true"
+  # nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+
   # -- Ingress hosts
   hosts: [ ]
   #- paths:
@@ -80,12 +83,15 @@ ingress:
   #      pathType: Prefix
   # -- set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
   defaultTls: false
+
   # -- Ingress tls
   tls: [ ]
+  #  - hosts: [ my-domain.com ]
+  #    secretName: sealed-secrets-web-tls
 
 # -- Resource limits and requests for the pods.
 resources: { }
-  # limits:
+# limits:
 #   cpu: 100m
 #   memory: 128Mi
 # requests:
