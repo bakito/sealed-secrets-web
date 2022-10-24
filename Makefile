@@ -66,7 +66,7 @@ build-arm:
 docs: helm-docs
 	@$(LOCALBIN)/helm-docs
 
-update-docs:
+update-docs: semver
 	@version=$$(semver -next); \
 	sed -i "s/^version:.*$$/version: $${version:1}/"     ./chart/Chart.yaml && \
 	sed -i "s/^appVersion:.*$$/appVersion: $${version}/" ./chart/Chart.yaml
