@@ -38,7 +38,7 @@ HELM_DOCS ?= $(LOCALBIN)/helm-docs
 MOCKGEN ?= $(LOCALBIN)/mockgen
 
 ## Tool Versions
-SEMVER_VERSION ?= v1.1.0
+SEMVER_VERSION ?= v1.1.2
 HELM_DOCS_VERSION ?= v1.11.0
 MOCKGEN_VERSION ?= v1.6.0
 
@@ -68,7 +68,8 @@ docs: helm-docs
 
 update-docs: semver
 	@version=$$($(LOCALBIN)/semver -next); \
-	sed -i "s/^version:.*$$/version: $${version:1}/"     ./chart/Chart.yaml && \
+	versionNum=$$($(LOCALBIN)/semver -next -numeric); \
+	sed -i "s/^version:.*$$/version: $${versionNum}/"    ./chart/Chart.yaml; \
 	sed -i "s/^appVersion:.*$$/appVersion: $${version}/" ./chart/Chart.yaml
 
 helm-lint: update-docs docs
