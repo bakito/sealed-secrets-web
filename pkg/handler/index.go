@@ -31,14 +31,9 @@ func (h *Handler) Index(c *gin.Context) {
 	c.String(http.StatusOK, h.indexHTML)
 }
 
-func (h *Handler) RedirectToIndex(redirect string) func(ctx *gin.Context) {
+func (h *Handler) RedirectToIndex(context string) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
-		if redirect != "" {
-			ctx.Redirect(http.StatusMovedPermanently, redirect)
-		} else {
-			ctx.Redirect(http.StatusMovedPermanently, "/")
-		}
-
+		ctx.Redirect(http.StatusMovedPermanently, context)
 		ctx.Abort()
 	}
 }

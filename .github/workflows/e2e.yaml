@@ -1,0 +1,124 @@
+name: end-2-end Helm Chart Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v1.0.0
+      - name: Install yq
+        uses: dcarbone/install-yq-action@v1.0.0
+
+      - name: Set up Registry Container
+        run: |
+          docker run -d --restart=always -p "127.0.0.1:5001:5000" --name kind-registry registry:2
+
+      - name: Build image
+        run: ./testdata/e2e/buildImage.sh
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.4.0
+        with:
+          version: v0.14.0
+          kubectl_version: v1.24.0
+          config: testdata/e2e/kind/config.yaml
+      - name: Set up Local Registry
+        run: |
+          # https://kind.sigs.k8s.io/docs/user/local-registry/
+          docker network connect kind kind-registry
+          kubectl apply -f testdata/e2e/kind/configmap-registry.yaml
+          # image registry: localhost:5001/
+      - name: Set up Ingress
+        run: |
+          # https://kind.sigs.k8s.io/docs/user/ingress/
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+          kubectl wait --namespace ingress-nginx \
+            --for=condition=ready pod \
+            --selector=app.kubernetes.io/component=controller \
+            --timeout=90s
+
+      - name: Install sealed-secrets
+        run: |
+          helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+          helm install sealed-secrets sealed-secrets/sealed-secrets \
+            --namespace sealed-secrets \
+            --create-namespace \
+            --atomic
+      - name: Install sealed-secrets-web with yaml format
+        run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml ""
+
+      - name: Test 'encode should encode a yaml stringData secret'
+        working-directory: testdata/e2e
+        run: ./runCheck.sh encode stringData.yaml data.yaml
+
+      - name: Test 'encode should not re-encode a yaml data secret'
+        working-directory: testdata/e2e
+        run: ./runCheck.sh encode data.yaml data.yaml
+
+      - name: Test 'decode should decode a yaml data secret'
+        working-directory: testdata/e2e
+        run: ./runCheck.sh decode data.yaml stringData.yaml
+
+      - name: Test 'decode should not re-decode a yaml stringData secret'
+        working-directory: testdata/e2e
+        run: ./runCheck.sh decode stringData.yaml stringData.yaml
+
+      - name: Test 'seal yaml'
+        working-directory: testdata/e2e
+        run: |
+          ./seal.sh stringData.json sealed.yaml
+          ./verifySealedSecret.sh sealed.yaml
+
+      - name: Print logs
+        run: kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web
+
+      - name: Install sealed-secrets-web with json format and cert URL
+        run: |
+          helm delete sealed-secrets-web --namespace sealed-secrets-web
+          ./testdata/e2e/installSealedSecretsWebChart.sh json http://sealed-secrets.sealed-secrets.svc:8080/v1/cert.pem
+
+      - name: Test 'encode should encode a json stringData secret'
+        working-directory: testdata/e2e
+        run: ./runCheck.sh encode stringData.json data.json
+
+      - name: Test 'encode should not re-encode a json data secret'
+        working-directory: testdata/e2e
+        run: ./runCheck.sh encode data.json data.json
+
+      - name: Test 'decode should decode a json data secret'
+        working-directory: testdata/e2e
+        run: ./runCheck.sh decode data.json stringData.json
+
+      - name: Test 'decode should not re-decode a json stringData secret'
+        working-directory: testdata/e2e
+        run: ./runCheck.sh decode stringData.json stringData.json
+
+      - name: Test 'seal json'
+        working-directory: testdata/e2e
+        run: |
+          ./seal.sh stringData.json sealed.json
+          ./verifySealedSecret.sh sealed.json
+
+      - name: Test 'raw'
+        working-directory: testdata/e2e
+        run: |
+          curl -s --show-error -H "Content-Type: application/json" -X POST --data @raw.json http://localhost/ssw/api/raw \
+          | jq -r -e .secret
+
+      - name: Print logs
+        run: kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web

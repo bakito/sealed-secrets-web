@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  password: YWRtaW4=
+  username: YWRtaW4=
+  values.yaml: InNlY3JldE5hbWUiOiAibXlzZWNyZXRuYW1lIiwgInNlY3JldFZhbHVlIjogIm15c2VjcmV0dmFsdWUiLCAic3ViU2VjcmV0cyI6IHsia2V5IjogInZhbHVlIn0=
+kind: Secret
+metadata:
+  name: mysecretname
+  namespace: mysecretnamespace
+type: Opaque
+

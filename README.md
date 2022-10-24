@@ -20,7 +20,7 @@
 **sealed-secrets-web** can be installed via our Helm chart:
 
 ```sh
-helm repo add bakito https://bakito.github.io/helm-charts
+helm repo add bakito https://charts.bakito.net
 helm repo update
 
 helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web
@@ -29,15 +29,19 @@ helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web
 To modify the settings for Sealed Secrets you can modify the arguments for the Docker image with the `--set` flag. For example you can set a different `controller-name` during the installation with the following command:
 
 ```sh
-helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web --set image.args={"--kubeseal-arguments=--controller-name=sealed-secrets"}
+helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web \
+  --set sealedSecrets.namespace=sealed-secrets \
+  --set sealedSecrets.serviceName=sealed-secrets
+
 ```
 
 or if you want to disable ability to load existing secrets, and use the tool purelly to seal new ones you can use:
 ```sh
-helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web --set disableLoadSecrets=true
+helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web \
+  --set disableLoadSecrets=true
 ```
 
-You can check helm values available at https://github.com/bakito/sealed-secrets-web/blob/main/charts/sealed-secrets-web/values.yaml
+You can check helm values available at https://github.com/bakito/sealed-secrets-web/blob/main/chart/values.yaml
 Also, check available application options at https://github.com/bakito/sealed-secrets-web/blob/main/pkg/config/types.go#L14-L22
 
 ## Development
@@ -45,39 +49,36 @@ Also, check available application options at https://github.com/bakito/sealed-se
 For development, we are using a local Kubernetes cluster using kind. When the cluster is created we install **Sealed Secrets** using Helm:
 
 ```sh
-./kind.sh
+# install registry
+docker run -d --restart=always -p "127.0.0.1:5001:5000" --name kind-registry registry:2
 
+# startup kind
+kind create cluster --config=testdata/e2e/kind/config.yaml
+
+# setup registry
+docker network connect kind kind-registry
+kubectl apply -f testdata/e2e/kind/configmap-registry.yaml
+
+# setup ingress
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=90s
+
+# build image
+./testdata/e2e/buildImage.sh
+
+# install sealed secrets
 helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
-helm install sealed-secrets sealed-secrets/sealed-secrets --namespace kube-system
+helm install sealed-secrets sealed-secrets/sealed-secrets \
+  --namespace sealed-secrets \
+  --create-namespace \
+  --atomic
 
-# Test the installation:
-echo -n bar | kubectl create secret generic mysecret --dry-run=client --from-file=foo=/dev/stdin -o json >mysecret.json
-kubeseal <mysecret.json >mysealedsecret.json --controller-name sealed-secrets
-kubectl create -f mysealedsecret.json
-kubectl get secret mysecret
+install sealed secrets web
+./testdata/e2e/installSealedSecretsWebChart.sh yaml
+
 ```
 
-if the service is not found, export the api and use the cert path
-```sh
-kubectl -n kube-system port-forward deployment/sealed-secrets 9090:8080
-
-kubeseal <mysecret.json >mysealedsecret.json --cert=http://localhost:9090/v1/cert.pem
-```
-
-Then we can build the Docker image and push it to the local registry:
-
-```sh
-docker build -f Dockerfile -t localhost:5000/sealed-secrets-web:dev .
-docker push localhost:5000/sealed-secrets-web:dev
-```
-
-Finally we can install **Sealed Secrets Web** using the provided Helm chart:
-
-```sh
-kubectl create namespace sealed-secrets-web
-
-helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web --namespace sealed-secrets-web --set image.args={"--kubeseal-arguments=--controller-name=sealed-secrets"} --set image.repository=localhost:5000/sealed-secrets-web --set image.tag=dev --set image.pullPolicy=Always
-
-# Access the Web UI:
-kubectl port-forward svc/sealed-secrets-web 8080:80
-```
+Access the interface via http://localhost/ssw

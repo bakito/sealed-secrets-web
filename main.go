@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/handler"
@@ -63,14 +64,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could build k8s clients:%v", err.Error())
 	}
+	sealer, err := seal.NewAPISealer(cfg.SealedSecrets)
+	if err != nil {
+		log.Fatalf("Setup sealer: %s", err.Error())
+	}
 
 	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, cfg.Web.Port)
-	_ = setupRouter(coreClient, ssc, cfg).Run(fmt.Sprintf(":%d", cfg.Web.Port))
+	_ = setupRouter(coreClient, ssc, cfg, sealer).Run(fmt.Sprintf(":%d", cfg.Web.Port))
 }
 
-func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *gin.Engine {
-	sealer := seal.New(cfg.KubesealArgs)
-
+func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1alpha1Interface, cfg *config.Config, sealer seal.Sealer) *gin.Engine {
 	indexHTML, err := renderIndexHTML(cfg)
 	if err != nil {
 		log.Fatalf("Could not render the index html template: %s", err.Error())
@@ -80,6 +83,9 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 
 	r := gin.New()
 	r.Use(gin.Recovery())
+	if cfg.Web.Logger {
+		r.Use(gin.LoggerWithFormatter(ginLogFormatter()))
+	}
 	h := handler.New(indexHTML, sealer, cfg)
 
 	r.GET("/", h.Index)
@@ -97,7 +103,7 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	api.GET("/secret/:namespace/:name", sHandler.Secret)
 	api.GET("/secrets", sHandler.AllSecrets)
 
-	r.NoRoute(h.RedirectToIndex(cfg.Web.ExternalURL))
+	r.NoRoute(h.RedirectToIndex(cfg.Web.Context))
 	return r
 }
 
@@ -113,7 +119,7 @@ func renderIndexHTML(cfg *config.Config) (string, error) {
 	data := map[string]interface{}{
 		"OutputFormat":       cfg.OutputFormat,
 		"DisableLoadSecrets": cfg.DisableLoadSecrets,
-		"WebExternalUrl":     cfg.Web.ExternalURL,
+		"WebContext":         cfg.Web.Context,
 		"InitialSecret":      initialSecret,
 		"Version":            version.Version,
 	}
@@ -124,4 +130,28 @@ func renderIndexHTML(cfg *config.Config) (string, error) {
 	}
 	indexHTML := tpl.String()
 	return indexHTML, nil
+}
+
+func ginLogFormatter() func(param gin.LogFormatterParams) string {
+	return func(param gin.LogFormatterParams) string {
+		var statusColor, methodColor, resetColor string
+		if param.IsOutputColor() {
+			statusColor = param.StatusCodeColor()
+			methodColor = param.MethodColor()
+			resetColor = param.ResetColor()
+		}
+
+		if param.Latency > time.Minute {
+			param.Latency = param.Latency.Truncate(time.Second)
+		}
+		return fmt.Sprintf("%v |%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
+			param.TimeStamp.Format("2006/01/02 15:04:05"),
+			statusColor, param.StatusCode, resetColor,
+			param.Latency,
+			param.ClientIP,
+			methodColor, param.Method, resetColor,
+			handler.Sanitize(param.Path),
+			param.ErrorMessage,
+		)
+	}
 }

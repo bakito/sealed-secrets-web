@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"sort"
 	"strings"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
+	"github.com/bakito/sealed-secrets-web/pkg/handler"
 	ssClient "github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v3"
@@ -156,6 +158,7 @@ func (h *Handler) AllSecrets(c *gin.Context) {
 
 	sec, err := h.list()
 	if err != nil {
+		log.Printf("Error in %s: %v\n", handler.Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -170,10 +173,11 @@ func (h *Handler) Secret(c *gin.Context) {
 	}
 
 	// Load existing secret.
-	namespace := c.Param("namespace")
-	name := c.Param("name")
+	namespace := handler.Sanitize(c.Param("namespace"))
+	name := handler.Sanitize(c.Param("name"))
 	secret, err := h.GetSecret(c, namespace, name)
 	if err != nil {
+		log.Printf("Error in %s: %v\n", handler.Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

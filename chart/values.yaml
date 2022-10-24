@@ -9,6 +9,20 @@ disableLoadSecrets: false
 # -- Secret format - either json or yaml
 format: yaml
 
+# -- Define you custom initial secret file
+initialSecretFile:
+
+# -- Secret format - either json or yaml
+webContext:
+
+sealedSecrets:
+  # -- Namespace of the sealed secrets service
+  namespace: sealed-secrets
+  # -- Name of the sealed secrets service
+  serviceName: sealed-secrets
+  # -- URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service)
+  certURL: ""
+
 image:
   # --  Repository to use
   repository: ghcr.io/bakito/sealed-secrets-web
@@ -17,11 +31,15 @@ image:
   # -- Image pull policy
   pullPolicy: IfNotPresent
   # -- Additional command args
-  args: [ ]
-   # - "--kubeseal-arguments=--controller-name=sealed-secrets"
 
 # -- Secrets with credentials to pull images from a private registry. Registry secret names as an array.
 imagePullSecrets: [ ]
+
+# -- Additional volumeMounts to the image updater main container
+volumeMounts: [ ]
+
+# -- Additional volumes to the image updater pod
+volumes: [ ]
 
 # -- String to partially override "argo-rollouts.fullname" template
 nameOverride: ""
@@ -51,26 +69,33 @@ ingress:
 
   # -- Ingress class name
   className: ""
+
   # -- Ingress annotations
   annotations: { }
+  # nginx.ingress.kubernetes.io/rewrite-target: /$2
+  # nginx.ingress.kubernetes.io/use-regex: "true"
+  # nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+
   # -- Ingress hosts
-  hosts:
-    - host: sealed-secrets-web.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
+  hosts: [ ]
+  #- paths:
+  #    - path: /ssw(/|$)(.*)
+  #      pathType: Prefix
   # -- set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
   defaultTls: false
+
   # -- Ingress tls
   tls: [ ]
+  #  - hosts: [ my-domain.com ]
+  #    secretName: sealed-secrets-web-tls
 
 # -- Resource limits and requests for the pods.
 resources: { }
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
+# limits:
+#   cpu: 100m
+#   memory: 128Mi
+# requests:
+#   cpu: 100m
 #   memory: 128Mi
 
 

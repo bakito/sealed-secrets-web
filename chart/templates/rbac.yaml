@@ -1,4 +1,5 @@
 {{ if .Values.rbac.create }}
+{{- if or (eq (.Values.disableLoadSecrets | toString) "false") (.Values.sealedSecrets.serviceName) }}
 apiVersion: rbac.authorization.k8s.io/v1
 {{- if .Values.includeLocalNamespaceOnly }}
 kind: Role
@@ -6,11 +7,14 @@ kind: Role
 kind: ClusterRole
 {{- end }}
 metadata:
-  name: sealed-secrets-web
+  name: {{ template "sealed-secrets-web.fullname" . }}
+{{- if .Values.includeLocalNamespaceOnly }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}
   labels:
-{{ include "sealed-secrets-web.labels" . | indent 4 }}
+    {{- include "sealed-secrets-web.labels" . | nindent 4 }}
 rules:
-{{- if not .Values.disableLoadSecrets }}
+{{- if eq (.Values.disableLoadSecrets | toString) "false" }}
   - apiGroups:
       - bitnami.com
     resources:
@@ -25,12 +29,16 @@ rules:
     verbs:
       - get
 {{- end }}
+{{- if .Values.sealedSecrets.serviceName }}
   - apiGroups:
       - ""
     resources:
       - services/proxy
     verbs:
       - get
+    resourceNames:
+      - {{ .Values.sealedSecrets.serviceName }}
+{{- end }}
 
 ---
 
@@ -42,8 +50,11 @@ kind: ClusterRoleBinding
 {{- end }}
 metadata:
   name: {{ template "sealed-secrets-web.fullname" . }}
+{{- if .Values.includeLocalNamespaceOnly }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}
   labels:
-{{ include "sealed-secrets-web.labels" . | indent 4 }}
+    {{- include "sealed-secrets-web.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   {{ if .Values.includeLocalNamespaceOnly }}
@@ -51,10 +62,11 @@ roleRef:
   {{- else }}
   kind: ClusterRole
   {{- end }}
-  name: sealed-secrets-web
+  name: {{ template "sealed-secrets-web.fullname" . }}
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
     name: {{ template "sealed-secrets-web.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
+{{ end }}
 {{ end }}

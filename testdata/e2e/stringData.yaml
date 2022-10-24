@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecretname
+  namespace: mysecretnamespace
+stringData:
+  password: admin
+  username: admin
+  values.yaml: '"secretName": "mysecretname", "secretValue": "mysecretvalue", "subSecrets": {"key": "value"}'
+type: Opaque
+

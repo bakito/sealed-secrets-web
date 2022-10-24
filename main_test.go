@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -49,7 +49,7 @@ var _ = Describe("Main", func() {
 			ssClient = ssclient.NewMockSealedSecretInterface(mock)
 			coreClient = core.NewMockCoreV1Interface(mock)
 			secrets = core.NewMockSecretInterface(mock)
-			router = setupRouter(coreClient, alpha1Client, cfg)
+			router = setupRouter(coreClient, alpha1Client, cfg, nil)
 		})
 		It("return OK on health", func() {
 			req, _ := http.NewRequest("GET", "/_health", nil)
@@ -110,7 +110,7 @@ var _ = Describe("Main", func() {
 
 		It("list sealed secrets only for given namespaces", func() {
 			cfg.IncludeNamespaces = []string{"a", "b"}
-			router = setupRouter(coreClient, alpha1Client, cfg)
+			router = setupRouter(coreClient, alpha1Client, cfg, nil)
 			alpha1Client.EXPECT().SealedSecrets("a").Return(ssClient)
 			ssClient.EXPECT().List(gomock.Any(), gomock.Any()).Return(&v1alpha1.SealedSecretList{
 				Items: []v1alpha1.SealedSecret{
@@ -148,7 +148,7 @@ var _ = Describe("Main", func() {
 
 		It("secrets endpoints are disabled", func() {
 			cfg.DisableLoadSecrets = true
-			router = setupRouter(coreClient, alpha1Client, cfg)
+			router = setupRouter(coreClient, alpha1Client, cfg, nil)
 			req, _ := http.NewRequest("GET", "/api/secrets", nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(403))

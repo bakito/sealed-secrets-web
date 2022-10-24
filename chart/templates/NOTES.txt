@@ -1,0 +1,33 @@
+{{- if .Values.image.args }}
+*************************************
+**          ATTENTION!!            **
+*************************************
+.Values.image args is deprecated
+
+Please use the following values instead:
+---------------------------------------------
+
+# -- If set to true, the application has only the permission to view sealed secrets in the current namespace
+includeLocalNamespaceOnly: false
+
+# -- If set to true secrets cannot be read from this tool, only seal new ones
+disableLoadSecrets: false
+
+# -- Secret format - either json or yaml
+format: yaml
+
+# -- Define you custom initial secret file
+initialSecretFile:
+
+# -- Secret format - either json or yaml
+webContext:
+
+sealedSecrets:
+  # -- Namespace of the sealed secrets service
+  namespace: sealed-secrets
+  # -- Name of the sealed secrets service
+  serviceName: sealed-secrets
+  # -- URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service)
+  certURL: ""
+---------------------------------------------
+{{- end }}

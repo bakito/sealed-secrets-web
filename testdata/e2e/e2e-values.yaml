@@ -1,0 +1,18 @@
+image:
+  repository: localhost:5001/sealed-secrets-web
+  tag: e2e
+  pullPolicy: Always
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  hosts:
+    - paths:
+        - path: /ssw(/|$)(.*)
+          pathType: Prefix
+
+webContext: ssw
+webLogs: true
