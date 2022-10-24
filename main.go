@@ -69,7 +69,7 @@ func main() {
 		log.Fatalf("Setup sealer: %s", err.Error())
 	}
 
-	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, cfg.Web.Port)
+	log.Printf("Running sealed secrets web (%s / %s) on port %d", version.Version, cfg.OutputFormat, cfg.Web.Port)
 	_ = setupRouter(coreClient, ssc, cfg, sealer).Run(fmt.Sprintf(":%d", cfg.Web.Port))
 }
 

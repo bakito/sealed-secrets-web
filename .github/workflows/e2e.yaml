@@ -18,7 +18,7 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          version: v3.10.1
       - name: Install jq
         uses: dcarbone/install-jq-action@v1.0.0
       - name: Install yq
@@ -85,7 +85,11 @@ jobs:
           ./verifySealedSecret.sh sealed.yaml
 
       - name: Print logs
-        run: kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web
+        run: |
+          echo 'Pod logs (yaml format)' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Install sealed-secrets-web with json format and cert URL
         run: |
@@ -121,4 +125,8 @@ jobs:
           | jq -r -e .secret
 
       - name: Print logs
-        run: kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web
+        run: |
+          echo 'Pod logs (json format and cert URL)' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
