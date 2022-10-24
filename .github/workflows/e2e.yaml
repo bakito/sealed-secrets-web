@@ -22,7 +22,7 @@ jobs:
       - name: Install jq
         uses: dcarbone/install-jq-action@v1.0.0
       - name: Install yq
-        uses: dcarbone/install-yq-action@v1.0.0
+        uses: dcarbone/install-yq-action@v1.0.1
 
       - name: Set up Registry Container
         run: |
