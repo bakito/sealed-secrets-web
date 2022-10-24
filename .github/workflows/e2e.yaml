@@ -24,7 +24,7 @@ jobs:
       - name: Install yq
         uses: dcarbone/install-yq-action@v1.0.0
 
-      - name: Setup Registry Container
+      - name: Set up Registry Container
         run: |
           docker run -d --restart=always -p "127.0.0.1:5001:5000" --name kind-registry registry:2
 
@@ -37,13 +37,13 @@ jobs:
           version: v0.14.0
           kubectl_version: v1.24.0
           config: testdata/e2e/kind/config.yaml
-      - name: Setup Local Registry
+      - name: Set up Local Registry
         run: |
           # https://kind.sigs.k8s.io/docs/user/local-registry/
           docker network connect kind kind-registry
           kubectl apply -f testdata/e2e/kind/configmap-registry.yaml
           # image registry: localhost:5001/
-      - name: Setup Ingress
+      - name: Set up Ingress
         run: |
           # https://kind.sigs.k8s.io/docs/user/ingress/
           kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
