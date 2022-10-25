@@ -101,7 +101,9 @@ func Parse() (*Config, error) {
 		}
 	}
 
-	if !strings.HasPrefix(cfg.Web.Context, "/") {
+	if !strings.HasPrefix(cfg.Web.Context, "/") &&
+		!strings.HasPrefix(cfg.Web.Context, "http://") &&
+		!strings.HasPrefix(cfg.Web.Context, "https://") {
 		cfg.Web.Context = "/" + cfg.Web.Context
 	}
 	if !strings.HasSuffix(cfg.Web.Context, "/") {
