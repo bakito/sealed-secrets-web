@@ -20,7 +20,7 @@ jobs:
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
       - name: Install jq
-        uses: dcarbone/install-jq-action@v1.0.0
+        uses: dcarbone/install-jq-action@v1.0.1
       - name: Install yq
         uses: dcarbone/install-yq-action@v1.0.1
 
