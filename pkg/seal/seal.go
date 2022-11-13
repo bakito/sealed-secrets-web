@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rsa"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -18,6 +19,7 @@ import (
 type Sealer interface {
 	Secret(secret string) ([]byte, error)
 	Raw(data Raw) ([]byte, error)
+	Certificate() ([]byte, error)
 }
 
 var _ Sealer = &apiSealer{}
@@ -41,13 +43,29 @@ func NewAPISealer(ss config.SealedSecrets) (Sealer, error) {
 
 	return &apiSealer{
 		clientConfig: cc,
+		ss:           ss,
 		pubKey:       pubKey,
 	}, nil
 }
 
 type apiSealer struct {
 	clientConfig clientcmd.ClientConfig
+	ss           config.SealedSecrets
 	pubKey       *rsa.PublicKey
+}
+
+func (a *apiSealer) Certificate() ([]byte, error) {
+	f, err := kubeseal.OpenCert(context.TODO(), a.clientConfig, a.ss.Namespace, a.ss.Service, a.ss.CertURL)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = f.Close() }()
+	data, err := io.ReadAll(f)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func (a *apiSealer) Secret(secret string) ([]byte, error) {
