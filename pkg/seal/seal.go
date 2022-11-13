@@ -20,6 +20,7 @@ type Sealer interface {
 	Secret(secret string) ([]byte, error)
 	Raw(data Raw) ([]byte, error)
 	Certificate() ([]byte, error)
+	Seal(outputFormat string, secret io.Reader) ([]byte, error)
 }
 
 var _ Sealer = &apiSealer{}
@@ -69,11 +70,15 @@ func (a *apiSealer) Certificate() ([]byte, error) {
 }
 
 func (a *apiSealer) Secret(secret string) ([]byte, error) {
+	return a.Seal("json", strings.NewReader(secret))
+}
+
+func (a *apiSealer) Seal(outputFormat string, secret io.Reader) ([]byte, error) {
 	var buf bytes.Buffer
 	if err := kubeseal.Seal(
 		a.clientConfig,
-		"json",
-		strings.NewReader(secret),
+		outputFormat,
+		secret,
 		&buf,
 		scheme.Codecs,
 		a.pubKey,

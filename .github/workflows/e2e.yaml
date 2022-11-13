@@ -124,11 +124,9 @@ jobs:
           curl -s --show-error -H "Content-Type: application/json" -X POST --data @raw.json http://localhost/ssw/api/raw \
           | jq -r -e .secret
 
-      - name: Test retrieve 'Certificate'
+      - name: Run Tests
         working-directory: testdata/e2e
-        run: |
-          curl -s --show-error -X GET http://localhost/ssw/api/certificate \
-          |  openssl x509 -checkend 0 -issuer -subject -dates
+        run: ./runTests.sh
 
       - name: Print logs
         run: |
