@@ -99,6 +99,7 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	api.POST("/raw", h.Raw)
 	api.GET("/certificate", h.Certificate)
 	api.POST("/kubeseal", h.KubeSeal)
+	api.POST("/dencode", h.Dencode)
 	api.POST("/encode", h.Encode)
 	api.POST("/decode", h.Decode)
 
