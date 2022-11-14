@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-func Sanitize(urlPath string) string {
-	p := path.Clean(urlPath)
+func Sanitize(value string) string {
+	p := path.Clean(value)
 	p = strings.ReplaceAll(p, "\n", "")
 	p = strings.ReplaceAll(p, "\r", "")
 	return p
