@@ -10,7 +10,7 @@
 
 **Sealed Secrets Web** is a web interface for [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) by Bitnami. The web interface let you encode, decode the keys in the `data` field of a secret, load existing Sealed Secrets and create Sealed Secrets. Under the hood it uses the [kubeseal](https://github.com/bitnami-labs/sealed-secrets/tree/master/cmd/kubeseal) command-line tool to encrypt your secrets. The web interface should be installed to your Kubernetes cluster, so your developers do not need access to your cluster via kubectl.
 
-- **Encode:** Base64 encodes each key in the `data` field in a secret.
+- **Encode:** Base64 encodes each key in the `stringData` field in a secret.
 - **Decode:** Base64 decodes each key in the `data` field in a secret.
 - **Secrets:** Returns a list of all Sealed Secrets in all namespaces. With a click on the Sealed Secret the decrypted Kubernetes secret is loaded.
 - **Seal:** Encrypt a Kubernetes secret and creates the Sealed Secret.

@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
@@ -27,8 +26,6 @@ import (
 var (
 	//go:embed templates/index.html
 	indexTemplate string
-	//go:embed templates/secret.json
-	initialSecretJSON string
 	//go:embed templates/secret.yaml
 	initialSecretYAML string
 
@@ -112,11 +109,9 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 
 func renderIndexHTML(cfg *config.Config) (string, error) {
 	indexTmpl := template.Must(template.New("index.html").Parse(indexTemplate))
-	initialSecret := initialSecretJSON
+	initialSecret := initialSecretYAML
 	if cfg.InitialSecret != "" {
 		initialSecret = cfg.InitialSecret
-	} else if strings.EqualFold(cfg.OutputFormat, "yaml") {
-		initialSecret = initialSecretYAML
 	}
 
 	data := map[string]interface{}{
