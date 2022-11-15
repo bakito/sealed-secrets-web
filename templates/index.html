@@ -19,8 +19,7 @@
       <v-app-bar app color="primary" dark>
         <v-toolbar-title>Sealed Secrets</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn @click="encode" text>Encode</v-btn>
-        <v-btn @click="decode" text>Decode</v-btn>
+        <v-btn @click="dencode" text>Encode / Decode</v-btn>
         {{ if eq .DisableLoadSecrets false}}<v-btn @click="loadSecrets" text>Secrets</v-btn>{{end}}
         <v-btn @click="seal" text>Seal</v-btn>
       </v-app-bar>
@@ -30,7 +29,10 @@
           <v-layout wrap>
             <v-flex xs6>
               <v-card height="100%">
-                <v-card-title>Secret</v-card-title>
+                <v-card-title>Secret
+                  <v-spacer></v-spacer>
+                  <v-select :items="['yaml', 'json']" hide-details="true" v-model="secretFormat" v-on:change="changeSecretFormat" dense solo style="max-width: 100px"></v-select>
+                </v-card-title>
                 <v-card-text style="height: calc(100% - 56px)">
                   <div id="editor1" style="width: 100%; height: 100%;"></div>
                 </v-card-text>
@@ -38,7 +40,10 @@
             </v-flex>
             <v-flex xs6>
               <v-card height="100%">
-                <v-card-title>Sealed Secret</v-card-title>
+                <v-card-title>Sealed Secret
+                  <v-spacer></v-spacer>
+                  <v-select :items="['yaml', 'json']" hide-details="true" v-model="sealedSecretFormat" v-on:change="changeSealedSecretFormat" dense solo style="max-width: 100px"></v-select>
+                </v-card-title>
                 <v-card-text style="height: calc(100% - 56px)">
                   <div id="editor2" style="width: 100%; height: 100%;"></div>
                 </v-card-text>
@@ -84,6 +89,7 @@
   <script src="{{.WebContext}}static/scripts/vue.min.js"></script>
   <script src="{{.WebContext}}static/scripts/vuetify.min.js"></script>
   <script src="{{.WebContext}}static/scripts/axios.min.js"></script>
+  <script src="{{.WebContext}}static/scripts/yaml.min.js"></script>
   <script src="{{.WebContext}}static/ace/ace.js"></script>
   <script>
     const INITIAL_SECRET = "{{.InitialSecret}}"
@@ -99,6 +105,8 @@
           editor2: Object,
           editor1Content: INITIAL_SECRET,
           editor2Content: '',
+          secretFormat: 'yaml',
+          sealedSecretFormat: 'yaml',
           options: {
             selectionStyle: "line",
             highlightActiveLine: true,
@@ -143,7 +151,7 @@
         this.editor1 = window.ace.edit('editor1')
         this.editor1.setValue(this.editor1Content, 1)
         this.editor1.setOptions(this.options)
-        this.editor1.getSession().setMode('ace/mode/{{.OutputFormat}}')
+        this.editor1.getSession().setMode('ace/mode/yaml')
         this.editor1.setTheme('ace/theme/dracula')
         this.editor1.on('change', () => {
           this.editor1Content = this.editor1.getValue()
@@ -152,7 +160,7 @@
         this.editor2 = window.ace.edit('editor2')
         this.editor2.setValue(this.editor2Content, 1)
         this.editor2.setOptions(this.options)
-        this.editor2.getSession().setMode('ace/mode/{{.OutputFormat}}')
+      this.editor2.getSession().setMode('ace/mode/yaml')
         this.editor2.setTheme('ace/theme/dracula')
         this.editor2.on('change', () => {
           this.editor2Content = this.editor2.getValue()
@@ -160,8 +168,13 @@
       },
       methods : {
         seal() {
-          axios.post('{{.WebContext}}api/seal', {secret: this.editor1Content}).then(res => {
-            this.editor2Content = res.data.secret
+          axios.post('{{.WebContext}}api/kubeseal', this.editor1Content,
+            { headers: {
+                'Content-Type': this.contentType(this.secretFormat),
+                'Accept': this.contentType(this.sealedSecretFormat)},
+              transformResponse: (r) => r}
+          ).then(res => {
+            this.editor2Content = res.data
             this.editor2.setValue(this.editor2Content, 1)
           }).catch(err => {
             this.error = err.response.data
@@ -184,21 +197,57 @@
             this.error = err.response.data
           });
         },
-        encode() {
-          axios.post('{{.WebContext}}api/encode', {secret: this.editor1Content}).then(res => {
-            this.editor1Content = res.data.secret
+        dencode() {
+          axios.post('{{.WebContext}}api/dencode', this.editor1Content,
+            { headers: {
+                'Content-Type': this.contentType(this.secretFormat),
+                'Accept': this.contentType(this.secretFormat)},
+              transformResponse: (r) => r}
+          ).then(res => {
+            console.log(res)
+            this.editor1Content = this.format(this.secretFormat, res.data)
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {
-            this.error = err.response.data
+            this.error = err.response
           });
         },
-        decode() {
-          axios.post('{{.WebContext}}api/decode', {secret: this.editor1Content}).then(res => {
-            this.editor1Content = res.data.secret
+        changeSecretFormat(selected) {
+          this.editor1.getSession().setMode('ace/mode/'+selected)
+          try{
+            if (selected === "json") {
+              this.editor1Content = JSON.stringify(YAML.parse(this.editor1Content), null, 2)
+            } else {
+              this.editor1Content = YAML.stringify(JSON.parse(this.editor1Content), null, 2)
+            }
             this.editor1.setValue(this.editor1Content, 1)
-          }).catch(err => {
-            this.error = err.response.data
-          });
+          } catch (err) {
+            this.error = err
+          }
+        },
+        changeSealedSecretFormat(selected) {
+          this.editor2.getSession().setMode('ace/mode/'+selected)
+          try{
+            if (selected === "json") {
+              this.editor2Content = JSON.stringify(YAML.parse(this.editor2Content), null, 2)
+            } else {
+              this.editor2Content = YAML.stringify(JSON.parse(this.editor2Content), null, 2)
+            }
+            this.editor2.setValue(this.editor2Content, 1)
+          } catch (err) {
+            this.error = err
+          }
+        },
+        contentType(c) {
+          if (c === "json") {
+            return 'application/json'
+          }
+          return 'application/x-yaml'
+        },
+        format(c, value) {
+          if (c === "json") {
+            return JSON.stringify(JSON.parse(value), null, 2)
+          }
+          return YAML.stringify(YAML.parse(value), null, 2)
         }
       }
     })
