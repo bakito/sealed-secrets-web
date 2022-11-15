@@ -44,6 +44,32 @@ helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web \
 You can check helm values available at https://github.com/bakito/sealed-secrets-web/blob/main/chart/values.yaml
 Also, check available application options at https://github.com/bakito/sealed-secrets-web/blob/main/pkg/config/types.go#L14-L22
 
+## Api Usage
+
+### Get current certificate
+
+```bash
+curl --request GET 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/certificate'
+```
+
+### Seal a secret using servers certificate
+
+#### having sealed secret as yaml output
+
+```bash
+curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/kubeseal' \
+  --header 'Accept: application/x-yaml' \
+  --data-binary '@stringData.yaml'
+```
+
+#### having sealed secret as json output
+
+```bash
+curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/kubeseal' \
+  --header 'Accept: application/json' \
+  --data-binary '@stringData.yaml'
+```
+
 ## Development
 
 For development, we are using a local Kubernetes cluster using kind. When the cluster is created we install **Sealed Secrets** using Helm:
