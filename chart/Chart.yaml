@@ -12,3 +12,4 @@ annotations:
   artifacthub.io/changes: |
     - "Removed image.args in favour of new values. (initialSecretFile, sealedSecrets.namespace, sealedSecrets.serviceName, webContext)"
     - "Add support for volume/volumeMounts"
+    - "Removed format as the UI can now handle json and yaml simultaneously"
