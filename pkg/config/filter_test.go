@@ -1,6 +1,10 @@
 package config
 
 import (
+	"flag"
+	"io"
+	"os"
+
 	. "github.com/bakito/sealed-secrets-web/pkg/test"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -12,6 +16,7 @@ var _ = Describe("Filter", func() {
 	Context("removeNullFields", func() {
 		var ff *FieldFilter
 		BeforeEach(func() {
+			resetFlagsForTesting()
 			cfg, err := Parse()
 			Ω(err).ShouldNot(HaveOccurred())
 			ff = cfg.FieldFilter
@@ -57,8 +62,10 @@ var _ = Describe("Filter", func() {
 	Context("removeRuntimeFields", func() {
 		var ff *FieldFilter
 		BeforeEach(func() {
-			config = &testConfigFile
-			cfg, err := Parse()
+			resetFlagsForTesting()
+			f := newFlags()
+			f.config = &testConfigFile
+			cfg, err := parse(f)
 			Ω(err).ShouldNot(HaveOccurred())
 			ff = cfg.FieldFilter
 		})
@@ -88,3 +95,8 @@ var _ = Describe("Filter", func() {
 		})
 	})
 })
+
+func resetFlagsForTesting() {
+	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	flag.CommandLine.SetOutput(io.Discard)
+}
