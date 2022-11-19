@@ -1,3 +1,7 @@
+[![end-2-end Helm Chart Tests](https://github.com/bakito/sealed-secrets-web/actions/workflows/e2e.yaml/badge.svg)](https://github.com/bakito/sealed-secrets-web/actions/workflows/e2e.yaml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/bakito/sealed-secrets-web)](https://goreportcard.com/report/github.com/bakito/sealed-secrets-web)
+[![Coverage Status](https://coveralls.io/repos/github/bakito/sealed-secrets-web/badge.svg?branch=main)](https://coveralls.io/github/bakito/sealed-secrets-web?branch=main)
+
 <div align="center">
   <img src="./assets/logo.png" />
   <br><br>

@@ -11,7 +11,9 @@ tidy:
 	go mod tidy
 
 # Run tests
-test: mocks tidy fmt vet helm-lint
+test: mocks tidy fmt vet helm-lint test-cover
+# Run coverage tests
+test-cover:
 	go test ./...  -coverprofile=coverage.out
 	go tool cover -func=coverage.out
 
