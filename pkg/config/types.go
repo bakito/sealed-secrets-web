@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bakito/sealed-secrets-web/pkg/marshal"
 	"gopkg.in/yaml.v3"
 )
 
@@ -19,7 +18,6 @@ var (
 	sealedSecretsServiceName      = flag.String("sealed-secrets-service-name", "sealed-secrets", "Name of the sealed secrets service")
 	sealedSecretsServiceNamespace = flag.String("sealed-secrets-service-namespace", "sealed-secrets", "Namespace of the sealed secrets service")
 	sealedSecretsCertURL          = flag.String("sealed-secrets-cert-url", "", "URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service)")
-	outputFormat                  = flag.String("format", "json", "Output format for sealed secret. Either json or yaml")
 	initialSecretFile             = flag.String("initial-secret-file", "", "Define a file with the initial secret to be displayed. If empty, defaults are used.")
 	webExternalURL                = flag.String("web-external-url", "", "Deprecated use (web-context)")
 	webContext                    = flag.String("web-context", "/", "The context the application is running on. (for example, if it is served via a reverse proxy)")
@@ -37,7 +35,6 @@ func Parse() (*Config, error) {
 			Logger:  *enableWebLogs,
 		},
 		PrintVersion:       *printVersion,
-		OutputFormat:       *outputFormat,
 		DisableLoadSecrets: *disableLoadSecrets,
 	}
 
@@ -91,16 +88,6 @@ func Parse() (*Config, error) {
 		}
 	}
 
-	cfg.Marshaller = marshal.For(cfg.OutputFormat)
-
-	if cfg.InitialSecret != "" {
-		// Read and format the initial secret with the default marshaller
-		sec := make(map[string]interface{})
-		if err := cfg.Marshaller.Unmarshal([]byte(cfg.InitialSecret), sec); err != nil {
-			return nil, fmt.Errorf("could not parse the initial secret: %w", err)
-		}
-	}
-
 	if !strings.HasPrefix(cfg.Web.Context, "/") &&
 		!strings.HasPrefix(cfg.Web.Context, "http://") &&
 		!strings.HasPrefix(cfg.Web.Context, "https://") {
@@ -114,15 +101,13 @@ func Parse() (*Config, error) {
 }
 
 type Config struct {
-	Web                Web                `yaml:"web"`
-	FieldFilter        *FieldFilter       `yaml:"fieldFilter,omitempty"`
-	PrintVersion       bool               `yaml:"printVersion"`
-	DisableLoadSecrets bool               `yaml:"disableLoadSecrets"`
-	IncludeNamespaces  []string           `yaml:"includeNamespaces"`
-	OutputFormat       string             `yaml:"outputFormat"`
-	SealedSecrets      SealedSecrets      `yaml:"sealedSecrets"`
-	InitialSecret      string             `yaml:"initialSecret"`
-	Marshaller         marshal.Marshaller `yaml:"_"`
+	Web                Web           `yaml:"web"`
+	FieldFilter        *FieldFilter  `yaml:"fieldFilter,omitempty"`
+	PrintVersion       bool          `yaml:"printVersion"`
+	DisableLoadSecrets bool          `yaml:"disableLoadSecrets"`
+	IncludeNamespaces  []string      `yaml:"includeNamespaces"`
+	SealedSecrets      SealedSecrets `yaml:"sealedSecrets"`
+	InitialSecret      string        `yaml:"initialSecret"`
 }
 
 type Web struct {

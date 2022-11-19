@@ -62,67 +62,10 @@ jobs:
       - name: Install sealed-secrets-web with yaml format
         run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml ""
 
-      - name: Test 'encode should encode a yaml stringData secret'
-        working-directory: testdata/e2e
-        run: ./runCheck.sh encode stringData.yaml data.yaml
-
-      - name: Test 'encode should not re-encode a yaml data secret'
-        working-directory: testdata/e2e
-        run: ./runCheck.sh encode data.yaml data.yaml
-
-      - name: Test 'decode should decode a yaml data secret'
-        working-directory: testdata/e2e
-        run: ./runCheck.sh decode data.yaml stringData.yaml
-
-      - name: Test 'decode should not re-decode a yaml stringData secret'
-        working-directory: testdata/e2e
-        run: ./runCheck.sh decode stringData.yaml stringData.yaml
-
-      - name: Test 'seal yaml'
-        working-directory: testdata/e2e
-        run: |
-          ./seal.sh stringData.json sealed.yaml
-          ./verifySealedSecret.sh sealed.yaml
-
-      - name: Print logs
-        run: |
-          echo 'Pod logs (yaml format)' >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-
       - name: Install sealed-secrets-web with json format and cert URL
         run: |
           helm delete sealed-secrets-web --namespace sealed-secrets-web
           ./testdata/e2e/installSealedSecretsWebChart.sh json http://sealed-secrets.sealed-secrets.svc:8080/v1/cert.pem
-
-      - name: Test 'encode should encode a json stringData secret'
-        working-directory: testdata/e2e
-        run: ./runCheck.sh encode stringData.json data.json
-
-      - name: Test 'encode should not re-encode a json data secret'
-        working-directory: testdata/e2e
-        run: ./runCheck.sh encode data.json data.json
-
-      - name: Test 'decode should decode a json data secret'
-        working-directory: testdata/e2e
-        run: ./runCheck.sh decode data.json stringData.json
-
-      - name: Test 'decode should not re-decode a json stringData secret'
-        working-directory: testdata/e2e
-        run: ./runCheck.sh decode stringData.json stringData.json
-
-      - name: Test 'seal json'
-        working-directory: testdata/e2e
-        run: |
-          ./seal.sh stringData.json sealed.json
-          ./verifySealedSecret.sh sealed.json
-
-      - name: Test 'raw'
-        working-directory: testdata/e2e
-        run: |
-          curl -s --show-error -H "Content-Type: application/json" -X POST --data @raw.json http://localhost/ssw/api/raw \
-          | jq -r -e .secret
 
       - name: Run Tests
         working-directory: testdata/e2e

@@ -8,6 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type secret struct {
+	Secret string `json:"secret"`
+}
+
 func (h *Handler) Raw(c *gin.Context) {
 	data := &seal.Raw{}
 	if err := c.ShouldBindJSON(&data); err != nil {

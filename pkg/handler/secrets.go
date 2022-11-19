@@ -1,8 +1,7 @@
-package secrets
+package handler
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,11 +9,13 @@ import (
 	"strings"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
-	"github.com/bakito/sealed-secrets-web/pkg/handler"
 	ssClient "github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1"
 	"github.com/gin-gonic/gin"
-	"gopkg.in/yaml.v3"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/kubernetes/scheme"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -43,8 +44,7 @@ func BuildClients(clientConfig clientcmd.ClientConfig, disableLoadSecrets bool) 
 }
 
 // Handler handles our secrets operations.
-type Handler struct {
-	outputFormat       string
+type SecretsHandler struct {
 	coreClient         corev1.CoreV1Interface
 	ssClient           ssClient.BitnamiV1alpha1Interface
 	disableLoadSecrets bool
@@ -52,13 +52,12 @@ type Handler struct {
 }
 
 // NewHandler creates a new secrets handler.
-func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *Handler {
+func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *SecretsHandler {
 	inMap := make(map[string]bool)
 	for _, n := range cfg.IncludeNamespaces {
 		inMap[n] = true
 	}
-	return &Handler{
-		outputFormat:       cfg.OutputFormat,
+	return &SecretsHandler{
 		ssClient:           ssCl,
 		coreClient:         coreClient,
 		disableLoadSecrets: cfg.DisableLoadSecrets,
@@ -67,8 +66,9 @@ func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1
 }
 
 // List returns a list of all secrets.
-func (h *Handler) list() ([]Secret, error) {
-	var secrets []Secret
+func (h *SecretsHandler) list() ([]Secret, error) {
+	secrets := []Secret{}
+	fmt.Printf("secrets: %#v\n", secrets)
 	if h.disableLoadSecrets {
 		return secrets, nil
 	}
@@ -99,7 +99,7 @@ func (h *Handler) list() ([]Secret, error) {
 	return secrets, nil
 }
 
-func (h *Handler) listForNamespace(ns string) ([]Secret, error) {
+func (h *SecretsHandler) listForNamespace(ns string) ([]Secret, error) {
 	var secrets []Secret
 	ssList, err := h.ssClient.SealedSecrets(ns).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -112,7 +112,7 @@ func (h *Handler) listForNamespace(ns string) ([]Secret, error) {
 }
 
 // GetSecret returns a secret by name in the given namespace.
-func (h *Handler) GetSecret(ctx context.Context, namespace, name string) ([]byte, error) {
+func (h *SecretsHandler) GetSecret(ctx context.Context, namespace, name string) (*v1.Secret, error) {
 	if h.disableLoadSecrets {
 		return nil, nil
 	}
@@ -128,29 +128,15 @@ func (h *Handler) GetSecret(ctx context.Context, namespace, name string) ([]byte
 		Kind:       "Secret",
 	}
 	secret.ObjectMeta.ManagedFields = nil
+	secret.ObjectMeta.OwnerReferences = nil
+	secret.ObjectMeta.CreationTimestamp = metav1.Time{}
+	secret.ObjectMeta.ResourceVersion = ""
+	secret.ObjectMeta.UID = ""
 
-	jsonData, err := json.MarshalIndent(secret, "", "  ")
-	if err != nil {
-		return nil, err
-	}
-
-	if strings.EqualFold(h.outputFormat, "yaml") {
-		secretMap := make(map[string]interface{})
-
-		err = json.Unmarshal(jsonData, &secretMap)
-		if err != nil {
-			return nil, err
-		}
-
-		return yaml.Marshal(secretMap)
-	} else if h.outputFormat == "json" {
-		return jsonData, nil
-	}
-
-	return nil, fmt.Errorf("unsupported output format: %s", h.outputFormat)
+	return secret, nil
 }
 
-func (h *Handler) AllSecrets(c *gin.Context) {
+func (h *SecretsHandler) AllSecrets(c *gin.Context) {
 	if h.disableLoadSecrets {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Loading secrets is disabled"})
 		return
@@ -158,37 +144,67 @@ func (h *Handler) AllSecrets(c *gin.Context) {
 
 	sec, err := h.list()
 	if err != nil {
-		log.Printf("Error in %s: %v\n", handler.Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, sec)
+	c.JSON(http.StatusOK, gin.H{"secrets": sec})
 }
 
-func (h *Handler) Secret(c *gin.Context) {
+func (h *SecretsHandler) Secret(c *gin.Context) {
+	contentType, outputFormat, done := NegotiateFormat(c)
+	if done {
+		return
+	}
+
 	if h.disableLoadSecrets {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Loading secrets is disabled"})
 		return
 	}
 
 	// Load existing secret.
-	namespace := handler.Sanitize(c.Param("namespace"))
-	name := handler.Sanitize(c.Param("name"))
+	namespace := Sanitize(c.Param("namespace"))
+	name := Sanitize(c.Param("name"))
 	secret, err := h.GetSecret(c, namespace, name)
 	if err != nil {
-		log.Printf("Error in %s: %v\n", handler.Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	data := struct {
-		Secret string `json:"secret"`
-	}{
-		string(secret),
+	encode, err := EncodeSecret(secret, outputFormat)
+	if err != nil {
+		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Data(http.StatusOK, contentType, encode)
+}
+
+func EncodeSecret(secret *v1.Secret, outputFormat string) ([]byte, error) {
+	var contentType string
+	switch strings.ToLower(outputFormat) {
+	case "json", "":
+		contentType = runtime.ContentTypeJSON
+	case "yaml":
+		contentType = runtime.ContentTypeYAML
+	default:
+		return nil, fmt.Errorf("unsupported output format: %s", outputFormat)
 	}
 
-	c.JSON(http.StatusOK, &data)
+	info, ok := runtime.SerializerInfoForMediaType(scheme.Codecs.SupportedMediaTypes(), contentType)
+	if !ok {
+		return nil, fmt.Errorf("unsupported output format: %s", outputFormat)
+	}
+
+	prettyEncoder := info.PrettySerializer
+	if prettyEncoder == nil {
+		prettyEncoder = info.Serializer
+	}
+	encoder := scheme.Codecs.EncoderForVersion(prettyEncoder, schema.GroupVersion{Group: "", Version: "v1"})
+
+	return runtime.Encode(encoder, secret)
 }
 
 type Secret struct {

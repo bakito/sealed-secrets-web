@@ -14,7 +14,6 @@ import (
 	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/handler"
 	"github.com/bakito/sealed-secrets-web/pkg/seal"
-	"github.com/bakito/sealed-secrets-web/pkg/secrets"
 	"github.com/bakito/sealed-secrets-web/pkg/version"
 	ssClient "github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1"
 	"github.com/gin-gonic/gin"
@@ -57,7 +56,7 @@ func main() {
 		return
 	}
 
-	coreClient, ssc, err := secrets.BuildClients(clientConfig, cfg.DisableLoadSecrets)
+	coreClient, ssc, err := handler.BuildClients(clientConfig, cfg.DisableLoadSecrets)
 	if err != nil {
 		log.Fatalf("Could build k8s clients:%v", err.Error())
 	}
@@ -66,7 +65,7 @@ func main() {
 		log.Fatalf("Setup sealer: %s", err.Error())
 	}
 
-	log.Printf("Running sealed secrets web (%s / %s) on port %d", version.Version, cfg.OutputFormat, cfg.Web.Port)
+	log.Printf("Running sealed secrets web (%s) on port %d", version.Version, cfg.Web.Port)
 	_ = setupRouter(coreClient, ssc, cfg, sealer).Run(fmt.Sprintf(":%d", cfg.Web.Port))
 }
 
@@ -76,7 +75,7 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 		log.Fatalf("Could not render the index html template: %s", err.Error())
 	}
 
-	sHandler := secrets.NewHandler(coreClient, ssClient, cfg)
+	sHandler := handler.NewHandler(coreClient, ssClient, cfg)
 
 	r := gin.New()
 	r.Use(gin.Recovery())
@@ -92,13 +91,10 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	api := r.Group("/api")
 
 	api.GET("/version", h.Version)
-	api.POST("/seal", h.Seal)
 	api.POST("/raw", h.Raw)
 	api.GET("/certificate", h.Certificate)
 	api.POST("/kubeseal", h.KubeSeal)
 	api.POST("/dencode", h.Dencode)
-	api.POST("/encode", h.Encode)
-	api.POST("/decode", h.Decode)
 
 	api.GET("/secret/:namespace/:name", sHandler.Secret)
 	api.GET("/secrets", sHandler.AllSecrets)
@@ -115,7 +111,6 @@ func renderIndexHTML(cfg *config.Config) (string, error) {
 	}
 
 	data := map[string]interface{}{
-		"OutputFormat":       cfg.OutputFormat,
 		"DisableLoadSecrets": cfg.DisableLoadSecrets,
 		"WebContext":         cfg.Web.Context,
 		"InitialSecret":      initialSecret,

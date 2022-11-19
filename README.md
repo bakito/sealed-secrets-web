@@ -70,6 +70,14 @@ curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/kubeseal' \
   --data-binary '@stringData.yaml'
 ```
 
+#### sealing one value with default
+
+```bash
+curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/kubeseal' \
+  --header 'Accept: application/json' \
+  --data-binary '@stringData.yaml'
+```
+
 ## Development
 
 For development, we are using a local Kubernetes cluster using kind. When the cluster is created we install **Sealed Secrets** using Helm:

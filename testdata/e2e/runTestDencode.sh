@@ -13,7 +13,7 @@ curl --silent --show-error --request POST 'http://localhost/ssw/api/dencode' \
   --header 'Content-Type: application/x-yaml' \
   --header 'Accept: application/x-yaml' \
   --data-binary '@data.yaml' \
-  | diff --strip-trailing-cr --ignore-blank-lines stringData.yaml -
+  | yq --prettyPrint | diff --strip-trailing-cr --ignore-blank-lines stringData.yaml -
 
 echo "Test /api/dencode should b64 encode secret springData having yaml input and json output"
 curl --silent --show-error --request POST 'http://localhost/ssw/api/dencode' \
@@ -60,4 +60,4 @@ curl --silent --show-error --request POST 'http://localhost/ssw/api/dencode' \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/x-yaml' \
   --data-binary '@data.json' \
-  | diff --strip-trailing-cr --ignore-blank-lines stringData.yaml -
+  | yq --prettyPrint | diff --strip-trailing-cr --ignore-blank-lines stringData.yaml -

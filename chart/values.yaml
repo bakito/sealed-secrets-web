@@ -6,13 +6,10 @@ includeLocalNamespaceOnly: false
 # -- If set to true secrets cannot be read from this tool, only seal new ones
 disableLoadSecrets: false
 
-# -- Secret format - either json or yaml
-format: yaml
-
 # -- Define you custom initial secret file
 initialSecretFile:
 
-# -- Secret format - either json or yaml
+# -- The context the application is running on. (for example, if it is served via a reverse proxy)
 webContext:
 
 sealedSecrets:
