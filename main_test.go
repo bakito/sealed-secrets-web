@@ -50,20 +50,20 @@ var _ = Describe("Main", func() {
 		It("return OK on health", func() {
 			req, _ := http.NewRequest("GET", "/_health", nil)
 			router.ServeHTTP(w, req)
-			Ω(w.Code).Should(Equal(200))
+			Ω(w.Code).Should(Equal(http.StatusOK))
 			Ω(w.Body.String()).Should(Equal("OK"))
 		})
 		It("return version info on version", func() {
 			req, _ := http.NewRequest("GET", "/api/version", nil)
 			router.ServeHTTP(w, req)
-			Ω(w.Code).Should(Equal(200))
+			Ω(w.Code).Should(Equal(http.StatusOK))
 			Ω(w.Body.String()).Should(Equal(`{"build":"","version":"dev"}`))
 		})
 
 		It("return the index page", func() {
 			req, _ := http.NewRequest("GET", "/", nil)
 			router.ServeHTTP(w, req)
-			Ω(w.Code).Should(Equal(200))
+			Ω(w.Code).Should(Equal(http.StatusOK))
 		})
 
 		It("redirect on any other url", func() {
@@ -86,7 +86,7 @@ var _ = Describe("Main", func() {
 			}, nil)
 			req, _ := http.NewRequest("GET", "/api/secrets", nil)
 			router.ServeHTTP(w, req)
-			Ω(w.Code).Should(Equal(200))
+			Ω(w.Code).Should(Equal(http.StatusOK))
 			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":"%s","name":"%s"}]}`, namespace, name)))
 		})
 
@@ -113,7 +113,7 @@ var _ = Describe("Main", func() {
 			}, nil)
 			req, _ := http.NewRequest("GET", "/api/secrets", nil)
 			router.ServeHTTP(w, req)
-			Ω(w.Code).Should(Equal(200))
+			Ω(w.Code).Should(Equal(http.StatusOK))
 			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":"%s","name":"%s"},{"namespace":"%s","name":"%s"}]}`, "a", name, "b", name)))
 		})
 
@@ -124,7 +124,7 @@ var _ = Describe("Main", func() {
 			}, nil)
 			req, _ := http.NewRequest("GET", fmt.Sprintf("/api/secret/%s/%s", namespace, name), nil)
 			router.ServeHTTP(w, req)
-			Ω(w.Code).Should(Equal(200))
+			Ω(w.Code).Should(Equal(http.StatusOK))
 			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{
   "kind": "Secret",
   "apiVersion": "v1",

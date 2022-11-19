@@ -8,9 +8,12 @@ import (
 )
 
 var (
-	validCertificate  = "-----BEGIN CERTIFICATE-----\n[...]\n-----END CERTIFICATE-----\n"
+	validCertificate = `-----BEGIN CERTIFICATE-----
+[...]
+-----END CERTIFICATE-----
+`
 	encryptedRawValue = "encryptedRawValue"
-	sealAsJSON        = "{\"apiVersion\": \"bitnami.com/v1alpha1\"}"
+	sealAsJSON        = `{"apiVersion": "bitnami.com/v1alpha1"}`
 	sealedAsYAML      = "apiVersion: bitnami.com/v1alpha1\n"
 
 	stringDataAsJSON = `{

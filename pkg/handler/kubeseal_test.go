@@ -4,42 +4,52 @@ import (
 	"bytes"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestHandler_KubeSeal_InputAsJson_OutputAsJson(t *testing.T) {
-	recorder := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(recorder)
-	c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
-	c.Request.Header.Set("Content-Type", "application/x-yaml")
-	c.Request.Header.Set("Accept", "application/x-yaml")
-	h := &Handler{
-		sealer: successfulSealer{},
-	}
+var _ = Describe("Handler ", func() {
+	Context("KubeSeal", func() {
+		var (
+			recorder *httptest.ResponseRecorder
+			c        *gin.Context
+		)
+		BeforeEach(func() {
+			gin.SetMode(gin.ReleaseMode)
+			recorder = httptest.NewRecorder()
+			c, _ = gin.CreateTestContext(recorder)
+		})
 
-	h.KubeSeal(c)
+		It("should kubeseal input as json and output as json", func() {
+			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsJSON)))
+			c.Request.Header.Set("Content-Type", "application/json")
+			c.Request.Header.Set("Accept", "application/json")
+			h := &Handler{
+				sealer: successfulSealer{},
+			}
 
-	assert.Equal(t, 200, recorder.Code)
-	assert.Equal(t, sealedAsYAML, recorder.Body.String())
-	assert.Equal(t, "application/x-yaml", recorder.Header().Get("Content-Type"))
-}
+			h.KubeSeal(c)
 
-func TestHandler_KubeSeal_InputAsYaml_OutputAsYaml(t *testing.T) {
-	recorder := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(recorder)
-	c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
-	c.Request.Header.Set("Content-Type", "application/json")
-	c.Request.Header.Set("Accept", "application/json")
-	h := &Handler{
-		sealer: successfulSealer{},
-	}
+			Ω(recorder.Code).Should(Equal(http.StatusOK))
+			Ω(recorder.Body.String()).Should(Equal(sealAsJSON))
+			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/json"))
+		})
 
-	h.KubeSeal(c)
+		It("should kubeseal input as yaml and output as yaml", func() {
+			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
+			c.Request.Header.Set("Content-Type", "application/x-yaml")
+			c.Request.Header.Set("Accept", "application/x-yaml")
+			h := &Handler{
+				sealer: successfulSealer{},
+			}
 
-	assert.Equal(t, 200, recorder.Code)
-	assert.Equal(t, sealAsJSON, recorder.Body.String())
-	assert.Equal(t, "application/json", recorder.Header().Get("Content-Type"))
-}
+			h.KubeSeal(c)
+
+			Ω(recorder.Code).Should(Equal(http.StatusOK))
+			Ω(recorder.Body.String()).Should(Equal(sealedAsYAML))
+			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/x-yaml"))
+		})
+	})
+})
