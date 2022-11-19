@@ -182,15 +182,19 @@
         },
         loadSecrets() {
           axios.get('{{.WebContext}}api/secrets').then(res => {
-            this.secrets = res.data
+            this.secrets = res.data.secrets
             this.dialogVisible = true
           }).catch(err => {
             this.error = err.response.data
           });
         },
         loadSecret(namespace, name) {
-          axios.get("{{.WebContext}}api/secret/" + namespace + "/" + name).then(res => {
-            this.editor1Content = res.data.secret
+          axios.get("{{.WebContext}}api/secret/" + namespace + "/" + name,
+            { headers: {
+                'Accept': this.contentType(this.secretFormat)},
+              transformResponse: (r) => r},
+          ).then(res => {
+            this.editor1Content = res.data
             this.editor1.setValue(this.editor1Content, 1)
             this.dialogVisible = false
           }).catch(err => {
@@ -204,8 +208,7 @@
                 'Accept': this.contentType(this.secretFormat)},
               transformResponse: (r) => r}
           ).then(res => {
-            console.log(res)
-            this.editor1Content = this.format(this.secretFormat, res.data)
+            this.editor1Content = res.data
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {
             this.error = err.response
@@ -242,12 +245,6 @@
             return 'application/json'
           }
           return 'application/x-yaml'
-        },
-        format(c, value) {
-          if (c === "json") {
-            return JSON.stringify(JSON.parse(value), null, 2)
-          }
-          return YAML.stringify(YAML.parse(value), null, 2)
         }
       }
     })

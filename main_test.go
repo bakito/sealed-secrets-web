@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
-	"github.com/bakito/sealed-secrets-web/pkg/marshal"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/core"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/ssclient"
 	"github.com/bitnami-labs/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
@@ -37,9 +35,7 @@ var _ = Describe("Main", func() {
 
 		BeforeEach(func() {
 			cfg = &config.Config{
-				OutputFormat: "yaml",
-				FieldFilter:  &config.FieldFilter{},
-				Marshaller:   marshal.For("yaml"),
+				FieldFilter: &config.FieldFilter{},
 			}
 			name = uuid.NewString()
 			namespace = uuid.NewString()
@@ -77,20 +73,6 @@ var _ = Describe("Main", func() {
 			Ω(w.Body.String()).Should(ContainSubstring("Moved Permanently"))
 		})
 
-		It("encode a secret", func() {
-			req, _ := http.NewRequest("POST", "/api/encode", strings.NewReader(encodeBody))
-			router.ServeHTTP(w, req)
-			Ω(w.Code).Should(Equal(200))
-			Ω(w.Body.String()).Should(Equal(decodeBody))
-		})
-
-		It("decode a secret", func() {
-			req, _ := http.NewRequest("POST", "/api/decode", strings.NewReader(decodeBody))
-			router.ServeHTTP(w, req)
-			Ω(w.Code).Should(Equal(200))
-			Ω(w.Body.String()).Should(Equal(encodeBody))
-		})
-
 		It("list sealed secrets for all namespaces", func() {
 			cfg.IncludeNamespaces = nil
 			alpha1Client.EXPECT().SealedSecrets("").Return(ssClient)
@@ -105,7 +87,7 @@ var _ = Describe("Main", func() {
 			req, _ := http.NewRequest("GET", "/api/secrets", nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(200))
-			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`[{"namespace":"%s","name":"%s"}]`, namespace, name)))
+			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":"%s","name":"%s"}]}`, namespace, name)))
 		})
 
 		It("list sealed secrets only for given namespaces", func() {
@@ -132,10 +114,10 @@ var _ = Describe("Main", func() {
 			req, _ := http.NewRequest("GET", "/api/secrets", nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(200))
-			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`[{"namespace":"%s","name":"%s"},{"namespace":"%s","name":"%s"}]`, "a", name, "b", name)))
+			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":"%s","name":"%s"},{"namespace":"%s","name":"%s"}]}`, "a", name, "b", name)))
 		})
 
-		It("list secret of namespace", func() {
+		It("get secret from namespace by name", func() {
 			coreClient.EXPECT().Secrets(namespace).Return(secrets)
 			secrets.EXPECT().Get(gomock.Any(), name, gomock.Any()).Return(&corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Name: name},
@@ -143,7 +125,15 @@ var _ = Describe("Main", func() {
 			req, _ := http.NewRequest("GET", fmt.Sprintf("/api/secret/%s/%s", namespace, name), nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(200))
-			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{"secret":"apiVersion: v1\nkind: Secret\nmetadata:\n    creationTimestamp: null\n    name: %s\n    namespace: %s\n"}`, name, namespace)))
+			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{
+  "kind": "Secret",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "%s",
+    "namespace": "%s",
+    "creationTimestamp": null
+  }
+}`, name, namespace)))
 		})
 
 		It("secrets endpoints are disabled", func() {
@@ -158,8 +148,3 @@ var _ = Describe("Main", func() {
 		})
 	})
 })
-
-const (
-	encodeBody = `{"secret":"apiVersion: v1\nkind: Secret\nmetadata:\n  name: mysecretname\n  namespace: mysecretnamespace\nstringData:\n  password: admin\n  username: admin\ntype: Opaque\n"}`
-	decodeBody = `{"secret":"apiVersion: v1\ndata:\n  password: YWRtaW4=\n  username: YWRtaW4=\nkind: Secret\nmetadata:\n  name: mysecretname\n  namespace: mysecretnamespace\ntype: Opaque\n"}`
-)

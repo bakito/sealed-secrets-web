@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bitnami-labs/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
@@ -17,7 +16,6 @@ import (
 )
 
 type Sealer interface {
-	Secret(secret string) ([]byte, error)
 	Raw(data Raw) ([]byte, error)
 	Certificate() ([]byte, error)
 	Seal(outputFormat string, secret io.Reader) ([]byte, error)
@@ -67,10 +65,6 @@ func (a *apiSealer) Certificate() ([]byte, error) {
 	}
 
 	return data, nil
-}
-
-func (a *apiSealer) Secret(secret string) ([]byte, error) {
-	return a.Seal("json", strings.NewReader(secret))
 }
 
 func (a *apiSealer) Seal(outputFormat string, secret io.Reader) ([]byte, error) {

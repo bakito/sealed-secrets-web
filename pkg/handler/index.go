@@ -4,25 +4,22 @@ import (
 	"net/http"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
-	"github.com/bakito/sealed-secrets-web/pkg/marshal"
 	"github.com/bakito/sealed-secrets-web/pkg/seal"
 	"github.com/bakito/sealed-secrets-web/pkg/version"
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	sealer     seal.Sealer
-	indexHTML  string
-	marshaller marshal.Marshaller
-	filter     *config.FieldFilter
+	sealer    seal.Sealer
+	indexHTML string
+	filter    *config.FieldFilter
 }
 
 func New(indexHTML string, sealer seal.Sealer, cfg *config.Config) *Handler {
 	return &Handler{
-		marshaller: cfg.Marshaller,
-		sealer:     sealer,
-		indexHTML:  indexHTML,
-		filter:     cfg.FieldFilter,
+		sealer:    sealer,
+		indexHTML: indexHTML,
+		filter:    cfg.FieldFilter,
 	}
 }
 

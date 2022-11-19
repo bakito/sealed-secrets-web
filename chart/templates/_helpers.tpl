@@ -64,7 +64,6 @@ Generate image args
 {{- if .Values.includeLocalNamespaceOnly }}
 {{- $args = append $args (printf "--include-namespaces=%s" .Release.Namespace) }}
 {{- end }}
-{{- $args = append $args (printf "--format=%s" .Values.format) }}
 {{- if .Values.sealedSecrets.certURL }}
   {{- $args = append $args (printf "--sealed-secrets-cert-url=%s" .Values.sealedSecrets.certURL ) }}
 {{- else }}

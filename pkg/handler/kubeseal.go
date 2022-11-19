@@ -5,18 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 func (h *Handler) KubeSeal(c *gin.Context) {
-	contentType := c.NegotiateFormat(gin.MIMEJSON, gin.MIMEYAML)
-	var outputFormat string
-	if contentType == "" {
-		c.AbortWithStatus(http.StatusNotAcceptable)
+	outputContentType, outputFormat, done := NegotiateFormat(c)
+	if done {
 		return
-	} else if contentType == gin.MIMEJSON {
-		outputFormat = "json"
-	} else {
-		outputFormat = "yaml"
 	}
 
 	ss, err := h.sealer.Seal(outputFormat, c.Request.Body)
@@ -29,5 +24,19 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 		return
 	}
 
-	c.Data(http.StatusOK, contentType, ss)
+	c.Data(http.StatusOK, outputContentType, ss)
+}
+
+func NegotiateFormat(c *gin.Context) (string, string, bool) {
+	contentType := c.NegotiateFormat(gin.MIMEJSON, gin.MIMEYAML, runtime.ContentTypeYAML)
+	var outputFormat string
+	if contentType == "" {
+		c.AbortWithStatus(http.StatusNotAcceptable)
+		return "", "", true
+	} else if contentType == gin.MIMEJSON {
+		outputFormat = "json"
+	} else {
+		outputFormat = "yaml"
+	}
+	return contentType, outputFormat, false
 }
