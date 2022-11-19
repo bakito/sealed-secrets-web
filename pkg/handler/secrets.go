@@ -43,7 +43,7 @@ func BuildClients(clientConfig clientcmd.ClientConfig, disableLoadSecrets bool) 
 	return restClient, ssCl, nil
 }
 
-// Handler handles our secrets operations.
+// SecretsHandler handles our secrets operations.
 type SecretsHandler struct {
 	coreClient         corev1.CoreV1Interface
 	ssClient           ssClient.BitnamiV1alpha1Interface
@@ -51,7 +51,7 @@ type SecretsHandler struct {
 	includeNamespaces  map[string]bool
 }
 
-// NewHandler creates a new secrets handler.
+// NewHandler creates a new secret handler.
 func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *SecretsHandler {
 	inMap := make(map[string]bool)
 	for _, n := range cfg.IncludeNamespaces {

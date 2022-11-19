@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) KubeSeal(c *gin.Context) {
-	contentType, outputFormat, done := NegotiateFormat(c)
+	outputContentType, outputFormat, done := NegotiateFormat(c)
 	if done {
 		return
 	}
@@ -24,7 +24,7 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 		return
 	}
 
-	c.Data(http.StatusOK, contentType, ss)
+	c.Data(http.StatusOK, outputContentType, ss)
 }
 
 func NegotiateFormat(c *gin.Context) (string, string, bool) {

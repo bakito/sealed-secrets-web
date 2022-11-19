@@ -13,7 +13,7 @@ import (
 )
 
 func (h *Handler) Dencode(c *gin.Context) {
-	contentType, outputFormat, done := NegotiateFormat(c)
+	outputContentType, outputFormat, done := NegotiateFormat(c)
 	if done {
 		return
 	}
@@ -31,7 +31,7 @@ func (h *Handler) Dencode(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Data(http.StatusOK, contentType, encode)
+	c.Data(http.StatusOK, outputContentType, encode)
 }
 
 func (h *Handler) dencode(secret *v1.Secret) *v1.Secret {
