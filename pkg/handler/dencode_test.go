@@ -15,19 +15,18 @@ var _ = Describe("Handler ", func() {
 		var (
 			recorder *httptest.ResponseRecorder
 			c        *gin.Context
+			h        *Handler
 		)
 		BeforeEach(func() {
 			gin.SetMode(gin.ReleaseMode)
 			recorder = httptest.NewRecorder()
 			c, _ = gin.CreateTestContext(recorder)
+			h = &Handler{}
 		})
 		It("should encode input as json and output as json", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(stringDataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
-			h := &Handler{
-				sealer: successfulSealer{},
-			}
 			h.Dencode(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusOK))
@@ -38,9 +37,6 @@ var _ = Describe("Handler ", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(dataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
-			h := &Handler{
-				sealer: successfulSealer{},
-			}
 			h.Dencode(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusOK))
@@ -51,9 +47,6 @@ var _ = Describe("Handler ", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/x-yaml")
 			c.Request.Header.Set("Accept", "application/x-yaml")
-			h := &Handler{
-				sealer: successfulSealer{},
-			}
 			h.Dencode(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusOK))
@@ -64,9 +57,6 @@ var _ = Describe("Handler ", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(dataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/x-yaml")
 			c.Request.Header.Set("Accept", "application/x-yaml")
-			h := &Handler{
-				sealer: successfulSealer{},
-			}
 			h.Dencode(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusOK))
@@ -77,9 +67,6 @@ var _ = Describe("Handler ", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(dataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "text/plain")
-			h := &Handler{
-				sealer: successfulSealer{},
-			}
 			h.Dencode(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusNotAcceptable))
@@ -90,9 +77,6 @@ var _ = Describe("Handler ", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte("invalidInputSecret")))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
-			h := &Handler{
-				sealer: successfulSealer{},
-			}
 			h.Dencode(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))

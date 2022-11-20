@@ -27,6 +27,7 @@ test-release:
 mocks: mockgen
 	$(LOCALBIN)/mockgen -destination pkg/mocks/core/mock.go     --package core     k8s.io/client-go/kubernetes/typed/core/v1 CoreV1Interface,SecretInterface
 	$(LOCALBIN)/mockgen -destination pkg/mocks/ssclient/mock.go --package ssclient github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1 BitnamiV1alpha1Interface,SealedSecretInterface
+	$(LOCALBIN)/mockgen -destination pkg/mocks/seal/mock.go --package seal github.com/bakito/sealed-secrets-web/pkg/seal Sealer
 
 ## Location to install dependencies to
 LOCALBIN ?= $(shell pwd)/bin

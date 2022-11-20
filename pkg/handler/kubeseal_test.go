@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/bakito/sealed-secrets-web/pkg/mocks/seal"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -15,20 +17,27 @@ var _ = Describe("Handler ", func() {
 		var (
 			recorder *httptest.ResponseRecorder
 			c        *gin.Context
+			mock     *gomock.Controller
+			sealer   *seal.MockSealer
+			h        *Handler
 		)
 		BeforeEach(func() {
 			gin.SetMode(gin.ReleaseMode)
 			recorder = httptest.NewRecorder()
 			c, _ = gin.CreateTestContext(recorder)
+			mock = gomock.NewController(GinkgoT())
+			sealer = seal.NewMockSealer(mock)
+			h = &Handler{
+				sealer: sealer,
+			}
 		})
 
 		It("should kubeseal input as json and output as json", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
-			h := &Handler{
-				sealer: successfulSealer{},
-			}
+
+			sealer.EXPECT().Seal("json", gomock.Any()).Return([]byte(sealAsJSON), nil)
 
 			h.KubeSeal(c)
 
@@ -41,9 +50,8 @@ var _ = Describe("Handler ", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/x-yaml")
 			c.Request.Header.Set("Accept", "application/x-yaml")
-			h := &Handler{
-				sealer: successfulSealer{},
-			}
+
+			sealer.EXPECT().Seal("yaml", gomock.Any()).Return([]byte(sealedAsYAML), nil)
 
 			h.KubeSeal(c)
 
