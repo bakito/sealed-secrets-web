@@ -14,5 +14,5 @@ func (h *Handler) Certificate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Data(http.StatusOK, "text/plain", certificate)
+	c.Data(http.StatusOK, "text/plain; charset=utf-8", certificate)
 }

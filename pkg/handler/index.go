@@ -24,7 +24,7 @@ func New(indexHTML string, sealer seal.Sealer, cfg *config.Config) *Handler {
 }
 
 func (h *Handler) Index(c *gin.Context) {
-	c.Writer.Header().Set("Content-Type", "text/html")
+	c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	c.String(http.StatusOK, h.indexHTML)
 }
 

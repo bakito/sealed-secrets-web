@@ -28,7 +28,7 @@ var _ = Describe("Handler ", func() {
 
 			Ω(recorder.Code).Should(Equal(http.StatusOK))
 			Ω(recorder.Body.String()).Should(Equal(validCertificate))
-			Ω(recorder.Header().Get("Content-Type")).Should(Equal("text/plain"))
+			Ω(recorder.Header().Get("Content-Type")).Should(Equal("text/plain; charset=utf-8"))
 		})
 		It("should successfully fail when requesting a certificate", func() {
 			h := &Handler{
