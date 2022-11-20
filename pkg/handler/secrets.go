@@ -173,7 +173,7 @@ func (h *SecretsHandler) Secret(c *gin.Context) {
 		return
 	}
 
-	encode, err := EncodeSecret(secret, outputFormat)
+	encode, err := encodeSecret(secret, outputFormat)
 	if err != nil {
 		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -182,7 +182,7 @@ func (h *SecretsHandler) Secret(c *gin.Context) {
 	c.Data(http.StatusOK, contentType, encode)
 }
 
-func EncodeSecret(secret *v1.Secret, outputFormat string) ([]byte, error) {
+func encodeSecret(secret *v1.Secret, outputFormat string) ([]byte, error) {
 	var contentType string
 	switch strings.ToLower(outputFormat) {
 	case "json", "":

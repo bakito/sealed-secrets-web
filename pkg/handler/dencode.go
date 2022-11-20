@@ -25,7 +25,7 @@ func (h *Handler) Dencode(c *gin.Context) {
 		return
 	}
 
-	encode, err := EncodeSecret(h.dencode(secret), outputFormat)
+	encode, err := encodeSecret(h.dencode(secret), outputFormat)
 	if err != nil {
 		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
