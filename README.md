@@ -74,12 +74,12 @@ curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/kubeseal' \
   --data-binary '@stringData.yaml'
 ```
 
-#### sealing one value with default
+#### sealing one value with default scope
 
 ```bash
-curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/kubeseal' \
-  --header 'Accept: application/json' \
-  --data-binary '@stringData.yaml'
+curl -request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/raw' \
+     --header 'Content-Type: application/json' \
+     --data '{ "name": "mysecretname", "namespace": "mysecretnamespace", "value": "value to seal" }'
 ```
 
 ## Development
