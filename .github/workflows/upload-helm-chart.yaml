@@ -30,7 +30,8 @@ jobs:
           VERSION=$(echo "${{github.event.release.tag_name }}" | sed 's/v//g')
           sed -i "s/^version:.*$/version: ${VERSION}/"        ./chart/Chart.yaml
           sed -i "s/^appVersion:.*$/appVersion: v${VERSION}/" ./chart/Chart.yaml
-          make docs
+          make helm-docs
+          ./bin/helm-docs
           helm package ./chart/ --version $VERSION --app-version v$VERSION -d dist
 
       - name: Install chart-releaser
