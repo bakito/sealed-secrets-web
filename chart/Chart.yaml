@@ -10,4 +10,4 @@ name: sealed-secrets-web
 version: 3.0.4
 annotations:
   artifacthub.io/changes: |
-    - added attribute to define revisionHistoryLimit
+    - simplified revisionHistoryLimit config in deployment

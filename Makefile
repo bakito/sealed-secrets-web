@@ -1,17 +1,13 @@
 # Run go fmt against code
-fmt:
-	golangci-lint run --fix
-
-# Run go vet against code
-vet:
-	go vet ./...
+fmt: golangci-lint
+	$(LOCALBIN)/golangci-lint run --fix
 
 # Run go mod tidy
 tidy:
 	go mod tidy
 
 # Run tests
-test: mocks tidy fmt vet helm-lint test-cover
+test: mocks tidy fmt helm-lint test-cover
 # Run coverage tests
 test-cover: ginkgo
 	$(LOCALBIN)/ginkgo --cover ./...
@@ -39,12 +35,14 @@ SEMVER ?= $(LOCALBIN)/semver
 HELM_DOCS ?= $(LOCALBIN)/helm-docs
 MOCKGEN ?= $(LOCALBIN)/mockgen
 GINKGO ?= $(LOCALBIN)/ginkgo
+GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 ## Tool Versions
 SEMVER_VERSION ?= v1.1.3
 HELM_DOCS_VERSION ?= v1.11.0
 MOCKGEN_VERSION ?= v1.6.0
-GINKGO_VERSION ?= v2.5.0
+GINKGO_VERSION ?= v2.5.1
+GOLANGCI_LINT_VERSION ?= v1.50.1
 
 .PHONY: semver
 semver: $(SEMVER) ## Download semver locally if necessary.
@@ -66,16 +64,22 @@ ginkgo: $(GINKGO) ## Download ginkgo locally if necessary.
 $(GINKGO): $(LOCALBIN)
 	test -s $(LOCALBIN)/ginkgo|| GOBIN=$(LOCALBIN) go install github.com/onsi/ginkgo/v2/ginkgo@$(GINKGO_VERSION)
 
+.PHONY: golangci-lint
+golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
+$(GOLANGCI_LINT): $(LOCALBIN)
+	test -s $(LOCALBIN)/golangci-lint|| GOBIN=$(LOCALBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
+
+
 build:
 	podman build --build-arg VERSION=dev --build-arg BUILD=dev --build-arg TARGETPLATFORM=linux/amd64 -t sealed-secrets-web .
 
 build-arm:
 	podman build --build-arg VERSION=dev --build-arg BUILD=dev --build-arg TARGETPLATFORM=linux/arm64 -t sealed-secrets-web .
 
-docs: helm-docs update-docs
+docs: helm-docs update-chart-version
 	@$(LOCALBIN)/helm-docs
 
-update-docs: semver
+update-chart-version: semver
 	@version=$$($(LOCALBIN)/semver -next); \
 	versionNum=$$($(LOCALBIN)/semver -next -numeric); \
 	sed -i "s/^version:.*$$/version: $${versionNum}/"    ./chart/Chart.yaml; \
