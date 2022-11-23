@@ -7,9 +7,7 @@ metadata:
     {{- include "sealed-secrets-web.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
-  {{- with .Values.revisionHistoryLimit }}
-  revisionHistoryLimit: {{ . }}
-  {{- end }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "sealed-secrets-web.name" . }}
