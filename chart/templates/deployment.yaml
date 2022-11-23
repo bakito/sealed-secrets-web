@@ -7,6 +7,9 @@ metadata:
     {{- include "sealed-secrets-web.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  {{- with .Values.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ . }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "sealed-secrets-web.name" . }}
@@ -20,9 +23,6 @@ spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.revisionHistoryLimit }}
-      revisionHistoryLimit: {{ . }}
     {{- end }}
       serviceAccountName: {{ template "sealed-secrets-web.serviceAccountName" . }}
       containers:
