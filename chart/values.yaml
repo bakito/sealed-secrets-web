@@ -1,5 +1,9 @@
 # -- The number of pods to run
 replicaCount: 1
+
+# -- Max number of old replicasets to retain
+revisionHistoryLimit: 10
+
 # -- If set to true, the application has only the permission to view sealed secrets in the current namespace
 includeLocalNamespaceOnly: false
 

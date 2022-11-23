@@ -35,6 +35,7 @@ helm install sealed-secrets-web bakito/sealed-secrets-web
 | rbac.create | bool | `true` | Specifies whether rbac should be created |
 | replicaCount | int | `1` | The number of pods to run |
 | resources | object | `{}` | Resource limits and requests for the pods. |
+| revisionHistoryLimit | int | `10` | Max number of old replicasets to retain |
 | sealedSecrets.certURL | string | `""` | URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service) |
 | sealedSecrets.namespace | string | `"sealed-secrets"` | Namespace of the sealed secrets service |
 | sealedSecrets.serviceName | string | `"sealed-secrets"` | Name of the sealed secrets service |
