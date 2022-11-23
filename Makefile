@@ -72,7 +72,7 @@ build:
 build-arm:
 	podman build --build-arg VERSION=dev --build-arg BUILD=dev --build-arg TARGETPLATFORM=linux/arm64 -t sealed-secrets-web .
 
-docs: helm-docs
+docs: helm-docs update-docs
 	@$(LOCALBIN)/helm-docs
 
 update-docs: semver
@@ -81,7 +81,7 @@ update-docs: semver
 	sed -i "s/^version:.*$$/version: $${versionNum}/"    ./chart/Chart.yaml; \
 	sed -i "s/^appVersion:.*$$/appVersion: $${version}/" ./chart/Chart.yaml
 
-helm-lint: update-docs docs
+helm-lint: docs
 	helm lint ./chart
 
 helm-template:
