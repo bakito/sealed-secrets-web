@@ -70,12 +70,12 @@ $(GOLANGCI_LINT): $(LOCALBIN)
 ## Update Tools
 .PHONY: update-toolbox-tools
 update-toolbox-tools:
-	toolbox --makefile $$(pwd)/Makefile \
-		--with github.com/bakito/semver \
-		--with github.com/norwoodj/helm-docs/cmd/helm-docs \
-		--with github.com/golang/mock/mockgen \
-		--with github.com/onsi/ginkgo/v2/ginkgo \
-		--with github.com/golangci/golangci-lint/cmd/golangci-lint
+	toolbox makefile -f $$(pwd)/Makefile \
+		github.com/bakito/semver \
+		github.com/norwoodj/helm-docs/cmd/helm-docs \
+		github.com/golang/mock/mockgen \
+		github.com/onsi/ginkgo/v2/ginkgo \
+		github.com/golangci/golangci-lint/cmd/golangci-lint
 ## toolbox - end
 
 build:
