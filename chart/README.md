@@ -1,7 +1,5 @@
 # sealed-secrets-web
 
-![Version: 3.0.5](https://img.shields.io/badge/Version-3.0.5-informational?style=flat-square) ![AppVersion: v3.0.5](https://img.shields.io/badge/AppVersion-v3.0.5-informational?style=flat-square)
-
 A web interface for Sealed Secrets by Bitnami.
 
 ## Installation
