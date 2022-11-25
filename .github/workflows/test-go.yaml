@@ -67,10 +67,16 @@ jobs:
         run: make semver helm-docs
 
       - name: Lint
-        run: make helm-lint
+        run: |
+          cp chart/README.md chart/README.md.old
+          make helm-lint
 
       - name: Check chart/README.md is correctly generated with 'make docs'
-        run: git diff --exit-code chart/README.md
+        run: |
+          # ignore version as it is updated during build
+          sed -i '/!\[Version\:/d' chart/README.md
+          sed -i '/!\[Version\:/d' chart/README.md.old
+          diff chart/README.md.old chart/README.md
 
       - name: Template
         run: make helm-template
