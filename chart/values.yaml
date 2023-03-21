@@ -72,23 +72,27 @@ ingress:
   className: ""
 
   # -- Ingress annotations
-  annotations: { }
-  # nginx.ingress.kubernetes.io/rewrite-target: /$2
-  # nginx.ingress.kubernetes.io/use-regex: "true"
-  # nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+  # annotations:
+  #   nginx.ingress.kubernetes.io/rewrite-target: /$2
+  #   nginx.ingress.kubernetes.io/use-regex: "true"
+  #   nginx.ingress.kubernetes.io/ssl-redirect: 'true'
 
   # -- Ingress hosts
-  hosts: [ ]
-  #- paths:
-  #    - path: /ssw(/|$)(.*)
-  #      pathType: Prefix
+  hosts:
+  - host: example.internal
+    paths:
+    - path: /
+      pathType: Prefix
+
   # -- set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
   defaultTls: false
 
   # -- Ingress tls
-  tls: [ ]
-  #  - hosts: [ my-domain.com ]
-  #    secretName: sealed-secrets-web-tls
+  # tls:
+  # - hosts:
+  #   - example.internal
+  #   - another-example.internal
+  #   secretName: sealed-secrets-web-tls
 
 # -- Resource limits and requests for the pods.
 resources: { }
@@ -99,6 +103,45 @@ resources: { }
 #   cpu: 100m
 #   memory: 128Mi
 
+deployment:
+  # -- Specifies whether deployment should be created
+  create: true
+
+  # -- Readiness Probes
+  readinessProbe:
+    failureThreshold: 3
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 10
+    initialDelaySeconds: 30
+
+  # -- Liveness Probes
+  livenessProbe:
+    periodSeconds: 10
+    failureThreshold: 3
+    successThreshold: 1
+    timeoutSeconds: 10
+    initialDelaySeconds: 15
+
+  # -- Hardening security
+  securityContext:
+    allowPrivilegeEscalation: "false"
+    capabilitiesDrop: ["ALL"]
+    privileged: "false"
+    runAsGroup: 1000
+    runAsUser: 1000
+
+  # -- Default process arguments are used, while additional can be added too
+  args:
+    defaultArgsEnabled: true
+    # additionalArgs:
+    # - --disable-load-secrets
+    # - --format=yaml
+
+  # -- Using environment variables
+  # env:
+  #   SEALEDSECRETSCONTROLLERNAMESPACE: sealed-secrets
+  #   SEALEDSECRETSCONTROLLERNAME: sealed-secrets
 
 # -- [Node selector]
 nodeSelector: { }

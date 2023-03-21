@@ -1,3 +1,4 @@
+{{ if .Values.deployment.create }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,20 +28,69 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.deployment.args }}
           args:
+          {{- if .Values.deployment.args.defaultArgsEnabled }}
           {{- include "sealed-secrets-web.imageArgs" . | nindent 12 }}
+          {{- end }}
+
+          {{- if .Values.deployment.args.additionalArgs }}
+          {{- toYaml .Values.deployment.args.additionalArgs | nindent 12 }}
+          {{- end }}
+          {{- end }}
+
+          {{- if .Values.deployment.env }}
+          env:
+          {{- if .Values.deployment.env.SEALEDSECRETSCONTROLLERNAMESPACE }}
+          - name: SEALED_SECRETS_CONTROLLER_NAMESPACE
+            value: {{ .Values.deployment.env.SEALEDSECRETSCONTROLLERNAMESPACE }}
+          {{- end }}
+          {{- if .Values.deployment.env.SEALEDSECRETSCONTROLLERNAME }}
+          - name: SEALED_SECRETS_CONTROLLER_NAME
+            value: {{ .Values.deployment.env.SEALEDSECRETSCONTROLLERNAME }}
+          {{- end }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /_health
-              port: http
           readinessProbe:
+            failureThreshold: {{ .Values.deployment.readinessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.deployment.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.deployment.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.deployment.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.deployment.readinessProbe.initialDelaySeconds }}
             httpGet:
               path: /_health
               port: http
+          livenessProbe:
+            failureThreshold: {{ .Values.deployment.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.deployment.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.deployment.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.deployment.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.deployment.livenessProbe.initialDelaySeconds }}
+            httpGet:
+              path: /_health
+              port: http
+          {{- if .Values.deployment.securityContext }}
+          securityContext:
+            {{- if .Values.deployment.securityContext.allowPrivilegeEscalation }}
+            allowPrivilegeEscalation: {{ .Values.deployment.securityContext.allowPrivilegeEscalation }}
+            {{- end }}
+            {{- if .Values.deployment.securityContext.capabilitiesDrop }}
+            capabilities:
+              drop: {{- toYaml .Values.deployment.securityContext.capabilitiesDrop | nindent 14 }}
+            {{- end }}
+            {{- if .Values.deployment.securityContext.privileged }}
+            privileged: {{ .Values.deployment.securityContext.privileged }}
+            {{- end }}
+            {{- if .Values.deployment.securityContext.runAsGroup }}
+            runAsGroup: {{ .Values.deployment.securityContext.runAsGroup }}
+            {{- end }}
+            {{- if .Values.deployment.securityContext.runAsUser }}
+            runAsUser: {{ .Values.deployment.securityContext.runAsUser }}
+            {{- end }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- if .Values.volumeMounts }}
@@ -67,3 +117,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+{{ end }}
