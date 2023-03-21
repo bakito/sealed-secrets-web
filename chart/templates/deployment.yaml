@@ -33,12 +33,10 @@ spec:
           {{- if .Values.deployment.args.defaultArgsEnabled }}
           {{- include "sealed-secrets-web.imageArgs" . | nindent 12 }}
           {{- end }}
-
           {{- if .Values.deployment.args.additionalArgs }}
           {{- toYaml .Values.deployment.args.additionalArgs | nindent 12 }}
           {{- end }}
           {{- end }}
-
           {{- if .Values.deployment.env }}
           env:
           {{- if .Values.deployment.env.SEALEDSECRETSCONTROLLERNAMESPACE }}
