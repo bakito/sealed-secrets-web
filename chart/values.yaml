@@ -72,17 +72,19 @@ ingress:
   className: ""
 
   # -- Ingress annotations
-  # annotations:
-  #   nginx.ingress.kubernetes.io/rewrite-target: /$2
-  #   nginx.ingress.kubernetes.io/use-regex: "true"
-  #   nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+  annotations:
+    # -- Specifies number of requests accepted from a given IP each minute
+    nginx.ingress.kubernetes.io/limit-rpm: "180"
+    # nginx.ingress.kubernetes.io/rewrite-target: /$2
+    # nginx.ingress.kubernetes.io/use-regex: "true"
+    # nginx.ingress.kubernetes.io/ssl-redirect: 'true'
 
   # -- Ingress hosts
   hosts:
-  - host: example.internal
-    paths:
+  - paths:
     - path: /
       pathType: Prefix
+    # host: example.internal
 
   # -- set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
   defaultTls: false
@@ -104,9 +106,6 @@ resources: { }
 #   memory: 128Mi
 
 deployment:
-  # -- Specifies whether deployment should be created
-  create: true
-
   # -- Readiness Probes
   readinessProbe:
     failureThreshold: 3
@@ -114,6 +113,9 @@ deployment:
     successThreshold: 1
     timeoutSeconds: 10
     initialDelaySeconds: 30
+    httpGet:
+      path: /_health
+      port: http
 
   # -- Liveness Probes
   livenessProbe:
@@ -122,12 +124,17 @@ deployment:
     successThreshold: 1
     timeoutSeconds: 10
     initialDelaySeconds: 15
+    httpGet:
+      path: /_health
+      port: http
 
   # -- Hardening security
   securityContext:
-    allowPrivilegeEscalation: "false"
-    capabilitiesDrop: ["ALL"]
-    privileged: "false"
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    privileged: false
     runAsGroup: 1000
     runAsUser: 1000
 
@@ -140,8 +147,8 @@ deployment:
 
   # -- Using environment variables
   # env:
-  #   SEALEDSECRETSCONTROLLERNAMESPACE: sealed-secrets
-  #   SEALEDSECRETSCONTROLLERNAME: sealed-secrets
+  #   sealedSecretsControllerNamespace: sealed-secrets
+  #   sealedSecretsControllerName: sealed-secrets
 
 # -- [Node selector]
 nodeSelector: { }
