@@ -17,9 +17,9 @@ helm install sealed-secrets-web bakito/sealed-secrets-web
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Assign custom [affinity] rules to the deployment |
 | deployment.args | object | `{"defaultArgsEnabled":true}` | Default process arguments are used, while additional can be added too |
-| deployment.livenessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/_health","port":"http"},"initialDelaySeconds":15,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":10}` | Liveness Probes |
-| deployment.readinessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/_health","port":"http"},"initialDelaySeconds":30,"periodSeconds":5,"successThreshold":1,"timeoutSeconds":10}` | Readiness Probes |
-| deployment.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"runAsGroup":1000,"runAsUser":1000}` | Hardening security |
+| deployment.livenessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/_health","port":"http"}}` | Liveness Probes |
+| deployment.readinessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/_health","port":"http"}}` | Readiness Probes |
+| deployment.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"runAsGroup":1000,"runAsUser":1001}` | Hardening security |
 | disableLoadSecrets | bool | `false` | If set to true secrets cannot be read from this tool, only seal new ones |
 | fullnameOverride | string | `""` | String to fully override "argo-rollouts.fullname" template |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
@@ -27,7 +27,6 @@ helm install sealed-secrets-web bakito/sealed-secrets-web
 | image.tag | string | `nil` | Overrides the image tag (default is the chart appVersion) |
 | imagePullSecrets | list | `[]` | Secrets with credentials to pull images from a private registry. Registry secret names as an array. |
 | includeLocalNamespaceOnly | bool | `false` | If set to true, the application has only the permission to view sealed secrets in the current namespace |
-| ingress.annotations | object | `{"nginx.ingress.kubernetes.io/limit-rpm":"300"}` | Ingress annotations |
 | ingress.className | string | `""` | Ingress class name |
 | ingress.defaultTls | bool | `false` | set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift) |
 | ingress.enabled | bool | `false` | Enable ingress support |

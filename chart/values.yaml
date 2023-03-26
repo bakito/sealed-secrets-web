@@ -66,18 +66,18 @@ service:
 
 ingress:
   # -- Enable ingress support
-  enabled: false
+  enabled: true
 
   # -- Ingress class name
   className: ""
 
   # -- Ingress annotations
-  annotations:
-    # -- Specifies number of requests accepted from a given IP each minute
-    nginx.ingress.kubernetes.io/limit-rpm: "180"
-    # nginx.ingress.kubernetes.io/rewrite-target: /$2
-    # nginx.ingress.kubernetes.io/use-regex: "true"
-    # nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+  # annotations:
+  #   # -- Specifies number of requests accepted from a given IP each minute
+  #   nginx.ingress.kubernetes.io/limit-rpm: "180"
+  #   nginx.ingress.kubernetes.io/rewrite-target: /$2
+  #   nginx.ingress.kubernetes.io/use-regex: "true"
+  #   nginx.ingress.kubernetes.io/ssl-redirect: 'true'
 
   # -- Ingress hosts
   hosts:
@@ -109,21 +109,21 @@ deployment:
   # -- Readiness Probes
   readinessProbe:
     failureThreshold: 3
-    periodSeconds: 5
-    successThreshold: 1
-    timeoutSeconds: 10
-    initialDelaySeconds: 30
+    # periodSeconds: 5
+    # successThreshold: 1
+    # timeoutSeconds: 10
+    # initialDelaySeconds: 30
     httpGet:
       path: /_health
       port: http
 
   # -- Liveness Probes
   livenessProbe:
-    periodSeconds: 10
     failureThreshold: 3
-    successThreshold: 1
-    timeoutSeconds: 10
-    initialDelaySeconds: 15
+    # periodSeconds: 10
+    # successThreshold: 1
+    # timeoutSeconds: 10
+    # initialDelaySeconds: 15
     httpGet:
       path: /_health
       port: http
@@ -136,7 +136,7 @@ deployment:
       - ALL
     privileged: false
     runAsGroup: 1000
-    runAsUser: 1000
+    runAsUser: 1001
 
   # -- Default process arguments are used, while additional can be added too
   args:
