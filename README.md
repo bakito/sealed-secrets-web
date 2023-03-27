@@ -45,6 +45,13 @@ helm upgrade --install sealed-secrets-web bakito/sealed-secrets-web \
   --set disableLoadSecrets=true
 ```
 
+To render templates locally:
+
+```sh
+cd chart
+helm template . -f values.yaml
+```
+
 You can check helm values available at https://github.com/bakito/sealed-secrets-web/blob/main/chart/values.yaml
 Also, check available application options at https://github.com/bakito/sealed-secrets-web/blob/main/pkg/config/types.go#L14-L22
 

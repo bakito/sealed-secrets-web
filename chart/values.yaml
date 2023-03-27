@@ -72,23 +72,29 @@ ingress:
   className: ""
 
   # -- Ingress annotations
-  annotations: { }
-  # nginx.ingress.kubernetes.io/rewrite-target: /$2
-  # nginx.ingress.kubernetes.io/use-regex: "true"
-  # nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+  # annotations:
+  #   # -- Specifies number of requests accepted from a given IP each minute
+  #   nginx.ingress.kubernetes.io/limit-rpm: "180"
+  #   nginx.ingress.kubernetes.io/rewrite-target: /$2
+  #   nginx.ingress.kubernetes.io/use-regex: "true"
+  #   nginx.ingress.kubernetes.io/ssl-redirect: 'true'
 
   # -- Ingress hosts
-  hosts: [ ]
-  #- paths:
-  #    - path: /ssw(/|$)(.*)
-  #      pathType: Prefix
+  hosts:
+  - paths:
+    - path: /
+      pathType: Prefix
+    # host: example.internal
+
   # -- set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
   defaultTls: false
 
   # -- Ingress tls
-  tls: [ ]
-  #  - hosts: [ my-domain.com ]
-  #    secretName: sealed-secrets-web-tls
+  # tls:
+  # - hosts:
+  #   - example.internal
+  #   - another-example.internal
+  #   secretName: sealed-secrets-web-tls
 
 # -- Resource limits and requests for the pods.
 resources: { }
@@ -99,6 +105,50 @@ resources: { }
 #   cpu: 100m
 #   memory: 128Mi
 
+deployment:
+  # -- Readiness Probes
+  readinessProbe:
+    failureThreshold: 3
+    # periodSeconds: 5
+    # successThreshold: 1
+    # timeoutSeconds: 10
+    # initialDelaySeconds: 30
+    httpGet:
+      path: /_health
+      port: http
+
+  # -- Liveness Probes
+  livenessProbe:
+    failureThreshold: 3
+    # periodSeconds: 10
+    # successThreshold: 1
+    # timeoutSeconds: 10
+    # initialDelaySeconds: 15
+    httpGet:
+      path: /_health
+      port: http
+
+  # -- Hardening security
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    privileged: false
+    runAsGroup: 1000
+    runAsUser: 1001
+
+  # -- Default process arguments are used, while additional can be added too
+  args:
+    defaultArgsEnabled: true
+    # additionalArgs:
+    # - --disable-load-secrets
+    # - --format=yaml
+
+  # -- Using environment variables
+  # env:
+  #   sealedSecretsControllerNamespace: sealed-secrets
+  #   sealedSecretsControllerName: sealed-secrets
 
 # -- [Node selector]
 nodeSelector: { }

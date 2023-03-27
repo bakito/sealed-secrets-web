@@ -27,20 +27,42 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.deployment.args }}
           args:
+          {{- if .Values.deployment.args.defaultArgsEnabled }}
           {{- include "sealed-secrets-web.imageArgs" . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.deployment.args.additionalArgs }}
+          {{- toYaml .Values.deployment.args.additionalArgs | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.deployment.env }}
+          env:
+          {{- if .Values.deployment.env.sealedSecretsControllerNamespace }}
+          - name: SEALED_SECRETS_CONTROLLER_NAMESPACE
+            value: {{ .Values.deployment.env.sealedSecretsControllerNamespace }}
+          {{- end }}
+          {{- if .Values.deployment.env.sealedSecretsControllerName }}
+          - name: SEALED_SECRETS_CONTROLLER_NAME
+            value: {{ .Values.deployment.env.sealedSecretsControllerName }}
+          {{- end }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /_health
-              port: http
+          {{- with .Values.deployment.readinessProbe }}
           readinessProbe:
-            httpGet:
-              path: /_health
-              port: http
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.deployment.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.deployment.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- if .Values.volumeMounts }}
