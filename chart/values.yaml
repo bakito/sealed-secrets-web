@@ -90,7 +90,7 @@ ingress:
   defaultTls: false
 
   # -- Ingress tls
-  # tls:
+  tls: []
   # - hosts:
   #   - example.internal
   #   - another-example.internal

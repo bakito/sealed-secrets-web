@@ -1,6 +1,6 @@
 # sealed-secrets-web
 
-![Version: 3.0.7](https://img.shields.io/badge/Version-3.0.7-informational?style=flat-square) ![AppVersion: v3.0.7](https://img.shields.io/badge/AppVersion-v3.0.7-informational?style=flat-square)
+![Version: 3.0.6](https://img.shields.io/badge/Version-3.0.6-informational?style=flat-square) ![AppVersion: v3.0.6](https://img.shields.io/badge/AppVersion-v3.0.6-informational?style=flat-square)
 
 A web interface for Sealed Secrets by Bitnami.
 
@@ -31,6 +31,7 @@ helm install sealed-secrets-web bakito/sealed-secrets-web
 | ingress.defaultTls | bool | `false` | set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift) |
 | ingress.enabled | bool | `false` | Enable ingress support |
 | ingress.hosts | list | `[{"paths":[{"path":"/","pathType":"Prefix"}]}]` | Ingress hosts |
+| ingress.tls | list | `[]` | Ingress tls |
 | initialSecretFile | string | `nil` | Define you custom initial secret file |
 | nameOverride | string | `""` | String to partially override "argo-rollouts.fullname" template |
 | nodeSelector | object | `{}` | [Node selector] |
