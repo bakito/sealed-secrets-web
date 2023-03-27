@@ -15,10 +15,10 @@ test-cover: ginkgo
 release: semver
 	@version=$$($(LOCALBIN)/semver); \
 	git tag -s $$version -m"Release $$version"
-	goreleaser --rm-dist
+	goreleaser --clean
 
 test-release:
-	goreleaser --skip-publish --snapshot --rm-dist
+	goreleaser --skip-publish --snapshot --clean
 
 mocks: mockgen
 	$(LOCALBIN)/mockgen -destination pkg/mocks/core/mock.go     --package core     k8s.io/client-go/kubernetes/typed/core/v1 CoreV1Interface,SecretInterface
