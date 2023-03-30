@@ -102,16 +102,13 @@ func (a *apiSealer) Raw(data Raw) ([]byte, error) {
 }
 
 func (a *apiSealer) Validate(secret io.Reader) error {
-	if err := kubeseal.ValidateSealedSecret(
+	return kubeseal.ValidateSealedSecret(
 		context.TODO(),
 		a.clientConfig,
 		a.ss.Namespace,
 		a.ss.Service,
 		secret,
-	); err != nil {
-		return err
-	}
-	return nil
+	)
 }
 
 type Raw struct {
