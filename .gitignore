@@ -127,3 +127,4 @@ mysecret.*
 mysealedsecret.*
 
 static/ace/ace-builds
+testdata/e2e/kind-config.yaml
