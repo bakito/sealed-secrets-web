@@ -63,6 +63,8 @@ service:
   type: ClusterIP
   # -- Service port
   port: 80
+  # -- Service annotations
+  annotations: { }
 
 ingress:
   # -- Enable ingress support
@@ -72,7 +74,7 @@ ingress:
   className: ""
 
   # -- Ingress annotations
-  # annotations:
+  annotations: { }
   #   # -- Specifies number of requests accepted from a given IP each minute
   #   nginx.ingress.kubernetes.io/limit-rpm: "180"
   #   nginx.ingress.kubernetes.io/rewrite-target: /$2
@@ -81,16 +83,16 @@ ingress:
 
   # -- Ingress hosts
   hosts:
-  - paths:
-    - path: /
-      pathType: Prefix
-    # host: example.internal
+    - paths:
+        - path: /
+          pathType: Prefix
+      # host: example.internal
 
   # -- set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
   defaultTls: false
 
   # -- Ingress tls
-  tls: []
+  tls: [ ]
   # - hosts:
   #   - example.internal
   #   - another-example.internal
@@ -133,7 +135,7 @@ deployment:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-      - ALL
+        - ALL
     privileged: false
     runAsGroup: 1000
     runAsUser: 1001
