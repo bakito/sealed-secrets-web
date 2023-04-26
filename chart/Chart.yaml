@@ -8,6 +8,7 @@ maintainers:
     url: https://github.com/bakito
 name: sealed-secrets-web
 version: 3.0.7
-#annotations:
-#  artifacthub.io/changes: |
-#    -
+annotations:
+  artifacthub.io/changes: |
+    - kind: added
+      description: Allow defining service annotations.
