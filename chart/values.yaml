@@ -57,6 +57,8 @@ serviceAccount:
   create: true
   # -- The name of the service account to use.
   name: sealed-secrets-web
+  # -- Automatically mount the service account token
+  automountServiceAccountToken: true
 
 service:
   # -- Sets the type of the Service

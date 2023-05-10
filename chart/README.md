@@ -46,6 +46,7 @@ helm install sealed-secrets-web bakito/sealed-secrets-web
 | service.annotations | object | `{}` | Service annotations |
 | service.port | int | `80` | Service port |
 | service.type | string | `"ClusterIP"` | Sets the type of the Service |
+| serviceAccount.automountServiceAccountToken | bool | `true` | Automatically mount the service account token |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `"sealed-secrets-web"` | The name of the service account to use. |
 | tolerations | list | `[]` | [Tolerations] for use with node taints |
