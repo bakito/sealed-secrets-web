@@ -8,7 +8,7 @@ maintainers:
     url: https://github.com/bakito
 name: sealed-secrets-web
 version: 3.0.8
-#annotations:
-#  artifacthub.io/changes: |
-#    - kind: added
-#      description: ...
+annotations:
+  artifacthub.io/changes: |
+    - kind: added
+      description: Add ServiceAccount automountServiceAccountToken
