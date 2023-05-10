@@ -17,20 +17,20 @@ import (
 
 type Sealer interface {
 	Raw(data Raw) ([]byte, error)
-	Certificate() ([]byte, error)
+	Certificate(ctx context.Context) ([]byte, error)
 	Seal(outputFormat string, secret io.Reader) ([]byte, error)
 }
 
 var _ Sealer = &apiSealer{}
 
-func NewAPISealer(ss config.SealedSecrets) (Sealer, error) {
+func NewAPISealer(ctx context.Context, ss config.SealedSecrets) (Sealer, error) {
 	log.Printf("Connection to sealed secrets with (%s)\n", ss.String())
 
 	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 	loadingRules.DefaultClientConfig = &clientcmd.DefaultClientConfig
 	cc := clientcmd.NewInteractiveDeferredLoadingClientConfig(loadingRules, nil, os.Stdout)
 
-	f, err := kubeseal.OpenCert(context.TODO(), cc, ss.Namespace, ss.Service, ss.CertURL)
+	f, err := kubeseal.OpenCert(ctx, cc, ss.Namespace, ss.Service, ss.CertURL)
 	if err != nil {
 		return nil, err
 	}
@@ -53,8 +53,8 @@ type apiSealer struct {
 	pubKey       *rsa.PublicKey
 }
 
-func (a *apiSealer) Certificate() ([]byte, error) {
-	f, err := kubeseal.OpenCert(context.TODO(), a.clientConfig, a.ss.Namespace, a.ss.Service, a.ss.CertURL)
+func (a *apiSealer) Certificate(ctx context.Context) ([]byte, error) {
+	f, err := kubeseal.OpenCert(ctx, a.clientConfig, a.ss.Namespace, a.ss.Service, a.ss.CertURL)
 	if err != nil {
 		return nil, err
 	}
