@@ -66,8 +66,8 @@ func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1
 }
 
 // List returns a list of all secrets.
-func (h *SecretsHandler) list() ([]Secret, error) {
-	secrets := []Secret{}
+func (h *SecretsHandler) list(ctx context.Context) ([]Secret, error) {
+	var secrets []Secret
 	fmt.Printf("secrets: %#v\n", secrets)
 	if h.disableLoadSecrets {
 		return secrets, nil
@@ -75,14 +75,14 @@ func (h *SecretsHandler) list() ([]Secret, error) {
 
 	if len(h.includeNamespaces) > 0 {
 		for ns := range h.includeNamespaces {
-			list, err := h.listForNamespace(ns)
+			list, err := h.listForNamespace(ctx, ns)
 			if err != nil {
 				return nil, err
 			}
 			secrets = append(secrets, list...)
 		}
 	} else {
-		list, err := h.listForNamespace("")
+		list, err := h.listForNamespace(ctx, "")
 		if err != nil {
 			return nil, err
 		}
@@ -99,9 +99,9 @@ func (h *SecretsHandler) list() ([]Secret, error) {
 	return secrets, nil
 }
 
-func (h *SecretsHandler) listForNamespace(ns string) ([]Secret, error) {
+func (h *SecretsHandler) listForNamespace(ctx context.Context, ns string) ([]Secret, error) {
 	var secrets []Secret
-	ssList, err := h.ssClient.SealedSecrets(ns).List(context.TODO(), metav1.ListOptions{})
+	ssList, err := h.ssClient.SealedSecrets(ns).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (h *SecretsHandler) AllSecrets(c *gin.Context) {
 		return
 	}
 
-	sec, err := h.list()
+	sec, err := h.list(c)
 	if err != nil {
 		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

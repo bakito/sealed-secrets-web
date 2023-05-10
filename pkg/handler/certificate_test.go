@@ -32,7 +32,7 @@ var _ = Describe("Handler ", func() {
 			}
 		})
 		It("should successfully return a certificate", func() {
-			sealer.EXPECT().Certificate().Return([]byte(validCertificate), nil)
+			sealer.EXPECT().Certificate(gomock.Any()).Return([]byte(validCertificate), nil)
 			h.Certificate(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusOK))
@@ -40,7 +40,7 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("text/plain; charset=utf-8"))
 		})
 		It("should successfully fail when requesting a certificate", func() {
-			sealer.EXPECT().Certificate().Return(nil, fmt.Errorf("unexpected error"))
+			sealer.EXPECT().Certificate(gomock.Any()).Return(nil, fmt.Errorf("unexpected error"))
 			h.Certificate(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusInternalServerError))

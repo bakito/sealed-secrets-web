@@ -5,6 +5,7 @@
 package seal
 
 import (
+	context "context"
 	io "io"
 	reflect "reflect"
 
@@ -36,18 +37,18 @@ func (m *MockSealer) EXPECT() *MockSealerMockRecorder {
 }
 
 // Certificate mocks base method.
-func (m *MockSealer) Certificate() ([]byte, error) {
+func (m *MockSealer) Certificate(arg0 context.Context) ([]byte, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Certificate")
+	ret := m.ctrl.Call(m, "Certificate", arg0)
 	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Certificate indicates an expected call of Certificate.
-func (mr *MockSealerMockRecorder) Certificate() *gomock.Call {
+func (mr *MockSealerMockRecorder) Certificate(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Certificate", reflect.TypeOf((*MockSealer)(nil).Certificate))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Certificate", reflect.TypeOf((*MockSealer)(nil).Certificate), arg0)
 }
 
 // Raw mocks base method.

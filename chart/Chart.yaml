@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: v3.0.7
+appVersion: v3.0.8
 description: A web interface for Sealed Secrets by Bitnami.
 home: https://github.com/bakito/sealed-secrets-web
 icon: https://raw.githubusercontent.com/bakito/sealed-secrets-web/master/assets/logo.png
@@ -7,8 +7,8 @@ maintainers:
   - name: bakito
     url: https://github.com/bakito
 name: sealed-secrets-web
-version: 3.0.7
-annotations:
-  artifacthub.io/changes: |
-    - kind: added
-      description: Allow defining service annotations.
+version: 3.0.8
+#annotations:
+#  artifacthub.io/changes: |
+#    - kind: added
+#      description: ...

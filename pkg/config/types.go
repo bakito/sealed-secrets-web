@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -78,6 +79,8 @@ func parse(f *flags) (*Config, error) {
 
 	cfg.Web.Context = sanitizeWebContext(cfg)
 
+	cfg.Ctx = context.Background()
+
 	return cfg, nil
 }
 
@@ -95,13 +98,14 @@ func sanitizeWebContext(cfg *Config) string {
 }
 
 type Config struct {
-	Web                Web           `yaml:"web"`
-	FieldFilter        *FieldFilter  `yaml:"fieldFilter,omitempty"`
-	PrintVersion       bool          `yaml:"printVersion"`
-	DisableLoadSecrets bool          `yaml:"disableLoadSecrets"`
-	IncludeNamespaces  []string      `yaml:"includeNamespaces"`
-	SealedSecrets      SealedSecrets `yaml:"sealedSecrets"`
-	InitialSecret      string        `yaml:"initialSecret"`
+	Web                Web             `yaml:"web"`
+	FieldFilter        *FieldFilter    `yaml:"fieldFilter,omitempty"`
+	PrintVersion       bool            `yaml:"printVersion"`
+	DisableLoadSecrets bool            `yaml:"disableLoadSecrets"`
+	IncludeNamespaces  []string        `yaml:"includeNamespaces"`
+	SealedSecrets      SealedSecrets   `yaml:"sealedSecrets"`
+	InitialSecret      string          `yaml:"initialSecret"`
+	Ctx                context.Context `yaml:"-"`
 }
 
 type Web struct {
