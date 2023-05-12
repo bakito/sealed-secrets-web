@@ -47,7 +47,7 @@ jobs:
 
       - name: 🏠 Print logs In-Cluster
         run: |
-          echo 'Pod logs (json format In-Cluster)' >> $GITHUB_STEP_SUMMARY
+          echo '🏠 Pod logs (json format In-Cluster)' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
@@ -72,7 +72,7 @@ jobs:
 
       - name: 🔐 Print logs Cert-URL
         run: |
-          echo 'Pod logs (json format and Cert-URL)' >> $GITHUB_STEP_SUMMARY
+          echo '🔐 Pod logs (json format and Cert-URL)' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
