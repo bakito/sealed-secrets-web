@@ -30,54 +30,54 @@ jobs:
             --namespace sealed-secrets \
             --create-namespace \
             --atomic
-      - name: Install sealed-secrets-web with yaml format
+      - name: Install sealed-secrets-web with yaml format In-Cluster
         run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml ""
 
-      - name: Install sealed-secrets-web with json format
+      - name: 🏠 Install sealed-secrets-web with json format In-Cluster
         run: |
           helm delete sealed-secrets-web --namespace sealed-secrets-web
           ./testdata/e2e/installSealedSecretsWebChart.sh json ""
 
-      - name: Run Tests In-Cluster
+      - name: 🏠 Run Tests In-Cluster
         id: run_tests_in_cluster
         # continue on error to show logs
         continue-on-error: true
         working-directory: testdata/e2e
         run: ./runTests.sh
 
-      - name: Print logs In-Cluster
+      - name: 🏠 Print logs In-Cluster
         run: |
           echo 'Pod logs (json format In-Cluster)' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Fail if 'Run Tests In-Cluster' failed
+      - name: 🏠 Fail if 'Run Tests In-Cluster' failed
         if: steps.run_tests_in_cluster.outcome=='failure'
         run: |
           echo "Step 'Run Tests In-Cluster' failed: Check 'Run Tests In-Cluster' and 'Print logs In-Cluster' as well as the job summary for errors"
           exit 1
 
-      - name: Install sealed-secrets-web with json format and cert URL
+      - name: 🔐 Install sealed-secrets-web with json format and cert URL
         run: |
           helm delete sealed-secrets-web --namespace sealed-secrets-web
           ./testdata/e2e/installSealedSecretsWebChart.sh json http://sealed-secrets.sealed-secrets.svc:8080/v1/cert.pem
 
-      - name: Run Tests Cert-URL
+      - name: 🔐 Run Tests Cert-URL
         id: run_tests_certURL
         # continue on error to show logs
         continue-on-error: true
         working-directory: testdata/e2e
         run: ./runTests.sh
 
-      - name: Print logs Cert-URL
+      - name: 🔐 Print logs Cert-URL
         run: |
           echo 'Pod logs (json format and Cert-URL)' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Fail if 'Run Tests Cert-URL' failed
+      - name: 🔐 Fail if 'Run Tests Cert-URL' failed
         if: steps.run_tests_certURL.outcome=='failure'
         run: |
           echo "Step 'Run Tests Cert-URL' failed: Check 'Run Tests Cert-URL' and 'Print logsCert-URL' as well as the job summary for errors"
