@@ -18,6 +18,7 @@
 - **Decode:** Base64 decodes each key in the `data` field in a secret.
 - **Secrets:** Returns a list of all Sealed Secrets in all namespaces. With a click on the Sealed Secret the decrypted Kubernetes secret is loaded.
 - **Seal:** Encrypt a Kubernetes secret and creates the Sealed Secret.
+- **Validate:** Validate a Sealed Secret.
 
 ## Installation
 
@@ -87,6 +88,14 @@ curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/kubeseal' \
 curl -request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/raw' \
      --header 'Content-Type: application/json' \
      --data '{ "name": "mysecretname", "namespace": "mysecretnamespace", "value": "value to seal" }'
+```
+
+### Validate sealed secret
+
+```bash
+curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/validate' \
+  --header 'Accept: application/x-yaml' \
+  --data-binary '@stringData.yaml'
 ```
 
 ## Development
