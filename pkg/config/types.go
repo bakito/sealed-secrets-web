@@ -36,14 +36,14 @@ func parse(f *flags) (*Config, error) {
 
 	if *f.sealedSecretsCertURL != "" {
 		cfg.SealedSecrets.CertURL = *f.sealedSecretsCertURL
-	} else {
-		if *f.sealedSecretsServiceName != "" {
-			cfg.SealedSecrets.Service = *f.sealedSecretsServiceName
-		}
-		if *f.sealedSecretsServiceNamespace != "" {
-			cfg.SealedSecrets.Namespace = *f.sealedSecretsServiceNamespace
-		}
 	}
+	if *f.sealedSecretsServiceName != "" {
+		cfg.SealedSecrets.Service = *f.sealedSecretsServiceName
+	}
+	if *f.sealedSecretsServiceNamespace != "" {
+		cfg.SealedSecrets.Namespace = *f.sealedSecretsServiceNamespace
+	}
+
 	if *f.includeNamespaces != "" {
 		cfg.IncludeNamespaces = strings.Split(*f.includeNamespaces, " ")
 	}
