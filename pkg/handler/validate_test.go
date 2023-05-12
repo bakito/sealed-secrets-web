@@ -37,7 +37,7 @@ var _ = Describe("Handler ", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/x-yaml")
 
-			sealer.EXPECT().Validate(gomock.Any()).Return(nil)
+			sealer.EXPECT().Validate(gomock.Any(), gomock.Any()).Return(nil)
 
 			h.Validate(c)
 
@@ -50,7 +50,7 @@ var _ = Describe("Handler ", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/x-yaml")
 
-			sealer.EXPECT().Validate(gomock.Any()).Return(errors.New("Validation failed"))
+			sealer.EXPECT().Validate(gomock.Any(), gomock.Any()).Return(errors.New("Validation failed"))
 
 			h.Validate(c)
 
