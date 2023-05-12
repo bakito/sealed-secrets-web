@@ -60,8 +60,8 @@ var _ = Describe("Types", func() {
 			f.sealedSecretsCertURL = ptr("cert.url")
 			cfg, err = parse(f)
 			Ω(cfg.SealedSecrets.CertURL).Should(Equal("cert.url"))
-			Ω(cfg.SealedSecrets.Namespace).Should(BeEmpty())
-			Ω(cfg.SealedSecrets.Service).Should(BeEmpty())
+			Ω(cfg.SealedSecrets.Namespace).Should(Equal("sealed-secrets"))
+			Ω(cfg.SealedSecrets.Service).Should(Equal("sealed-secrets"))
 		})
 		It("should set the service namespace and name", func() {
 			f.sealedSecretsServiceName = ptr("name")
