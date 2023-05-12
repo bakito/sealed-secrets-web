@@ -8,7 +8,7 @@ import (
 )
 
 func (h *Handler) Validate(c *gin.Context) {
-	err := h.sealer.Validate(c.Request.Body)
+	err := h.sealer.Validate(c, c.Request.Body)
 	if err != nil {
 		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.Data(http.StatusBadRequest, "text/plain", []byte(err.Error()))
