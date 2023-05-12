@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+./runTestValidate.sh
+
 ./runTestKubeseal.sh
 
 ./runTestCertificate.sh

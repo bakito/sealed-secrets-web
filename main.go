@@ -95,6 +95,7 @@ func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1a
 	api.GET("/certificate", h.Certificate)
 	api.POST("/kubeseal", h.KubeSeal)
 	api.POST("/dencode", h.Dencode)
+	api.POST("/validate", h.Validate)
 
 	api.GET("/secret/:namespace/:name", sHandler.Secret)
 	api.GET("/secrets", sHandler.AllSecrets)
