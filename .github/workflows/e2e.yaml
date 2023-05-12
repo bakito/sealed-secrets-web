@@ -31,7 +31,7 @@ jobs:
             --create-namespace \
             --atomic
       - name: Install sealed-secrets-web with yaml format
-        run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml ""
+        run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml "" "sealed-secrets" "sealed-secrets"
 
       - name: Install sealed-secrets-web with json format and cert URL
         run: |
