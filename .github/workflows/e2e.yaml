@@ -39,6 +39,8 @@ jobs:
           ./testdata/e2e/installSealedSecretsWebChart.sh json http://sealed-secrets.sealed-secrets.svc:8080/v1/cert.pem
 
       - name: Run Tests
+        id: run_tests
+        # continue on error to show logs
         continue-on-error: true
         working-directory: testdata/e2e
         run: ./runTests.sh
@@ -49,3 +51,7 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail if 'Run Tests' failed
+        if: steps.run_tests.outcome=='failure'
+        run: exit 1
