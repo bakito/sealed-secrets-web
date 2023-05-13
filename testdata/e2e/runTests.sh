@@ -1,8 +1,10 @@
 #!/bin/bash
 set -e
 
-if [ "${1}" !=  "skip-validate" ]; then
+if [ "${1}" != "skip-validate" ]; then
   ./runTestValidate.sh
+else
+  echo "Validation test is skipped"
 fi
 
 ./runTestKubeseal.sh

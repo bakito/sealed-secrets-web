@@ -1,16 +1,18 @@
-#!/bin/sh
+#!/bin/bash
 
 set -eo pipefail
 
 # install registry
-docker run -d --restart=always -p "127.0.0.1:5001:5000" --name kind-registry registry:2
+docker start kind-registry || docker run -d --restart=always -p "127.0.0.1:5001:5000" --name kind-registry registry:2
 
 # startup kind
-curl -L https://raw.githubusercontent.com/bakito/kind-with-registry-action/main/kind-config.yaml -o testdata/e2e/kind-config.yaml
-kind create cluster --config=testdata/e2e/kind-config.yaml
+if $(kind get clusters | grep -vqFx kind); then
+  curl -L https://raw.githubusercontent.com/bakito/kind-with-registry-action/main/kind-config.yaml -o testdata/e2e/kind-config.yaml
+  kind create cluster --name kind --config=testdata/e2e/kind-config.yaml
+fi
 
 # setup registry
-docker network connect kind kind-registry
+docker network connect kind kind-registry || true
 kubectl apply -f https://raw.githubusercontent.com/bakito/kind-with-registry-action/main/configmap-registry.yaml
 
 # setup ingress
@@ -25,7 +27,7 @@ kubectl wait --namespace ingress-nginx \
 
 # install sealed secrets
 helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
-helm install sealed-secrets sealed-secrets/sealed-secrets \
+helm upgrade --install sealed-secrets sealed-secrets/sealed-secrets \
   --namespace sealed-secrets \
   --create-namespace \
   --atomic
