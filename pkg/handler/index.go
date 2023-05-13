@@ -13,6 +13,7 @@ type Handler struct {
 	sealer    seal.Sealer
 	indexHTML string
 	filter    *config.FieldFilter
+	cfg       *config.Config
 }
 
 func New(indexHTML string, sealer seal.Sealer, cfg *config.Config) *Handler {

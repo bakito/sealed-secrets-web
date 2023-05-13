@@ -58,5 +58,16 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Body.String()).Should(Equal("Validation failed"))
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("text/plain"))
 		})
+
+		It("should return an error if certURL is used", func() {
+			c.Request, _ = http.NewRequest("POST", "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
+			c.Request.Header.Set("Content-Type", "application/x-yaml")
+
+			sealer.EXPECT().Validate(gomock.Any(), gomock.Any()).Return(errors.New("Validation failed"))
+
+			Ω(recorder.Code).Should(Equal(http.StatusBadRequest))
+			Ω(recorder.Body.String()).Should(Equal("Validation failed"))
+			Ω(recorder.Header().Get("Content-Type")).Should(Equal("text/plain"))
+		})
 	})
 })
