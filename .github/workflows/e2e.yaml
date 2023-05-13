@@ -49,7 +49,8 @@ jobs:
         run: |
           echo '🏠 Pod logs (json format In-Cluster)' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
+          POD_NAME=$(kubectl get pod -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web  -o name)
+          kubectl logs -n sealed-secrets-web ${POD_NAME} >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: 🏠 Fail if 'Run Tests In-Cluster' failed
@@ -68,13 +69,14 @@ jobs:
         # continue on error to show logs
         continue-on-error: true
         working-directory: testdata/e2e
-        run: ./runTests.sh "skip-validate"
+        run: ./runTests.sh skip-validate
 
       - name: 🔐 Print logs Cert-URL
         run: |
           echo '🔐 Pod logs (json format and Cert-URL)' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          kubectl logs -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web >> $GITHUB_STEP_SUMMARY
+          POD_NAME=$(kubectl get pod -n sealed-secrets-web -l app.kubernetes.io/instance=sealed-secrets-web  -o name)
+          kubectl logs -n sealed-secrets-web ${POD_NAME} >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: 🔐 Fail if 'Run Tests Cert-URL' failed
