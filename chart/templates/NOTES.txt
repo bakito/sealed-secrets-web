@@ -32,7 +32,7 @@ sealedSecrets:
 ---------------------------------------------
 {{- end }}
 
-{{- if .Values.sealedSecrets.certURL not "" }}
+{{- if ne .Values.sealedSecrets.certURL "" }}
 *************************************
 **          ATTENTION!!            **
 *************************************
