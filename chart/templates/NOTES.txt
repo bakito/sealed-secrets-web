@@ -28,6 +28,13 @@ sealedSecrets:
   # -- Name of the sealed secrets service
   serviceName: sealed-secrets
   # -- URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service)
-  certURL: ""
+  certURL: "" # this will disable validate api
 ---------------------------------------------
+{{- end }}
+
+{{- if .Values.sealedSecrets.certURL not "" }}
+*************************************
+**          ATTENTION!!            **
+*************************************
+- Using sealedSecrets.certURL will disable the validate functionality, as it is only available via cluster internal api
 {{- end }}

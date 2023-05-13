@@ -91,7 +91,7 @@ curl -request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/raw' \
 ```
 
 ### Validate sealed secret
-
+> **_NOTE:_**  Validate is only available when using cluster internal api (e.g. certURL not set) see [bitnami-labs/sealed-secrets](https://github.com/bitnami-labs/sealed-secrets/issues/1208)
 ```bash
 curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/validate' \
   --header 'Accept: application/x-yaml' \

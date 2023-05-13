@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rsa"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -102,6 +103,10 @@ func (a *apiSealer) Raw(data Raw) ([]byte, error) {
 }
 
 func (a *apiSealer) Validate(ctx context.Context, secret io.Reader) error {
+	if a.ss.CertURL != "" {
+		return fmt.Errorf("Validate can't be used with CertURL (%s)\n", a.ss.CertURL)
+	}
+
 	return kubeseal.ValidateSealedSecret(
 		ctx,
 		a.clientConfig,
