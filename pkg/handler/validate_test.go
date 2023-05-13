@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
-
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/seal"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
