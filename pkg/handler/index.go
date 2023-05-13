@@ -20,6 +20,7 @@ func New(indexHTML string, sealer seal.Sealer, cfg *config.Config) *Handler {
 	return &Handler{
 		sealer:    sealer,
 		indexHTML: indexHTML,
+		cfg:       cfg,
 		filter:    cfg.FieldFilter,
 	}
 }

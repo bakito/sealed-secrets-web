@@ -3,9 +3,10 @@ package handler
 import (
 	"bytes"
 	"errors"
-	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"net/http"
 	"net/http/httptest"
+
+	"github.com/bakito/sealed-secrets-web/pkg/config"
 
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/seal"
 	"github.com/gin-gonic/gin"
