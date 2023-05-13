@@ -19,6 +19,7 @@ type Sealer interface {
 	Raw(data Raw) ([]byte, error)
 	Certificate(ctx context.Context) ([]byte, error)
 	Seal(outputFormat string, secret io.Reader) ([]byte, error)
+	Validate(ctx context.Context, secret io.Reader) error
 }
 
 var _ Sealer = &apiSealer{}
@@ -98,6 +99,16 @@ func (a *apiSealer) Raw(data Raw) ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+func (a *apiSealer) Validate(ctx context.Context, secret io.Reader) error {
+	return kubeseal.ValidateSealedSecret(
+		ctx,
+		a.clientConfig,
+		a.ss.Namespace,
+		a.ss.Service,
+		secret,
+	)
 }
 
 type Raw struct {

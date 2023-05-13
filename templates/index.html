@@ -22,6 +22,8 @@
         <v-btn @click="dencode" text>Encode / Decode</v-btn>
         {{ if eq .DisableLoadSecrets false}}<v-btn @click="loadSecrets" text>Secrets</v-btn>{{end}}
         <v-btn @click="seal" text>Seal</v-btn>
+        {{ if eq .DisableValidateSecrets false}}
+        <v-btn @click="validate" text>Validate</v-btn>{{end}}
       </v-app-bar>
 
       <v-main>
@@ -71,10 +73,11 @@
         </v-card>
       </v-dialog>
 
-      <v-snackbar :bottom="true" :multi-line="true" :right="true" :timeout="5000" v-model="snackbar" color="error">
-          {{"{{error}}"}}
-        <v-btn @click="error = ''" dark text>Close</v-btn>
+      <v-snackbar :bottom="true" :multi-line="true" :right="true" :timeout="5000" v-model="snackbar" :color="messageType">
+          {{"{{message}}"}}
+        <v-btn @click="message = ''" dark text>Close</v-btn>
       </v-snackbar>
+    </v-snackbar>
       <v-footer color="primary" padless >
           <v-col class="primary py-1 text-center white--text text-caption" cols="12" >
             Sealed Secrets Web ({{.Version}})
@@ -100,7 +103,10 @@
         return {
           secrets: Object,
           dialogVisible: false,
-          error: '',
+          message: '',
+          messageType: '',
+          successMessage: '',
+          showSuccess: false,
           editor1: Object,
           editor2: Object,
           editor1Content: INITIAL_SECRET,
@@ -130,11 +136,11 @@
       computed: {
         snackbar: {
           get() {
-            return this.error !== ''
+            return this.message !== ''
           },
           set(newValue) {
             if (newValue === false) {
-              this.error = ''
+              this.message = ''
             }
           }
         },
@@ -177,7 +183,8 @@
             this.editor2Content = res.data
             this.editor2.setValue(this.editor2Content, 1)
           }).catch(err => {
-            this.error = err.response.data
+            this.messageType = 'error'
+            this.message = err.response.data
           });
         },
         loadSecrets() {
@@ -185,7 +192,8 @@
             this.secrets = res.data.secrets
             this.dialogVisible = true
           }).catch(err => {
-            this.error = err.response.data
+            this.messageType = 'error'
+            this.message = err.response.data
           });
         },
         loadSecret(namespace, name) {
@@ -198,7 +206,8 @@
             this.editor1.setValue(this.editor1Content, 1)
             this.dialogVisible = false
           }).catch(err => {
-            this.error = err.response.data
+            this.messageType = 'error'
+            this.message = err.response.data
           });
         },
         dencode() {
@@ -211,7 +220,8 @@
             this.editor1Content = res.data
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {
-            this.error = err.response
+            this.messageType = 'error'
+            this.message = err.response
           });
         },
         changeSecretFormat(selected) {
@@ -224,7 +234,8 @@
             }
             this.editor1.setValue(this.editor1Content, 1)
           } catch (err) {
-            this.error = err
+            this.messageType = 'error'
+            this.message = err
           }
         },
         changeSealedSecretFormat(selected) {
@@ -237,7 +248,8 @@
             }
             this.editor2.setValue(this.editor2Content, 1)
           } catch (err) {
-            this.error = err
+            this.messageType = 'error'
+            this.message = err
           }
         },
         contentType(c) {
@@ -245,6 +257,21 @@
             return 'application/json'
           }
           return 'application/x-yaml'
+        },
+        validate() {
+          axios.post('{{.WebContext}}api/validate', this.editor2Content, {
+            headers: {
+                'Content-Type': this.contentType(this.secretFormat),
+                'Accept': 'text/plain'
+            },
+            transformResponse: (r) => r
+          }).then(res => {
+            this.messageType = 'success'
+            this.message = 'Sealed secret is valid'
+          }).catch(err => {
+            this.messageType = 'error'
+            this.message = err.response.data
+          });
         }
       }
     })

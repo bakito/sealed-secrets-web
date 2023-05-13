@@ -68,7 +68,7 @@ jobs:
         # continue on error to show logs
         continue-on-error: true
         working-directory: testdata/e2e
-        run: ./runTests.sh
+        run: ./runTests.sh "skip-validate"
 
       - name: 🔐 Print logs Cert-URL
         run: |

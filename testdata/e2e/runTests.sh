@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+if [ "${1}" !=  "skip-validate" ]; then
+  ./runTestValidate.sh
+fi
+
 ./runTestKubeseal.sh
 
 ./runTestCertificate.sh

@@ -18,6 +18,7 @@
 - **Decode:** Base64 decodes each key in the `data` field in a secret.
 - **Secrets:** Returns a list of all Sealed Secrets in all namespaces. With a click on the Sealed Secret the decrypted Kubernetes secret is loaded.
 - **Seal:** Encrypt a Kubernetes secret and creates the Sealed Secret.
+- **Validate:** Validate a Sealed Secret.
 
 ## Installation
 
@@ -89,42 +90,20 @@ curl -request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/raw' \
      --data '{ "name": "mysecretname", "namespace": "mysecretnamespace", "value": "value to seal" }'
 ```
 
+### Validate sealed secret
+> **_NOTE:_**  Validate is only available when using cluster internal api (e.g. certURL not set) see [bitnami-labs/sealed-secrets](https://github.com/bitnami-labs/sealed-secrets/issues/1208)
+```bash
+curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/validate' \
+  --header 'Accept: application/x-yaml' \
+  --data-binary '@stringData.yaml'
+```
+
 ## Development
 
 For development, we are using a local Kubernetes cluster using kind. When the cluster is created we install **Sealed Secrets** using Helm:
 
 ```sh
-# install registry
-docker run -d --restart=always -p "127.0.0.1:5001:5000" --name kind-registry registry:2
-
-# startup kind
-curl -L https://raw.githubusercontent.com/bakito/kind-with-registry-action/main/kind-config.yaml -o testdata/e2e/kind-config.yaml
-kind create cluster --config=testdata/e2e/kind-config.yaml
-
-# setup registry
-docker network connect kind kind-registry
-kubectl apply -f https://raw.githubusercontent.com/bakito/kind-with-registry-action/main/configmap-registry.yaml
-
-# setup ingress
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-kubectl wait --namespace ingress-nginx \
-  --for=condition=ready pod \
-  --selector=app.kubernetes.io/component=controller \
-  --timeout=90s
-
-# build image
-./testdata/e2e/buildImage.sh
-
-# install sealed secrets
-helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
-helm install sealed-secrets sealed-secrets/sealed-secrets \
-  --namespace sealed-secrets \
-  --create-namespace \
-  --atomic
-
-# install sealed secrets web
-./testdata/e2e/installSealedSecretsWebChart.sh yaml
-
+./run_local.sh
 ```
 
 Access the interface via http://localhost/ssw
