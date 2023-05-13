@@ -112,10 +112,11 @@ func renderIndexHTML(cfg *config.Config) (string, error) {
 	}
 
 	data := map[string]interface{}{
-		"DisableLoadSecrets": cfg.DisableLoadSecrets,
-		"WebContext":         cfg.Web.Context,
-		"InitialSecret":      initialSecret,
-		"Version":            version.Version,
+		"DisableLoadSecrets":     cfg.DisableLoadSecrets,
+		"DisableValidateSecrets": cfg.SealedSecrets.CertURL != "",
+		"WebContext":             cfg.Web.Context,
+		"InitialSecret":          initialSecret,
+		"Version":                version.Version,
 	}
 
 	var tpl bytes.Buffer

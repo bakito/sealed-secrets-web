@@ -22,7 +22,8 @@
         <v-btn @click="dencode" text>Encode / Decode</v-btn>
         {{ if eq .DisableLoadSecrets false}}<v-btn @click="loadSecrets" text>Secrets</v-btn>{{end}}
         <v-btn @click="seal" text>Seal</v-btn>
-        <v-btn @click="validate" text>Validate</v-btn>
+        {{ if eq .DisableValidateSecrets false}}
+        <v-btn @click="validate" text>Validate</v-btn>{{end}}
       </v-app-bar>
 
       <v-main>
