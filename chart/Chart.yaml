@@ -12,3 +12,5 @@ annotations:
   artifacthub.io/changes: |
     - kind: added
       description: Add ServiceAccount automountServiceAccountToken
+    - kind: added
+      description: Add Secret Validation

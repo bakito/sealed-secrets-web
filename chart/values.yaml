@@ -22,6 +22,7 @@ sealedSecrets:
   # -- Name of the sealed secrets service
   serviceName: sealed-secrets
   # -- URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service)
+  #    Validation api will be disabled when cert URL is used.
   certURL: ""
 
 image:
