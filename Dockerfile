@@ -5,7 +5,6 @@ RUN apt-get update && apt-get install -y upx curl
 
 ARG VERSION=main
 ARG BUILD="N/A"
-ARG TARGETPLATFORM=linux/amd64
 
 ENV GO111MODULE=on \
   CGO_ENABLED=0 \
@@ -13,11 +12,8 @@ ENV GO111MODULE=on \
 
 COPY . /go/src/app/
 
-RUN export GOARCH=$(basename ${TARGETPLATFORM}) && \
-    echo "GOARCH ${GOARCH}" && \
-    go build -a -installsuffix cgo -ldflags="-w -s -X github.com/bakito/sealed-secrets-web/pkg/version.Version=${VERSION} -X github.com/bakito/sealed-secrets-web/pkg/version.Build=${BUILD}" -o sealed-secrets-web . && \
+RUN go build -a -installsuffix cgo -ldflags="-w -s -X github.com/bakito/sealed-secrets-web/pkg/version.Version=${VERSION} -X github.com/bakito/sealed-secrets-web/pkg/version.Build=${BUILD}" -o sealed-secrets-web . && \
     upx -q sealed-secrets-web
-
 
 # application image
 FROM alpine:latest
