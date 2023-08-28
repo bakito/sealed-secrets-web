@@ -6,7 +6,7 @@ require (
 	github.com/bitnami-labs/sealed-secrets v0.23.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang/mock v1.6.0
-	github.com/google/uuid v1.3.0
+	github.com/google/uuid v1.3.1
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.10
 	gopkg.in/yaml.v3 v3.0.1
