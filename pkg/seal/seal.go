@@ -95,7 +95,7 @@ func (a *apiSealer) Raw(data Raw) ([]byte, error) {
 	}
 	if err := kubeseal.EncryptSecretItem(
 		&buf, data.Name, data.Namespace, []byte(data.Value),
-		v1alpha1.DefaultScope, a.pubKey); err != nil {
+		scope, a.pubKey); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
