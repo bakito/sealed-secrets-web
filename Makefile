@@ -10,20 +10,20 @@ tidy:
 test: mocks tidy fmt helm-lint test-cover
 # Run coverage tests
 test-cover: ginkgo
-	$(LOCALBIN)/ginkgo --cover ./...
+	$(GINKGO) --cover ./...
 
-release: semver
-	@version=$$($(LOCALBIN)/semver); \
+release: goreleaser semver
+	@version=$$($(SEMVER)); \
 	git tag -s $$version -m"Release $$version"
-	goreleaser --clean
+	$(GORELEASER) --clean
 
-test-release:
-	goreleaser --skip-publish --snapshot --clean
+test-release: goreleaser
+	$(GORELEASER) --skip=publish --snapshot --clean
 
 mocks: mockgen
-	$(LOCALBIN)/mockgen -destination pkg/mocks/core/mock.go     --package core     k8s.io/client-go/kubernetes/typed/core/v1 CoreV1Interface,SecretInterface
-	$(LOCALBIN)/mockgen -destination pkg/mocks/ssclient/mock.go --package ssclient github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1 BitnamiV1alpha1Interface,SealedSecretInterface
-	$(LOCALBIN)/mockgen -destination pkg/mocks/seal/mock.go --package seal github.com/bakito/sealed-secrets-web/pkg/seal Sealer
+	$(MOCKGEN) -destination pkg/mocks/core/mock.go     --package core     k8s.io/client-go/kubernetes/typed/core/v1 CoreV1Interface,SecretInterface
+	$(MOCKGEN) -destination pkg/mocks/ssclient/mock.go --package ssclient github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1 BitnamiV1alpha1Interface,SealedSecretInterface
+	$(MOCKGEN) -destination pkg/mocks/seal/mock.go --package seal github.com/bakito/sealed-secrets-web/pkg/seal Sealer
 
 ## toolbox - start
 ## Current working directory
@@ -37,6 +37,7 @@ $(LOCALBIN):
 SEMVER ?= $(LOCALBIN)/semver
 MOCKGEN ?= $(LOCALBIN)/mockgen
 GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
+GORELEASER ?= $(LOCALBIN)/goreleaser
 HELM_DOCS ?= $(LOCALBIN)/helm-docs
 GINKGO ?= $(LOCALBIN)/ginkgo
 
@@ -44,8 +45,9 @@ GINKGO ?= $(LOCALBIN)/ginkgo
 SEMVER_VERSION ?= v1.1.3
 MOCKGEN_VERSION ?= v1.6.0
 GOLANGCI_LINT_VERSION ?= v1.54.2
-HELM_DOCS_VERSION ?= v1.11.0
-GINKGO_VERSION ?= v2.12.0
+GORELEASER_VERSION ?= v1.21.2
+HELM_DOCS_VERSION ?= v1.11.3
+GINKGO_VERSION ?= v2.13.0
 
 ## Tool Installer
 .PHONY: semver
@@ -60,6 +62,10 @@ $(MOCKGEN): $(LOCALBIN)
 golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
 $(GOLANGCI_LINT): $(LOCALBIN)
 	test -s $(LOCALBIN)/golangci-lint || GOBIN=$(LOCALBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
+.PHONY: goreleaser
+goreleaser: $(GORELEASER) ## Download goreleaser locally if necessary.
+$(GORELEASER): $(LOCALBIN)
+	test -s $(LOCALBIN)/goreleaser || GOBIN=$(LOCALBIN) go install github.com/goreleaser/goreleaser@$(GORELEASER_VERSION)
 .PHONY: helm-docs
 helm-docs: $(HELM_DOCS) ## Download helm-docs locally if necessary.
 $(HELM_DOCS): $(LOCALBIN)
@@ -76,12 +82,14 @@ update-toolbox-tools:
 		$(LOCALBIN)/semver \
 		$(LOCALBIN)/mockgen \
 		$(LOCALBIN)/golangci-lint \
+		$(LOCALBIN)/goreleaser \
 		$(LOCALBIN)/helm-docs \
 		$(LOCALBIN)/ginkgo
 	toolbox makefile -f $(LOCALDIR)/Makefile \
 		github.com/bakito/semver \
 		github.com/golang/mock/mockgen \
 		github.com/golangci/golangci-lint/cmd/golangci-lint \
+		github.com/goreleaser/goreleaser \
 		github.com/norwoodj/helm-docs/cmd/helm-docs \
 		github.com/onsi/ginkgo/v2/ginkgo
 ## toolbox - end
