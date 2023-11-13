@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-curl --version
-
 echo "Test /api/validate should respond 200 if sealed secret is valid"
 
 SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/ssw/api/kubeseal' \
