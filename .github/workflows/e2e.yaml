@@ -19,6 +19,8 @@ jobs:
         uses: bakito/kind-with-registry-action@main
         with:
           ingress_enabled: true
+          node_image: v1.28.0
+          kubectl_version: v1.28.0
 
       - name: Build image
         run: ./testdata/e2e/buildImage.sh
