@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+./runTestHealth.sh
+
 if [ "${1}" != "skip-validate" ]; then
   ./runTestValidate.sh
 else
