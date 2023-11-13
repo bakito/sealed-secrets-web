@@ -44,3 +44,4 @@ echo "$SEALED_SECRET" | jq -r .apiVersion | grep --quiet "bitnami.com/v1alpha1"
 echo "$SEALED_SECRET" | jq -r .kind | grep --quiet "SealedSecret"
 echo "$SEALED_SECRET" | jq -r .metadata.name | grep --quiet "mysecretname"
 echo "$SEALED_SECRET" | jq -r .metadata.namespace | grep --quiet "mysecretnamespace"
+
