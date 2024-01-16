@@ -34,64 +34,50 @@ $(LOCALBIN):
 	mkdir -p $(LOCALBIN)
 
 ## Tool Binaries
-SEMVER ?= $(LOCALBIN)/semver
-MOCKGEN ?= $(LOCALBIN)/mockgen
+GINKGO ?= $(LOCALBIN)/ginkgo
 GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 GORELEASER ?= $(LOCALBIN)/goreleaser
 HELM_DOCS ?= $(LOCALBIN)/helm-docs
-GINKGO ?= $(LOCALBIN)/ginkgo
-
-## Tool Versions
-SEMVER_VERSION ?= v1.1.3
-MOCKGEN_VERSION ?= v1.6.0
-GOLANGCI_LINT_VERSION ?= v1.55.2
-GORELEASER_VERSION ?= v1.23.0
-HELM_DOCS_VERSION ?= v1.12.0
-GINKGO_VERSION ?= v2.14.0
+MOCKGEN ?= $(LOCALBIN)/mockgen
+SEMVER ?= $(LOCALBIN)/semver
 
 ## Tool Installer
-.PHONY: semver
-semver: $(SEMVER) ## Download semver locally if necessary.
-$(SEMVER): $(LOCALBIN)
-	test -s $(LOCALBIN)/semver || GOBIN=$(LOCALBIN) go install github.com/bakito/semver@$(SEMVER_VERSION)
-.PHONY: mockgen
-mockgen: $(MOCKGEN) ## Download mockgen locally if necessary.
-$(MOCKGEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/mockgen || GOBIN=$(LOCALBIN) go install github.com/golang/mock/mockgen@$(MOCKGEN_VERSION)
-.PHONY: golangci-lint
-golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
-$(GOLANGCI_LINT): $(LOCALBIN)
-	test -s $(LOCALBIN)/golangci-lint || GOBIN=$(LOCALBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
-.PHONY: goreleaser
-goreleaser: $(GORELEASER) ## Download goreleaser locally if necessary.
-$(GORELEASER): $(LOCALBIN)
-	test -s $(LOCALBIN)/goreleaser || GOBIN=$(LOCALBIN) go install github.com/goreleaser/goreleaser@$(GORELEASER_VERSION)
-.PHONY: helm-docs
-helm-docs: $(HELM_DOCS) ## Download helm-docs locally if necessary.
-$(HELM_DOCS): $(LOCALBIN)
-	test -s $(LOCALBIN)/helm-docs || GOBIN=$(LOCALBIN) go install github.com/norwoodj/helm-docs/cmd/helm-docs@$(HELM_DOCS_VERSION)
 .PHONY: ginkgo
 ginkgo: $(GINKGO) ## Download ginkgo locally if necessary.
 $(GINKGO): $(LOCALBIN)
-	test -s $(LOCALBIN)/ginkgo || GOBIN=$(LOCALBIN) go install github.com/onsi/ginkgo/v2/ginkgo@$(GINKGO_VERSION)
+	test -s $(LOCALBIN)/ginkgo || GOBIN=$(LOCALBIN) go install github.com/onsi/ginkgo/v2/ginkgo
+.PHONY: golangci-lint
+golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
+$(GOLANGCI_LINT): $(LOCALBIN)
+	test -s $(LOCALBIN)/golangci-lint || GOBIN=$(LOCALBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint
+.PHONY: goreleaser
+goreleaser: $(GORELEASER) ## Download goreleaser locally if necessary.
+$(GORELEASER): $(LOCALBIN)
+	test -s $(LOCALBIN)/goreleaser || GOBIN=$(LOCALBIN) go install github.com/goreleaser/goreleaser
+.PHONY: helm-docs
+helm-docs: $(HELM_DOCS) ## Download helm-docs locally if necessary.
+$(HELM_DOCS): $(LOCALBIN)
+	test -s $(LOCALBIN)/helm-docs || GOBIN=$(LOCALBIN) go install github.com/norwoodj/helm-docs/cmd/helm-docs
+.PHONY: mockgen
+mockgen: $(MOCKGEN) ## Download mockgen locally if necessary.
+$(MOCKGEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/mockgen || GOBIN=$(LOCALBIN) go install go.uber.org/mock/mockgen
+.PHONY: semver
+semver: $(SEMVER) ## Download semver locally if necessary.
+$(SEMVER): $(LOCALBIN)
+	test -s $(LOCALBIN)/semver || GOBIN=$(LOCALBIN) go install github.com/bakito/semver
 
 ## Update Tools
 .PHONY: update-toolbox-tools
 update-toolbox-tools:
 	@rm -f \
-		$(LOCALBIN)/semver \
-		$(LOCALBIN)/mockgen \
+		$(LOCALBIN)/ginkgo \
 		$(LOCALBIN)/golangci-lint \
 		$(LOCALBIN)/goreleaser \
 		$(LOCALBIN)/helm-docs \
-		$(LOCALBIN)/ginkgo
-	toolbox makefile -f $(LOCALDIR)/Makefile \
-		github.com/bakito/semver \
-		github.com/golang/mock/mockgen \
-		github.com/golangci/golangci-lint/cmd/golangci-lint \
-		github.com/goreleaser/goreleaser \
-		github.com/norwoodj/helm-docs/cmd/helm-docs \
-		github.com/onsi/ginkgo/v2/ginkgo
+		$(LOCALBIN)/mockgen \
+		$(LOCALBIN)/semver
+	toolbox makefile -f $(LOCALDIR)/Makefile
 ## toolbox - end
 
 build:
