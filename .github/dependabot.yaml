@@ -4,9 +4,19 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    ignore:
-      - dependency-name: k8s.io/client-go
-      - dependency-name: k8s.io/apimachinery
+    groups:
+      k8s:
+        patterns:
+          - "k8s.io/*"
+        update-types:
+          - "minor"
+          - "patch"
+      onsi:
+        patterns:
+          - "github.com/onsi/*"
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
