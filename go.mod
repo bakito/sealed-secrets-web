@@ -11,7 +11,7 @@ require (
 	github.com/goreleaser/goreleaser v1.23.0
 	github.com/norwoodj/helm-docs v1.12.0
 	github.com/onsi/ginkgo/v2 v2.15.0
-	github.com/onsi/gomega v1.31.0
+	github.com/onsi/gomega v1.31.1
 	go.uber.org/mock v0.4.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.29.1
