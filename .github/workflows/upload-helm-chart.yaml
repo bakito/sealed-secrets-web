@@ -25,6 +25,13 @@ jobs:
         run: |
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build chart
         run: |
           VERSION=$(echo "${{github.event.release.tag_name }}" | sed 's/v//g')
@@ -33,12 +40,13 @@ jobs:
           make helm-docs
           ./bin/helm-docs
           helm package ./chart/ --version $VERSION --app-version v$VERSION -d dist
+          helm push dist/sealed-secrets-web-${VERSION}.tgz oci://ghcr.io/bakito/helm-charts
 
       - name: Install chart-releaser
         uses: engineerd/configurator@v0.0.10
         with:
           name: cr
-          url: https://github.com/helm/chart-releaser/releases/download/v1.4.1/chart-releaser_1.4.1_linux_amd64.tar.gz
+          url: https://github.com/helm/chart-releaser/releases/download/v1.6.1/chart-releaser_1.6.1_linux_amd64.tar.gz
           pathInArchive: cr
 
       - name: Upload Chart
