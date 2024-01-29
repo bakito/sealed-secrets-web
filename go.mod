@@ -7,7 +7,7 @@ require (
 	github.com/bitnami-labs/sealed-secrets v0.25.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golangci/golangci-lint v1.55.2
-	github.com/google/uuid v1.5.0
+	github.com/google/uuid v1.6.0
 	github.com/goreleaser/goreleaser v1.23.0
 	github.com/norwoodj/helm-docs v1.12.0
 	github.com/onsi/ginkgo/v2 v2.15.0
