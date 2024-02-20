@@ -16,16 +16,15 @@ var _ = Describe("Types", func() {
 				cfg.Web.Context = context
 				Ω(sanitizeWebContext(cfg)).Should(Equal(expected))
 			},
-			Entry("trailing / is added", "/ssw", "/ssw/"),
-			Entry("leading / is added", "ssw/", "/ssw/"),
-			Entry("leading  and trailing / are added", "ssw", "/ssw/"),
-			Entry("correct path is not changed", "/ssw/", "/ssw/"),
+			Entry("trailing is not added", "/ssw", "/ssw"),
+			Entry("leading / is added", "ssw", "/ssw"),
+			Entry("leading / are added - trailing / is removed", "ssw/", "/ssw"),
+			Entry("correct path is not changed", "/ssw", "/ssw"),
 
-			Entry("trailing / is added with http", "http://ssw", "http://ssw/"),
-			Entry("http with trailing / should not be changed", "http://ssw/", "http://ssw/"),
+			Entry("trailing / is not added with http", "http://ssw", "http://ssw"),
+			Entry("http with trailing / should not be changed", "http://ssw", "http://ssw"),
 
-			Entry("trailing / is added with https", "https://ssw", "https://ssw/"),
-			Entry("https with trailing / should not be changed", "https://ssw/", "https://ssw/"),
+			Entry("https with trailing / should be changed", "https://ssw/", "https://ssw"),
 		)
 	})
 	Context("SealedSecrets", func() {

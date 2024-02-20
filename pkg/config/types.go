@@ -91,8 +91,8 @@ func sanitizeWebContext(cfg *Config) string {
 		!strings.HasPrefix(wc, "https://") {
 		wc = "/" + wc
 	}
-	if !strings.HasSuffix(wc, "/") {
-		wc = wc + "/"
+	if strings.HasSuffix(wc, "/") {
+		wc, _ = strings.CutSuffix(wc, "/")
 	}
 	return wc
 }
