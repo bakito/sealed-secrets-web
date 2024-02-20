@@ -89,11 +89,11 @@
     </v-app>
   </div>
 
-  <script src="{{.WebContext}}static/scripts/vue.min.js"></script>
-  <script src="{{.WebContext}}static/scripts/vuetify.min.js"></script>
-  <script src="{{.WebContext}}static/scripts/axios.min.js"></script>
-  <script src="{{.WebContext}}static/scripts/yaml.min.js"></script>
-  <script src="{{.WebContext}}static/ace/ace.js"></script>
+  <script src="{{.WebContext}}/static/scripts/vue.min.js"></script>
+  <script src="{{.WebContext}}/static/scripts/vuetify.min.js"></script>
+  <script src="{{.WebContext}}/static/scripts/axios.min.js"></script>
+  <script src="{{.WebContext}}/static/scripts/yaml.min.js"></script>
+  <script src="{{.WebContext}}/static/ace/ace.js"></script>
   <script>
     const INITIAL_SECRET = "{{.InitialSecret}}"
     new Vue({
@@ -174,7 +174,7 @@
       },
       methods : {
         seal() {
-          axios.post('{{.WebContext}}api/kubeseal', this.editor1Content,
+          axios.post('{{.WebContext}}/api/kubeseal', this.editor1Content,
             { headers: {
                 'Content-Type': this.contentType(this.secretFormat),
                 'Accept': this.contentType(this.sealedSecretFormat)},
@@ -188,7 +188,7 @@
           });
         },
         loadSecrets() {
-          axios.get('{{.WebContext}}api/secrets').then(res => {
+          axios.get('{{.WebContext}}/api/secrets').then(res => {
             this.secrets = res.data.secrets
             this.dialogVisible = true
           }).catch(err => {
@@ -197,7 +197,7 @@
           });
         },
         loadSecret(namespace, name) {
-          axios.get("{{.WebContext}}api/secret/" + namespace + "/" + name,
+          axios.get("{{.WebContext}}/api/secret/" + namespace + "/" + name,
             { headers: {
                 'Accept': this.contentType(this.secretFormat)},
               transformResponse: (r) => r},
@@ -211,7 +211,7 @@
           });
         },
         dencode() {
-          axios.post('{{.WebContext}}api/dencode', this.editor1Content,
+          axios.post('{{.WebContext}}/api/dencode', this.editor1Content,
             { headers: {
                 'Content-Type': this.contentType(this.secretFormat),
                 'Accept': this.contentType(this.secretFormat)},
@@ -259,7 +259,7 @@
           return 'application/x-yaml'
         },
         validate() {
-          axios.post('{{.WebContext}}api/validate', this.editor2Content, {
+          axios.post('{{.WebContext}}/api/validate', this.editor2Content, {
             headers: {
                 'Content-Type': this.contentType(this.secretFormat),
                 'Accept': 'text/plain'
