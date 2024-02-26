@@ -119,3 +119,48 @@ Secrets** using Helm:
 ```
 
 Access the interface via http://localhost/ssw
+
+## Traefik
+
+This section is about using sealed-secrets-web with Traefik ingress controller.
+
+Traefik does not by default strip the path when forwarding to application. If you path is `localhost/seal`, then your route will be parsed by Traefik and your application will be accessed at `/seal`, not `/`.
+
+To configure Traefik correctly, apply the following resource:
+
+```bash
+$ cat << EOF > traefik-strip-prefix-middleware.yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-prefix
+  namespace: kube-system # can be anything, but needs ingress.metadata.annotations spec: traefik.ingress.kubernetes.io/router.middlewares: namespace-strip-prefix@kubernetescrd
+spec:
+  stripPrefixRegex:
+    regex:
+    - ^/[^/]+
+EOF
+
+$ kubectl apply -f traefik-strip-prefix-middleware.yaml
+```
+
+Next, in your `values.yaml`, adapt the following to your host:
+
+```yaml
+ingress:
+  enabled: true
+  className: traefik
+  hosts:
+  - host: your.host
+    paths:
+    - path: /seal
+      pathType: Prefix
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-prefix@kubernetescrd
+
+sealedSecrets:
+  certURL: https://your.host/v1/cert.pem
+
+webLogs: true
+webContext: /seal
+```
