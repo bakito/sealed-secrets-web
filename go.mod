@@ -1,7 +1,6 @@
 module github.com/bakito/sealed-secrets-web
 
-go 1.21
-toolchain go1.22.0
+go 1.22
 
 require (
 	github.com/bakito/semver v1.1.3
