@@ -44,6 +44,8 @@ jobs:
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v4
+        with:
+          skip-pkg-cache: true
 
   helm:
     name: Helm Checks
@@ -84,10 +86,5 @@ jobs:
       - name: Run chart-testing (lint)
         run: ct lint --config .github/linters/ct.yaml
 
-      - name: Run chart-testing (list-changed)
-        id: list-changed
-        run: |
-          changed="$(ct list-changed --config .github/linters/ct.yaml)"
-          if [[ -n "$changed" ]]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Template
+        run: make helm-template
