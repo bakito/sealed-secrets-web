@@ -10,8 +10,8 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/goreleaser/goreleaser v1.24.0
 	github.com/norwoodj/helm-docs v1.13.1
-	github.com/onsi/ginkgo/v2 v2.16.0
-	github.com/onsi/gomega v1.31.1
+	github.com/onsi/ginkgo/v2 v2.17.1
+	github.com/onsi/gomega v1.32.0
 	go.uber.org/mock v0.4.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.29.3
