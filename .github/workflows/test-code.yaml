@@ -1,4 +1,4 @@
-name: Go
+name: Code
 on:
   push:
     branches:
@@ -30,7 +30,7 @@ jobs:
           path-to-profile: coverprofile.out
 
   lint:
-    name: Lint
+    name: Go Lint
     runs-on: ubuntu-latest
     steps:
 
@@ -44,6 +44,8 @@ jobs:
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v4
+        with:
+          skip-pkg-cache: true
 
   helm:
     name: Helm Checks
@@ -77,6 +79,12 @@ jobs:
           sed -i '/!\[Version\:/d' chart/README.md
           sed -i '/!\[Version\:/d' chart/README.md.old
           diff chart/README.md.old chart/README.md
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
+      - name: Run chart-testing (lint)
+        run: ct lint --config .github/linters/ct.yaml
 
       - name: Template
         run: make helm-template
