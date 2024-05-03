@@ -1,12 +1,28 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"gopkg.in/yaml.v2"
 	"k8s.io/apimachinery/pkg/runtime"
 )
+
+func mapToReader(inputMap map[string]interface{}) (io.Reader, error) {
+	jsonBytes, err := json.Marshal(inputMap)
+	if err != nil {
+			return nil, err
+	}
+
+	reader := bytes.NewReader(jsonBytes)
+	return reader, nil
+}
 
 func (h *Handler) KubeSeal(c *gin.Context) {
 	result := []byte{}
@@ -17,19 +33,20 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		return err
+		return
 	}
 
-	yamlFiles := strings.Split(string(data), "
----
-")
+	yamlFiles := strings.Split(string(data), "---\n")
 	for _, yamlFile := range yamlFiles {
 		var obj map[string]interface{}
 		if err := yaml.Unmarshal([]byte(yamlFile), &obj); err != nil {
-			return err
+			return
 		}
-
-		ss, err := h.sealer.Seal(outputFormat, obj)
+		reader, err := mapToReader(obj)
+		if err != nil {
+			return
+		}
+		ss, err := h.sealer.Seal(outputFormat, reader)
 		if err != nil {
 			log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 			c.Negotiate(http.StatusInternalServerError, gin.Negotiate{
@@ -38,7 +55,7 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 			})
 			return
 		}
-		result = append(result, ss)
+		result = append(result, ss...)
   }
 
 	c.Data(http.StatusOK, outputContentType, result)
