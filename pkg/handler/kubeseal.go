@@ -17,7 +17,7 @@ import (
 func mapToReader(inputMap map[string]interface{}) (io.Reader, error) {
 	jsonBytes, err := json.Marshal(inputMap)
 	if err != nil {
-			return nil, err
+		return nil, err
 	}
 
 	reader := bytes.NewReader(jsonBytes)
@@ -56,7 +56,7 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 			return
 		}
 		result = append(result, ss...)
-  }
+	}
 
 	c.Data(http.StatusOK, outputContentType, result)
 }
