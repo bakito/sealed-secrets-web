@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.6.0
 	github.com/onsi/ginkgo/v2 v2.17.2
-	github.com/onsi/gomega v1.33.0
+	github.com/onsi/gomega v1.33.1
 	go.uber.org/mock v0.4.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.30.0
