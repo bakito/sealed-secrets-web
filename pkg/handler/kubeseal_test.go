@@ -61,7 +61,7 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/yaml"))
 		})
 
-		FIt("should return an error if seal is not successful", func() {
+		It("should return an error if seal is not successful", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
