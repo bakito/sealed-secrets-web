@@ -49,8 +49,8 @@ var _ = Describe("Handler ", func() {
 
 		It("should kubeseal input as yaml and output as yaml", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
-			c.Request.Header.Set("Content-Type", "application/x-yaml")
-			c.Request.Header.Set("Accept", "application/x-yaml")
+			c.Request.Header.Set("Content-Type", "application/yaml")
+			c.Request.Header.Set("Accept", "application/yaml")
 
 			sealer.EXPECT().Seal("yaml", gomock.Any()).Return([]byte(sealedAsYAML), nil)
 
@@ -58,13 +58,13 @@ var _ = Describe("Handler ", func() {
 
 			Ω(recorder.Code).Should(Equal(http.StatusOK))
 			Ω(recorder.Body.String()).Should(Equal(sealedAsYAML))
-			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/x-yaml"))
+			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/yaml"))
 		})
 
 		It("should return an error if seal is not successful", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
-			c.Request.Header.Set("Content-Type", "application/x-yaml")
-			c.Request.Header.Set("Accept", "application/x-yaml")
+			c.Request.Header.Set("Content-Type", "application/yaml")
+			c.Request.Header.Set("Accept", "application/yaml")
 
 			sealer.EXPECT().Seal(gomock.Any(), gomock.Any()).Return(nil, errors.New("error sealing"))
 
@@ -72,7 +72,7 @@ var _ = Describe("Handler ", func() {
 
 			Ω(recorder.Code).Should(Equal(http.StatusInternalServerError))
 			Ω(recorder.Body.String()).Should(Equal("error: error sealing\n"))
-			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/x-yaml; charset=utf-8"))
+			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/yaml; charset=utf-8"))
 		})
 	})
 })

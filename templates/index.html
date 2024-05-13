@@ -256,7 +256,7 @@
           if (c === "json") {
             return 'application/json'
           }
-          return 'application/x-yaml'
+          return 'application/yaml'
         },
         validate() {
           axios.post('{{.WebContext}}api/validate', this.editor2Content, {

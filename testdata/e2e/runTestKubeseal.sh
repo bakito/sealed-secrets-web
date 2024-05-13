@@ -4,7 +4,7 @@ set -e
 echo "Test /api/kubeseal should seal secret having yaml input and yaml output"
 
 SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/ssw/api/kubeseal' \
-  --header 'Accept: application/x-yaml' \
+  --header 'Accept: application/yaml' \
   --data-binary '@stringData.yaml')
 
 echo "$SEALED_SECRET" | yq -r .apiVersion | grep --quiet "bitnami.com/v1alpha1"
@@ -15,7 +15,7 @@ echo "$SEALED_SECRET" | yq -r .metadata.namespace | grep --quiet "mysecretnamesp
 echo "Test /api/kubeseal should seal secret having json input and yaml output"
 
 SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/ssw/api/kubeseal' \
-  --header 'Accept: application/x-yaml' \
+  --header 'Accept: application/yaml' \
   --data-binary '@stringData.json')
 
 echo "$SEALED_SECRET" | yq -r .apiVersion | grep --quiet "bitnami.com/v1alpha1"
