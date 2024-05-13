@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -18,7 +19,7 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 	if err != nil {
 		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
 		c.Negotiate(http.StatusInternalServerError, gin.Negotiate{
-			Offered: []string{gin.MIMEJSON, gin.MIMEYAML2},
+			Offered: []string{binding.MIMEJSON, binding.MIMEYAML2},
 			Data:    gin.H{"error": err.Error()},
 		})
 		return
@@ -28,7 +29,7 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 }
 
 func NegotiateFormat(c *gin.Context) (string, string, bool) {
-	contentType := c.NegotiateFormat(gin.MIMEJSON, gin.MIMEYAML2, runtime.ContentTypeYAML)
+	contentType := c.NegotiateFormat(gin.MIMEJSON, binding.MIMEYAML2, runtime.ContentTypeYAML)
 	var outputFormat string
 	if contentType == "" {
 		c.AbortWithStatus(http.StatusNotAcceptable)
