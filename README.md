@@ -78,7 +78,7 @@ curl --request GET 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/certificate'
 
 ```bash
 curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/kubeseal' \
-  --header 'Accept: application/x-yaml' \
+  --header 'Accept: application/yaml' \
   --data-binary '@stringData.yaml'
 ```
 
@@ -105,7 +105,7 @@ curl -request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/raw' \
 
 ```bash
 curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/validate' \
-  --header 'Accept: application/x-yaml' \
+  --header 'Accept: application/yaml' \
   --data-binary '@stringData.yaml'
 ```
 

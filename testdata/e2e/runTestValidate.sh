@@ -4,7 +4,7 @@ set -e
 echo "Test /api/validate should respond 200 if sealed secret is valid"
 
 SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/ssw/api/kubeseal' \
-  --header 'Accept: application/x-yaml' \
+  --header 'Accept: application/yaml' \
   --data-binary '@stringData.yaml')
 
 echo "$SEALED_SECRET" | yq -r .apiVersion | grep --quiet "bitnami.com/v1alpha1"
@@ -22,7 +22,7 @@ echo "$RESPONSE" | grep --quiet 200
 echo "Test /api/validate should respond 400 if sealed secret is invalid"
 
 INVALID_SECRET=$(curl --silent --show-error --request POST 'http://localhost/ssw/api/kubeseal' \
-  --header 'Accept: application/x-yaml' \
+  --header 'Accept: application/yaml' \
   --data-binary '@stringData.yaml' | yq '.metadata.name = "wrongname"')
 
 echo "$INVALID_SECRET" | yq -r .apiVersion | grep --quiet "bitnami.com/v1alpha1"

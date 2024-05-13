@@ -39,7 +39,7 @@ var _ = Describe("Handler ", func() {
 
 		It("should return success if validation succeeds", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
-			c.Request.Header.Set("Content-Type", "application/x-yaml")
+			c.Request.Header.Set("Content-Type", "application/yaml")
 
 			sealer.EXPECT().Validate(gomock.Any(), gomock.Any()).Return(nil)
 
@@ -52,7 +52,7 @@ var _ = Describe("Handler ", func() {
 
 		It("should return an error if validation fails", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
-			c.Request.Header.Set("Content-Type", "application/x-yaml")
+			c.Request.Header.Set("Content-Type", "application/yaml")
 
 			sealer.EXPECT().Validate(gomock.Any(), gomock.Any()).Return(errors.New("Validation failed"))
 
@@ -66,7 +66,7 @@ var _ = Describe("Handler ", func() {
 		It("should return an error if certURL is used", func() {
 			cfg.SealedSecrets.CertURL = "http://sealed-secrets/v1/cert.pem"
 			c.Request, _ = http.NewRequest("POST", "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
-			c.Request.Header.Set("Content-Type", "application/x-yaml")
+			c.Request.Header.Set("Content-Type", "application/yaml")
 
 			h.Validate(c)
 
