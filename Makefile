@@ -42,9 +42,9 @@ MOCKGEN ?= $(LOCALBIN)/mockgen
 SEMVER ?= $(LOCALBIN)/semver
 
 ## Tool Versions
-GINKGO_VERSION ?= v2.17.3
-GOLANGCI_LINT_VERSION ?= v1.58.1
-GORELEASER_VERSION ?= v1.26.0
+GINKGO_VERSION ?= v2.19.0
+GOLANGCI_LINT_VERSION ?= v1.59.1
+GORELEASER_VERSION ?= v2.0.1
 HELM_DOCS_VERSION ?= v1.13.1
 MOCKGEN_VERSION ?= v0.4.0
 SEMVER_VERSION ?= v1.1.3
@@ -61,7 +61,7 @@ $(GOLANGCI_LINT): $(LOCALBIN)
 .PHONY: goreleaser
 goreleaser: $(GORELEASER) ## Download goreleaser locally if necessary.
 $(GORELEASER): $(LOCALBIN)
-	test -s $(LOCALBIN)/goreleaser || GOBIN=$(LOCALBIN) go install github.com/goreleaser/goreleaser@$(GORELEASER_VERSION)
+	test -s $(LOCALBIN)/goreleaser || GOBIN=$(LOCALBIN) go install github.com/goreleaser/goreleaser/v2@$(GORELEASER_VERSION)
 .PHONY: helm-docs
 helm-docs: $(HELM_DOCS) ## Download helm-docs locally if necessary.
 $(HELM_DOCS): $(LOCALBIN)
@@ -88,10 +88,10 @@ update-toolbox-tools:
 	toolbox makefile -f $(LOCALDIR)/Makefile \
 		github.com/onsi/ginkgo/v2/ginkgo \
 		github.com/golangci/golangci-lint/cmd/golangci-lint \
-		github.com/goreleaser/goreleaser \
 		github.com/norwoodj/helm-docs/cmd/helm-docs \
 		go.uber.org/mock/mockgen@github.com/uber-go/mock \
-		github.com/bakito/semver
+		github.com/bakito/semver \
+		github.com/goreleaser/goreleaser/v2
 ## toolbox - end
 
 build:
