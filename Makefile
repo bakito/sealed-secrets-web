@@ -88,10 +88,10 @@ update-toolbox-tools:
 	toolbox makefile -f $(LOCALDIR)/Makefile \
 		github.com/onsi/ginkgo/v2/ginkgo \
 		github.com/golangci/golangci-lint/cmd/golangci-lint \
+		github.com/goreleaser/goreleaser/v2 \
 		github.com/norwoodj/helm-docs/cmd/helm-docs \
 		go.uber.org/mock/mockgen@github.com/uber-go/mock \
-		github.com/bakito/semver \
-		github.com/goreleaser/goreleaser/v2
+		github.com/bakito/semver
 ## toolbox - end
 
 build:

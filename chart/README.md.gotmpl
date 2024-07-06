@@ -6,9 +6,17 @@
 
 ## Installation
 
+### oci
+
+```console
+helm install my-{{ template "chart.name" . }} oci://ghcr.io/bakito/helm-charts/{{ template "chart.name" . }} --version {{ template "chart.version" . }}
+```
+
+### helm repository
+
 ```console
 helm repo add bakito https://charts.bakito.net
-helm install {{ template "chart.name" . }} bakito/{{ template "chart.name" . }}
+helm install my-{{ template "chart.name" . }} bakito/{{ template "chart.name" . }} --version {{ template "chart.version" . }}
 ```
 
 {{ template "chart.valuesSection" . }}
