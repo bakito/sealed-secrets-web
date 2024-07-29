@@ -6,8 +6,8 @@ require (
 	github.com/bitnami-labs/sealed-secrets v0.27.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
-	github.com/onsi/ginkgo/v2 v2.19.0
-	github.com/onsi/gomega v1.33.1
+	github.com/onsi/ginkgo/v2 v2.19.1
+	github.com/onsi/gomega v1.34.0
 	go.uber.org/mock v0.4.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.30.3
