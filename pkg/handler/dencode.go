@@ -35,7 +35,7 @@ func (h *Handler) Dencode(c *gin.Context) {
 }
 
 func (h *Handler) dencode(secret *v1.Secret) *v1.Secret {
-	if secret.StringData != nil && len(secret.StringData) > 0 {
+	if len(secret.StringData) > 0 {
 		if secret.Data == nil {
 			secret.Data = map[string][]byte{}
 		}
@@ -46,7 +46,7 @@ func (h *Handler) dencode(secret *v1.Secret) *v1.Secret {
 		return secret
 	}
 
-	if secret.Data != nil && len(secret.Data) > 0 {
+	if len(secret.Data) > 0 {
 		if secret.StringData == nil {
 			secret.StringData = map[string]string{}
 		}
