@@ -66,7 +66,7 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Set up Tools
-        run: make semver helm-docs
+        run: make tb.semver tb.helm-docs
 
       - name: Lint
         run: |

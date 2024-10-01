@@ -2,8 +2,8 @@
 include ./.toolbox.mk
 
 # Run go fmt against code
-fmt: golangci-lint
-	$(LOCALBIN)/golangci-lint run --fix
+fmt: tb.golangci-lint
+	$(TB_GOLANG_CI_LINT) run --fix
 
 # Run go mod tidy
 tidy:
@@ -12,21 +12,21 @@ tidy:
 # Run tests
 test: mocks tidy fmt helm-lint test-cover
 # Run coverage tests
-test-cover: ginkgo
-	$(GINKGO) --cover ./...
+test-cover: tb.ginkgo
+	$(TB_GINKGO) --cover ./...
 
-release: goreleaser semver
-	@version=$$($(SEMVER)); \
+release: tb.goreleaser tb.semver
+	@version=$$($(TB_SEMVER)); \
 	git tag -s $$version -m"Release $$version"
-	$(GORELEASER) --clean
+	$(TB_GORELEASER) --clean
 
-test-release: goreleaser
-	$(GORELEASER) --skip=publish --snapshot --clean
+test-release: tb.goreleaser
+	$(TB_GORELEASER) --skip=publish --snapshot --clean
 
-mocks: mockgen
-	$(MOCKGEN) -destination pkg/mocks/core/mock.go     --package core     k8s.io/client-go/kubernetes/typed/core/v1 CoreV1Interface,SecretInterface
-	$(MOCKGEN) -destination pkg/mocks/ssclient/mock.go --package ssclient github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1 BitnamiV1alpha1Interface,SealedSecretInterface
-	$(MOCKGEN) -destination pkg/mocks/seal/mock.go --package seal github.com/bakito/sealed-secrets-web/pkg/seal Sealer
+mocks: tb.mockgen
+	$(TB_MOCKGEN) -destination pkg/mocks/core/mock.go     --package core     k8s.io/client-go/kubernetes/typed/core/v1 CoreV1Interface,SecretInterface
+	$(TB_MOCKGEN) -destination pkg/mocks/ssclient/mock.go --package ssclient github.com/bitnami-labs/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1 BitnamiV1alpha1Interface,SealedSecretInterface
+	$(TB_MOCKGEN) -destination pkg/mocks/seal/mock.go --package seal github.com/bakito/sealed-secrets-web/pkg/seal Sealer
 
 build:
 	podman build --build-arg VERSION=dev --build-arg BUILD=dev --build-arg TARGETPLATFORM=linux/amd64 -t sealed-secrets-web .
@@ -34,12 +34,12 @@ build:
 build-arm:
 	podman build --build-arg VERSION=dev --build-arg BUILD=dev --build-arg TARGETPLATFORM=linux/arm64 -t sealed-secrets-web .
 
-docs: helm-docs update-chart-version
-	@$(LOCALBIN)/helm-docs
+docs: tb.helm-docs update-chart-version
+	@$(TB_HELM_DOCSLOCALBIN)
 
-update-chart-version: semver
-	@version=$$($(LOCALBIN)/semver -next); \
-	versionNum=$$($(LOCALBIN)/semver -next -numeric); \
+update-chart-version: tb.semver
+	@version=$$($(TB_SEMVER) -next); \
+	versionNum=$$($(TB_SEMVER) -next -numeric); \
 	sed -i "s/^version:.*$$/version: $${versionNum}/"    ./chart/Chart.yaml; \
 	sed -i "s/^appVersion:.*$$/appVersion: $${version}/" ./chart/Chart.yaml
 
