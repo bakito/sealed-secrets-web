@@ -37,7 +37,7 @@ build-arm:
 docs: tb.helm-docs update-chart-version
 	@$(TB_HELM_DOCSLOCALBIN)
 
-update-chart-version: .semver
+update-chart-version: tb.semver
 	@version=$$($(TB_SEMVER) -next); \
 	versionNum=$$($(TB_SEMVER) -next -numeric); \
 	sed -i "s/^version:.*$$/version: $${versionNum}/"    ./chart/Chart.yaml; \
