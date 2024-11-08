@@ -35,7 +35,7 @@ build-arm:
 	podman build --build-arg VERSION=dev --build-arg BUILD=dev --build-arg TARGETPLATFORM=linux/arm64 -t sealed-secrets-web .
 
 docs: tb.helm-docs update-chart-version
-	@$(TB_HELM_DOCSLOCALBIN)
+	@$(TB_HELM_DOCS)
 
 update-chart-version: tb.semver
 	@version=$$($(TB_SEMVER) -next); \

@@ -40,6 +40,7 @@ helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.5
 | ingress.defaultTls | bool | `false` | set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift) |
 | ingress.enabled | bool | `false` | Enable ingress support |
 | ingress.hosts | list | `[{"paths":[{"path":"/","pathType":"Prefix"}]}]` | Ingress hosts |
+| ingress.labels | object | `{}` | Ingress labels |
 | ingress.tls | list | `[]` | Ingress tls |
 | initialSecretFile | string | `nil` | Define you custom initial secret file |
 | nameOverride | string | `""` | String to partially override "argo-rollouts.fullname" template |
