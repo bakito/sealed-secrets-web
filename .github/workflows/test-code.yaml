@@ -78,6 +78,8 @@ jobs:
           # ignore version as it is updated during build
           sed -i '/!\[Version\:/d' chart/README.md
           sed -i '/!\[Version\:/d' chart/README.md.old
+          sed -i -E 's/--version [0-9]+.[0-9]+.[0-9]+/--version x.x.x/' chart/README.md
+          sed -i -E 's/--version [0-9]+.[0-9]+.[0-9]+/--version x.x.x/' chart/README.md.old
           diff chart/README.md.old chart/README.md
 
       - name: Set up chart-testing

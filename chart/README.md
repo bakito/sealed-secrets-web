@@ -1,6 +1,6 @@
 # sealed-secrets-web
 
-![Version: 3.1.5](https://img.shields.io/badge/Version-3.1.5-informational?style=flat-square) ![AppVersion: v3.1.5](https://img.shields.io/badge/AppVersion-v3.1.5-informational?style=flat-square)
+![Version: 3.1.6](https://img.shields.io/badge/Version-3.1.6-informational?style=flat-square) ![AppVersion: v3.1.6](https://img.shields.io/badge/AppVersion-v3.1.6-informational?style=flat-square)
 
 A web interface for Sealed Secrets by Bitnami.
 
@@ -9,14 +9,14 @@ A web interface for Sealed Secrets by Bitnami.
 ### oci
 
 ```console
-helm install my-sealed-secrets-web oci://ghcr.io/bakito/helm-charts/sealed-secrets-web --version 3.1.5
+helm install my-sealed-secrets-web oci://ghcr.io/bakito/helm-charts/sealed-secrets-web --version 3.1.6
 ```
 
 ### helm repository
 
 ```console
 helm repo add bakito https://charts.bakito.net
-helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.5
+helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.6
 ```
 
 ## Values
