@@ -50,3 +50,6 @@ helm-template:
 	helm template ./chart -n sealed-secrets-web
 	@echo "#######################"
 	helm template ./chart -n sealed-secrets-web --set disableLoadSecrets=true --set sealedSecrets.serviceName=
+
+helm-chainsaw:
+	./testdata/e2e/chainsaw/run.sh
