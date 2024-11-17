@@ -8,9 +8,9 @@ automountServiceAccountToken: true
 ---
 # Source: sealed-secrets-web/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  name: release-name-sealed-secrets-web
+  name: cs-test-3-sealed-secrets-web
 rules:
   - apiGroups:
       - bitnami.com
@@ -25,25 +25,16 @@ rules:
       - secrets
     verbs:
       - get
-  - apiGroups:
-      - ""
-    resources:
-      - services
-      - services/proxy
-    verbs:
-      - get
-    resourceNames:
-      - sealed-secrets
 ---
 # Source: sealed-secrets-web/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  name: release-name-sealed-secrets-web
+  name: cs-test-3-sealed-secrets-web
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: release-name-sealed-secrets-web
+  kind: ClusterRole
+  name: cs-test-3-sealed-secrets-web
 subjects:
   - kind: ServiceAccount
     name: sealed-secrets-web
@@ -53,7 +44,7 @@ subjects:
 apiVersion: v1
 kind: Service
 metadata:
-  name: release-name-sealed-secrets-web
+  name: cs-test-3-sealed-secrets-web
 spec:
   type: ClusterIP
   ports:
@@ -63,25 +54,25 @@ spec:
       name: http
   selector:
     app.kubernetes.io/name: sealed-secrets-web
-    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/instance: cs-test-3
 ---
 # Source: sealed-secrets-web/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: release-name-sealed-secrets-web
+  name: cs-test-3-sealed-secrets-web
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
       app.kubernetes.io/name: sealed-secrets-web
-      app.kubernetes.io/instance: release-name
+      app.kubernetes.io/instance: cs-test-3
   template:
     metadata:
       labels:
         app.kubernetes.io/name: sealed-secrets-web
-        app.kubernetes.io/instance: release-name
+        app.kubernetes.io/instance: cs-test-3
     spec:
       serviceAccountName: sealed-secrets-web
       containers:
@@ -89,9 +80,7 @@ spec:
           image: "ghcr.io/bakito/sealed-secrets-web:v3.1.6"
           imagePullPolicy: IfNotPresent
           args:
-            - --include-namespaces=default
             - --sealed-secrets-service-namespace=sealed-secrets
-            - --sealed-secrets-service-name=sealed-secrets
           ports:
             - name: http
               containerPort: 8080
