@@ -65,8 +65,7 @@ roleRef:
   {{- end }}
   name: {{ template "sealed-secrets-web.fullname" . }}
 subjects:
-  - apiGroup: ""
-    kind: ServiceAccount
+  - kind: ServiceAccount
     name: {{ template "sealed-secrets-web.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
 {{ end }}

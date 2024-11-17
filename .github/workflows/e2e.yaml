@@ -26,6 +26,12 @@ jobs:
           node_image: kindest/node:${{ matrix.k8s_version }}
           kubectl_version: ${{ matrix.k8s_version }}
 
+      - name: Setup Chainsaw
+        uses: kyverno/action-install-chainsaw@v0.2.11
+
+      - name: Chainsaw
+        run: ./testdata/e2e/chainsaw/run.sh
+
       - name: Build image
         run: ./testdata/e2e/buildImage.sh
 

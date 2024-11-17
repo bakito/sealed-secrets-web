@@ -1,0 +1,30 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sealed-secrets-web-default
+spec:
+  timeouts:
+    apply: 5s
+    assert: 10s
+  steps:
+    - try:
+        - apply:
+            file: template-default.yaml
+        - assert:
+            file: expected-default.yaml
+---
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sealed-secrets-web-include-local-namespace-only
+spec:
+  timeouts:
+    apply: 5s
+    assert: 10s
+  steps:
+    - try:
+        - apply:
+            file: template-includeLocalNamespaceOnly.yaml
+        - assert:
+            file: expected-includeLocalNamespaceOnly.yaml
+---

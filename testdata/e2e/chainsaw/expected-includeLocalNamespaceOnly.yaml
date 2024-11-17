@@ -1,0 +1,117 @@
+---
+# Source: sealed-secrets-web/templates/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sealed-secrets-web
+automountServiceAccountToken: true
+---
+# Source: sealed-secrets-web/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: release-name-sealed-secrets-web
+rules:
+  - apiGroups:
+      - bitnami.com
+    resources:
+      - sealedsecrets
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - services
+      - services/proxy
+    verbs:
+      - get
+    resourceNames:
+      - sealed-secrets
+---
+# Source: sealed-secrets-web/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: release-name-sealed-secrets-web
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: release-name-sealed-secrets-web
+subjects:
+  - kind: ServiceAccount
+    name: sealed-secrets-web
+    namespace: default
+---
+# Source: sealed-secrets-web/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-sealed-secrets-web
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: sealed-secrets-web
+    app.kubernetes.io/instance: release-name
+---
+# Source: sealed-secrets-web/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-sealed-secrets-web
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sealed-secrets-web
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sealed-secrets-web
+        app.kubernetes.io/instance: release-name
+    spec:
+      serviceAccountName: sealed-secrets-web
+      containers:
+        - name: sealed-secrets-web
+          image: "ghcr.io/bakito/sealed-secrets-web:v3.1.6"
+          imagePullPolicy: IfNotPresent
+          args:
+            - --include-namespaces=default
+            - --sealed-secrets-service-namespace=sealed-secrets
+            - --sealed-secrets-service-name=sealed-secrets
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /_health
+              port: http
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /_health
+              port: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsGroup: 1000
+            runAsUser: 1001
+          resources: {}
