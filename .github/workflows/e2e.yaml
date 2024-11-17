@@ -25,7 +25,7 @@ jobs:
           ingress_enabled: true
           node_image: kindest/node:${{ matrix.k8s_version }}
           kubectl_version: ${{ matrix.k8s_version }}
-      - name: Chainsaw
+      - name: ⚙️ Chainsaw
         run: ./testdata/e2e/chainsaw/run.sh
 
       - name: Build image
