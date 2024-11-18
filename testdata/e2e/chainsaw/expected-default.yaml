@@ -4,6 +4,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: sealed-secrets-web
+  namespace: ($namespace)
 automountServiceAccountToken: true
 ---
 # Source: sealed-secrets-web/templates/rbac.yaml
@@ -47,13 +48,14 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: sealed-secrets-web
-    namespace: default
+    namespace: ($namespace)
 ---
 # Source: sealed-secrets-web/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: cs-test-1-sealed-secrets-web
+  namespace: ($namespace)
 spec:
   type: ClusterIP
   ports:
@@ -70,6 +72,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cs-test-1-sealed-secrets-web
+  namespace: ($namespace)
 spec:
   replicas: 1
   revisionHistoryLimit: 10
