@@ -71,7 +71,9 @@ var _ = Describe("Handler ", func() {
 			h.Validate(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusConflict))
-			Ω(recorder.Body.String()).Should(Equal("validate can't be used with CertURL (http://sealed-secrets/v1/cert.pem)"))
+			Ω(
+				recorder.Body.String(),
+			).Should(Equal("validate can't be used with CertURL (http://sealed-secrets/v1/cert.pem)"))
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("text/plain"))
 		})
 	})

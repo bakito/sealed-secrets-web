@@ -55,7 +55,10 @@ func contextNegotiate(c *gin.Context, code int, config gin.Negotiate) {
 		c.TOML(code, data)
 
 	default:
-		c.AbortWithError(http.StatusNotAcceptable, errors.New("the accepted formats are not offered by the server")) //nolint: errcheck
+		_ = c.AbortWithError(
+			http.StatusNotAcceptable,
+			errors.New("the accepted formats are not offered by the server"),
+		)
 	}
 }
 

@@ -69,7 +69,12 @@ func main() {
 	_ = setupRouter(coreClient, ssc, cfg, sealer).Run(fmt.Sprintf(":%d", cfg.Web.Port))
 }
 
-func setupRouter(coreClient corev1.CoreV1Interface, ssClient ssClient.BitnamiV1alpha1Interface, cfg *config.Config, sealer seal.Sealer) *gin.Engine {
+func setupRouter(
+	coreClient corev1.CoreV1Interface,
+	ssClient ssClient.BitnamiV1alpha1Interface,
+	cfg *config.Config,
+	sealer seal.Sealer,
+) *gin.Engine {
 	indexHTML, err := renderIndexHTML(cfg)
 	if err != nil {
 		log.Fatalf("Could not render the index html template: %s", err.Error())

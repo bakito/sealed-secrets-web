@@ -55,7 +55,9 @@ var _ = Describe("Handler ", func() {
 			h.Raw(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(Equal(`{"error":"invalid character 'o' in literal false (expecting 'a')"}`))
+			Ω(
+				recorder.Body.String(),
+			).Should(Equal(`{"error":"invalid character 'o' in literal false (expecting 'a')"}`))
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/json; charset=utf-8"))
 		})
 

@@ -65,7 +65,9 @@ var _ = Describe("Handler ", func() {
 				h.Version(c)
 
 				Ω(recorder.Code).Should(Equal(http.StatusOK))
-				Ω(recorder.Body.String()).Should(Equal(fmt.Sprintf(`{"build":"%v","version":"%v"}`, version.Build, version.Version)))
+				Ω(
+					recorder.Body.String(),
+				).Should(Equal(fmt.Sprintf(`{"build":"%v","version":"%v"}`, version.Build, version.Version)))
 				Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/json; charset=utf-8"))
 			})
 		})

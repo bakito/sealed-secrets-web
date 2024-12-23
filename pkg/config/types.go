@@ -28,7 +28,9 @@ func parse(f *flags) (*Config, error) {
 	}
 
 	if *f.kubesealArgs != "" {
-		log.Println("Argument 'kubeseal-arguments' is deprecated use (sealed-secrets-service-name, sealed-secrets-service-namespace or sealed-secrets-cert-url).")
+		log.Println(
+			"Argument 'kubeseal-arguments' is deprecated use (sealed-secrets-service-name, sealed-secrets-service-namespace or sealed-secrets-cert-url).",
+		)
 	}
 	if *f.webExternalURL != "" {
 		log.Println("Argument 'web-external-url' is deprecated use (web-context).")
@@ -145,18 +147,54 @@ type flags struct {
 
 func newFlags() *flags {
 	return &flags{
-		disableLoadSecrets:            flag.Bool("disable-load-secrets", false, "Disable the loading of existing secrets"),
-		enableWebLogs:                 flag.Bool("enable-web-logs", false, "Enable web logs"),
-		includeNamespaces:             flag.String("include-namespaces", "", "Optional space separated list if namespaces to be included in the sealed secret search"),
-		kubesealArgs:                  flag.String("kubeseal-arguments", "", "Deprecated use (sealed-secrets-service-name, sealed-secrets-service-namespace or sealed-secrets-cert-url)"),
-		sealedSecretsServiceName:      flag.String("sealed-secrets-service-name", "sealed-secrets", "Name of the sealed secrets service"),
-		sealedSecretsServiceNamespace: flag.String("sealed-secrets-service-namespace", "sealed-secrets", "Namespace of the sealed secrets service"),
-		sealedSecretsCertURL:          flag.String("sealed-secrets-cert-url", "", "URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service)"),
-		initialSecretFile:             flag.String("initial-secret-file", "", "Define a file with the initial secret to be displayed. If empty, defaults are used."),
-		webExternalURL:                flag.String("web-external-url", "", "Deprecated use (web-context)"),
-		webContext:                    flag.String("web-context", "/", "The context the application is running on. (for example, if it is served via a reverse proxy)"),
-		printVersion:                  flag.Bool("version", false, "Print version information and exit"),
-		port:                          flag.Int("port", 8080, "Define the port to run the application on. (default: 8080)"),
-		config:                        flag.String("config", "", "Define the config file"),
+		disableLoadSecrets: flag.Bool(
+			"disable-load-secrets",
+			false,
+			"Disable the loading of existing secrets",
+		),
+		enableWebLogs: flag.Bool("enable-web-logs", false, "Enable web logs"),
+		includeNamespaces: flag.String(
+			"include-namespaces",
+			"",
+			"Optional space separated list if namespaces to be included in the sealed secret search",
+		),
+		kubesealArgs: flag.String(
+			"kubeseal-arguments",
+			"",
+			"Deprecated use (sealed-secrets-service-name, sealed-secrets-service-namespace or sealed-secrets-cert-url)",
+		),
+		sealedSecretsServiceName: flag.String(
+			"sealed-secrets-service-name",
+			"sealed-secrets",
+			"Name of the sealed secrets service",
+		),
+		sealedSecretsServiceNamespace: flag.String(
+			"sealed-secrets-service-namespace",
+			"sealed-secrets",
+			"Namespace of the sealed secrets service",
+		),
+		sealedSecretsCertURL: flag.String(
+			"sealed-secrets-cert-url",
+			"",
+			"URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service)",
+		),
+		initialSecretFile: flag.String(
+			"initial-secret-file",
+			"",
+			"Define a file with the initial secret to be displayed. If empty, defaults are used.",
+		),
+		webExternalURL: flag.String("web-external-url", "", "Deprecated use (web-context)"),
+		webContext: flag.String(
+			"web-context",
+			"/",
+			"The context the application is running on. (for example, if it is served via a reverse proxy)",
+		),
+		printVersion: flag.Bool("version", false, "Print version information and exit"),
+		port: flag.Int(
+			"port",
+			8080,
+			"Define the port to run the application on. (default: 8080)",
+		),
+		config: flag.String("config", "", "Define the config file"),
 	}
 }

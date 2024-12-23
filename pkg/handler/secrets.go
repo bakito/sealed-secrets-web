@@ -21,7 +21,10 @@ import (
 )
 
 // BuildClients build the  k82 clients
-func BuildClients(clientConfig clientcmd.ClientConfig, disableLoadSecrets bool) (corev1.CoreV1Interface, ssClient.BitnamiV1alpha1Interface, error) {
+func BuildClients(
+	clientConfig clientcmd.ClientConfig,
+	disableLoadSecrets bool,
+) (corev1.CoreV1Interface, ssClient.BitnamiV1alpha1Interface, error) {
 	if disableLoadSecrets {
 		return nil, nil, nil
 	}
@@ -52,7 +55,11 @@ type SecretsHandler struct {
 }
 
 // NewHandler creates a new secret handler.
-func NewHandler(coreClient corev1.CoreV1Interface, ssCl ssClient.BitnamiV1alpha1Interface, cfg *config.Config) *SecretsHandler {
+func NewHandler(
+	coreClient corev1.CoreV1Interface,
+	ssCl ssClient.BitnamiV1alpha1Interface,
+	cfg *config.Config,
+) *SecretsHandler {
 	inMap := make(map[string]bool)
 	for _, n := range cfg.IncludeNamespaces {
 		inMap[n] = true
@@ -209,5 +216,5 @@ func encodeSecret(secret *v1.Secret, outputFormat string) ([]byte, error) {
 
 type Secret struct {
 	Namespace string `json:"namespace" yaml:"namespace"`
-	Name      string `json:"name" yaml:"name"`
+	Name      string `json:"name"      yaml:"name"`
 }

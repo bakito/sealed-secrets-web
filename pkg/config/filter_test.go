@@ -90,7 +90,9 @@ var _ = Describe("Filter", func() {
 			Ω(secretData["metadata"]).ShouldNot(HaveKey("resourceVersion"))
 			Ω(secretData["metadata"]).ShouldNot(HaveKey("selfLink"))
 			Ω(secretData["metadata"]).ShouldNot(HaveKey("uid"))
-			Ω(SubMap(secretData, "metadata", "annotations")).ShouldNot(HaveKey("kubectl.kubernetes.io/last-applied-configuration"))
+			Ω(
+				SubMap(secretData, "metadata", "annotations"),
+			).ShouldNot(HaveKey("kubectl.kubernetes.io/last-applied-configuration"))
 			Ω(SubMap(secretData, "metadata", "annotations")).Should(HaveKey("foo"))
 		})
 	})

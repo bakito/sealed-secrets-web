@@ -87,7 +87,9 @@ var _ = Describe("Main", func() {
 			req, _ := http.NewRequest("GET", "/api/secrets", nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(http.StatusOK))
-			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":"%s","name":"%s"}]}`, namespace, name)))
+			Ω(
+				w.Body.String(),
+			).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":"%s","name":"%s"}]}`, namespace, name)))
 		})
 
 		It("list sealed secrets only for given namespaces", func() {
@@ -114,7 +116,9 @@ var _ = Describe("Main", func() {
 			req, _ := http.NewRequest("GET", "/api/secrets", nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(http.StatusOK))
-			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":"%s","name":"%s"},{"namespace":"%s","name":"%s"}]}`, "a", name, "b", name)))
+			Ω(
+				w.Body.String(),
+			).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":"%s","name":"%s"},{"namespace":"%s","name":"%s"}]}`, "a", name, "b", name)))
 		})
 
 		It("get secret from namespace by name", func() {

@@ -1,13 +1,15 @@
 # Include toolbox tasks
 include ./.toolbox.mk
 
-# Run go fmt against code
-fmt: tb.golangci-lint
-	$(TB_GOLANG_CI_LINT) run --fix
+lint: tb.golangci-lint
+	$(TB_GOLANGCI_LINT) run --fix
 
 # Run go mod tidy
 tidy:
 	go mod tidy
+
+fmt: tb.golines tb.gofumpt
+	$(TB_GOLINES) --base-formatter="$(TB_GOFUMPT)" --max-len=120 --write-output .
 
 # Run tests
 test: mocks tidy fmt helm-lint test-cover

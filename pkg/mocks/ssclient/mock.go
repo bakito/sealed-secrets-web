@@ -26,6 +26,7 @@ import (
 type MockBitnamiV1alpha1Interface struct {
 	ctrl     *gomock.Controller
 	recorder *MockBitnamiV1alpha1InterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockBitnamiV1alpha1InterfaceMockRecorder is the mock recorder for MockBitnamiV1alpha1Interface.
@@ -60,23 +61,24 @@ func (mr *MockBitnamiV1alpha1InterfaceMockRecorder) RESTClient() *gomock.Call {
 }
 
 // SealedSecrets mocks base method.
-func (m *MockBitnamiV1alpha1Interface) SealedSecrets(arg0 string) v1alpha10.SealedSecretInterface {
+func (m *MockBitnamiV1alpha1Interface) SealedSecrets(namespace string) v1alpha10.SealedSecretInterface {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SealedSecrets", arg0)
+	ret := m.ctrl.Call(m, "SealedSecrets", namespace)
 	ret0, _ := ret[0].(v1alpha10.SealedSecretInterface)
 	return ret0
 }
 
 // SealedSecrets indicates an expected call of SealedSecrets.
-func (mr *MockBitnamiV1alpha1InterfaceMockRecorder) SealedSecrets(arg0 any) *gomock.Call {
+func (mr *MockBitnamiV1alpha1InterfaceMockRecorder) SealedSecrets(namespace any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SealedSecrets", reflect.TypeOf((*MockBitnamiV1alpha1Interface)(nil).SealedSecrets), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SealedSecrets", reflect.TypeOf((*MockBitnamiV1alpha1Interface)(nil).SealedSecrets), namespace)
 }
 
 // MockSealedSecretInterface is a mock of SealedSecretInterface interface.
 type MockSealedSecretInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockSealedSecretInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockSealedSecretInterfaceMockRecorder is the mock recorder for MockSealedSecretInterface.
@@ -97,83 +99,83 @@ func (m *MockSealedSecretInterface) EXPECT() *MockSealedSecretInterfaceMockRecor
 }
 
 // Create mocks base method.
-func (m *MockSealedSecretInterface) Create(arg0 context.Context, arg1 *v1alpha1.SealedSecret, arg2 v1.CreateOptions) (*v1alpha1.SealedSecret, error) {
+func (m *MockSealedSecretInterface) Create(ctx context.Context, sealedSecret *v1alpha1.SealedSecret, opts v1.CreateOptions) (*v1alpha1.SealedSecret, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Create", ctx, sealedSecret, opts)
 	ret0, _ := ret[0].(*v1alpha1.SealedSecret)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockSealedSecretInterfaceMockRecorder) Create(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockSealedSecretInterfaceMockRecorder) Create(ctx, sealedSecret, opts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockSealedSecretInterface)(nil).Create), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockSealedSecretInterface)(nil).Create), ctx, sealedSecret, opts)
 }
 
 // Delete mocks base method.
-func (m *MockSealedSecretInterface) Delete(arg0 context.Context, arg1 string, arg2 v1.DeleteOptions) error {
+func (m *MockSealedSecretInterface) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Delete", ctx, name, opts)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockSealedSecretInterfaceMockRecorder) Delete(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockSealedSecretInterfaceMockRecorder) Delete(ctx, name, opts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSealedSecretInterface)(nil).Delete), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSealedSecretInterface)(nil).Delete), ctx, name, opts)
 }
 
 // DeleteCollection mocks base method.
-func (m *MockSealedSecretInterface) DeleteCollection(arg0 context.Context, arg1 v1.DeleteOptions, arg2 v1.ListOptions) error {
+func (m *MockSealedSecretInterface) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteCollection", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "DeleteCollection", ctx, opts, listOpts)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteCollection indicates an expected call of DeleteCollection.
-func (mr *MockSealedSecretInterfaceMockRecorder) DeleteCollection(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockSealedSecretInterfaceMockRecorder) DeleteCollection(ctx, opts, listOpts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCollection", reflect.TypeOf((*MockSealedSecretInterface)(nil).DeleteCollection), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCollection", reflect.TypeOf((*MockSealedSecretInterface)(nil).DeleteCollection), ctx, opts, listOpts)
 }
 
 // Get mocks base method.
-func (m *MockSealedSecretInterface) Get(arg0 context.Context, arg1 string, arg2 v1.GetOptions) (*v1alpha1.SealedSecret, error) {
+func (m *MockSealedSecretInterface) Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.SealedSecret, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Get", ctx, name, opts)
 	ret0, _ := ret[0].(*v1alpha1.SealedSecret)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockSealedSecretInterfaceMockRecorder) Get(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockSealedSecretInterfaceMockRecorder) Get(ctx, name, opts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockSealedSecretInterface)(nil).Get), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockSealedSecretInterface)(nil).Get), ctx, name, opts)
 }
 
 // List mocks base method.
-func (m *MockSealedSecretInterface) List(arg0 context.Context, arg1 v1.ListOptions) (*v1alpha1.SealedSecretList, error) {
+func (m *MockSealedSecretInterface) List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.SealedSecretList, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", arg0, arg1)
+	ret := m.ctrl.Call(m, "List", ctx, opts)
 	ret0, _ := ret[0].(*v1alpha1.SealedSecretList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // List indicates an expected call of List.
-func (mr *MockSealedSecretInterfaceMockRecorder) List(arg0, arg1 any) *gomock.Call {
+func (mr *MockSealedSecretInterfaceMockRecorder) List(ctx, opts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockSealedSecretInterface)(nil).List), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockSealedSecretInterface)(nil).List), ctx, opts)
 }
 
 // Patch mocks base method.
-func (m *MockSealedSecretInterface) Patch(arg0 context.Context, arg1 string, arg2 types.PatchType, arg3 []byte, arg4 v1.PatchOptions, arg5 ...string) (*v1alpha1.SealedSecret, error) {
+func (m *MockSealedSecretInterface) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (*v1alpha1.SealedSecret, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1, arg2, arg3, arg4}
-	for _, a := range arg5 {
+	varargs := []any{ctx, name, pt, data, opts}
+	for _, a := range subresources {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Patch", varargs...)
@@ -183,53 +185,53 @@ func (m *MockSealedSecretInterface) Patch(arg0 context.Context, arg1 string, arg
 }
 
 // Patch indicates an expected call of Patch.
-func (mr *MockSealedSecretInterfaceMockRecorder) Patch(arg0, arg1, arg2, arg3, arg4 any, arg5 ...any) *gomock.Call {
+func (mr *MockSealedSecretInterfaceMockRecorder) Patch(ctx, name, pt, data, opts any, subresources ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1, arg2, arg3, arg4}, arg5...)
+	varargs := append([]any{ctx, name, pt, data, opts}, subresources...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Patch", reflect.TypeOf((*MockSealedSecretInterface)(nil).Patch), varargs...)
 }
 
 // Update mocks base method.
-func (m *MockSealedSecretInterface) Update(arg0 context.Context, arg1 *v1alpha1.SealedSecret, arg2 v1.UpdateOptions) (*v1alpha1.SealedSecret, error) {
+func (m *MockSealedSecretInterface) Update(ctx context.Context, sealedSecret *v1alpha1.SealedSecret, opts v1.UpdateOptions) (*v1alpha1.SealedSecret, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Update", ctx, sealedSecret, opts)
 	ret0, _ := ret[0].(*v1alpha1.SealedSecret)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockSealedSecretInterfaceMockRecorder) Update(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockSealedSecretInterfaceMockRecorder) Update(ctx, sealedSecret, opts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockSealedSecretInterface)(nil).Update), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockSealedSecretInterface)(nil).Update), ctx, sealedSecret, opts)
 }
 
 // UpdateStatus mocks base method.
-func (m *MockSealedSecretInterface) UpdateStatus(arg0 context.Context, arg1 *v1alpha1.SealedSecret, arg2 v1.UpdateOptions) (*v1alpha1.SealedSecret, error) {
+func (m *MockSealedSecretInterface) UpdateStatus(ctx context.Context, sealedSecret *v1alpha1.SealedSecret, opts v1.UpdateOptions) (*v1alpha1.SealedSecret, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateStatus", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "UpdateStatus", ctx, sealedSecret, opts)
 	ret0, _ := ret[0].(*v1alpha1.SealedSecret)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // UpdateStatus indicates an expected call of UpdateStatus.
-func (mr *MockSealedSecretInterfaceMockRecorder) UpdateStatus(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockSealedSecretInterfaceMockRecorder) UpdateStatus(ctx, sealedSecret, opts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatus", reflect.TypeOf((*MockSealedSecretInterface)(nil).UpdateStatus), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatus", reflect.TypeOf((*MockSealedSecretInterface)(nil).UpdateStatus), ctx, sealedSecret, opts)
 }
 
 // Watch mocks base method.
-func (m *MockSealedSecretInterface) Watch(arg0 context.Context, arg1 v1.ListOptions) (watch.Interface, error) {
+func (m *MockSealedSecretInterface) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Watch", arg0, arg1)
+	ret := m.ctrl.Call(m, "Watch", ctx, opts)
 	ret0, _ := ret[0].(watch.Interface)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Watch indicates an expected call of Watch.
-func (mr *MockSealedSecretInterfaceMockRecorder) Watch(arg0, arg1 any) *gomock.Call {
+func (mr *MockSealedSecretInterfaceMockRecorder) Watch(ctx, opts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Watch", reflect.TypeOf((*MockSealedSecretInterface)(nil).Watch), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Watch", reflect.TypeOf((*MockSealedSecretInterface)(nil).Watch), ctx, opts)
 }
