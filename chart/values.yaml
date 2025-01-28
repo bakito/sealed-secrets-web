@@ -166,3 +166,6 @@ tolerations: []
 
 # -- Assign custom [affinity] rules to the deployment
 affinity: {}
+
+# -- Optional labels to apply to all resources
+commonLabels: {}
