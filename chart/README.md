@@ -53,6 +53,10 @@ helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.6
 | sealedSecrets.namespace | string | `"sealed-secrets"` | Namespace of the sealed secrets service |
 | sealedSecrets.serviceName | string | `"sealed-secrets"` | Name of the sealed secrets service |
 | service.annotations | object | `{}` | Service annotations |
+| service.clusterIP | string | `""` | Kubernetes Service clusterIP |
+| service.loadBalancerIP | string | `""` | Kubernetes Service loadBalancerIP |
+| service.loadBalancerSourceRanges | list | `[]` | Kubernetes Service loadBalancerSourceRanges |
+| service.nodePort | string | `nil` | Kubernetes Service Nodeport |
 | service.port | int | `80` | Service port |
 | service.type | string | `"ClusterIP"` | Sets the type of the Service |
 | serviceAccount.automountServiceAccountToken | bool | `true` | Automatically mount the service account token |
