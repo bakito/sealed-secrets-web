@@ -24,6 +24,7 @@ helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.6
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Assign custom [affinity] rules to the deployment |
+| commonLabels | object | `{}` | Optional labels to apply to all resources |
 | deployment.args | object | `{"defaultArgsEnabled":true}` | Default process arguments are used, while additional can be added too |
 | deployment.livenessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/_health","port":"http"}}` | Liveness Probes |
 | deployment.readinessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/_health","port":"http"}}` | Readiness Probes |
