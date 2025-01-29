@@ -39,11 +39,17 @@ build-arm:
 helm-docs: tb.helm-docs update-chart-version
 	@$(TB_HELM_DOCS)
 
+# Detect OS
+OS := $(shell uname)
+
+# Define the sed command based on OS
+SED := $(if $(filter Darwin, $(OS)), sed -i "", sed -i)
+
 update-chart-version: tb.semver
 	@version=$$($(TB_SEMVER) -next); \
 	versionNum=$$($(TB_SEMVER) -next -numeric); \
-	sed -i "s/^version:.*$$/version: $${versionNum}/"    ./chart/Chart.yaml; \
-	sed -i "s/^appVersion:.*$$/appVersion: $${version}/" ./chart/Chart.yaml
+	$(SED) "s/^version:.*$$/version: $${versionNum}/"    ./chart/Chart.yaml; \
+	$(SED) "s/^appVersion:.*$$/appVersion: $${version}/" ./chart/Chart.yaml
 
 helm-lint: helm-docs
 	helm lint ./chart

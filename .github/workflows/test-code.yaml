@@ -73,7 +73,7 @@ jobs:
           cp chart/README.md chart/README.md.old
           make helm-lint
 
-      - name: Check chart/README.md is correctly generated with 'make docs'
+      - name: Check chart/README.md is correctly generated with 'make helm-docs'
         run: |
           # ignore version as it is updated during build
           sed -i '/!\[Version\:/d' chart/README.md
@@ -90,3 +90,24 @@ jobs:
 
       - name: Template
         run: make helm-template
+
+  helm-macos:
+    name: Run helm-docs on macos
+    runs-on: macos-latest
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+
+      - name: make helm-docs
+        run: make helm-docs
