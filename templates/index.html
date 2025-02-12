@@ -33,7 +33,10 @@
               <v-card height="100%">
                 <v-card-title>Secret
                   <v-spacer></v-spacer>
-                  <v-select :items="['yaml', 'json']" hide-details="true" v-model="secretFormat" v-on:change="changeSecretFormat" dense solo style="max-width: 100px"></v-select>
+                  <v-btn icon @click="copySecret">
+                    <v-icon>mdi-content-copy</v-icon>
+                  </v-btn>
+                  <v-select :items="['yaml', 'json']" hide-details="true" v-model="secretFormat" v-on:change="changeSecretFormat" dense solo style="max-width: 100px; margin-left: 20px;"></v-select>
                 </v-card-title>
                 <v-card-text style="height: calc(100% - 56px)">
                   <div id="editor1" style="width: 100%; height: 100%;"></div>
@@ -44,7 +47,10 @@
               <v-card height="100%">
                 <v-card-title>Sealed Secret
                   <v-spacer></v-spacer>
-                  <v-select :items="['yaml', 'json']" hide-details="true" v-model="sealedSecretFormat" v-on:change="changeSealedSecretFormat" dense solo style="max-width: 100px"></v-select>
+                  <v-btn icon @click="copySealedSecret">
+                    <v-icon>mdi-content-copy</v-icon>
+                  </v-btn>
+                  <v-select :items="['yaml', 'json']" hide-details="true" v-model="sealedSecretFormat" v-on:change="changeSealedSecretFormat" dense solo style="max-width: 100px; margin-left: 20px;"></v-select>
                 </v-card-title>
                 <v-card-text style="height: calc(100% - 56px)">
                   <div id="editor2" style="width: 100%; height: 100%;"></div>
@@ -272,6 +278,26 @@
             this.messageType = 'error'
             this.message = err.response.data
           });
+        },
+        copySecret() {
+            const text = this.editor1.getValue();
+            navigator.clipboard.writeText(text).then(() => {
+              this.messageType = 'success';
+              this.message = 'Secret copied to clipboard';
+            }).catch(err => {
+              this.messageType = 'error';
+              this.message = 'Failed to copy: ' + err;
+            });
+        },
+        copySealedSecret() {
+            const text = this.editor2.getValue();
+            navigator.clipboard.writeText(text).then(() => {
+              this.messageType = 'success';
+              this.message = 'Sealed Secret copied to clipboard';
+            }).catch(err => {
+              this.messageType = 'error';
+              this.message = 'Failed to copy: ' + err;
+            });
         }
       }
     })
