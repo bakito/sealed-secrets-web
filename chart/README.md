@@ -30,6 +30,7 @@ helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.6
 | deployment.readinessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/_health","port":"http"}}` | Readiness Probes |
 | deployment.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"runAsGroup":1000,"runAsUser":1001}` | Hardening security |
 | disableLoadSecrets | bool | `false` | If set to true secrets cannot be read from this tool, only seal new ones |
+| extraContainers | list | `[]` | Additional containers to run in the pod |
 | fullnameOverride | string | `""` | String to fully override "argo-rollouts.fullname" template |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"ghcr.io/bakito/sealed-secrets-web"` | Repository to use |
