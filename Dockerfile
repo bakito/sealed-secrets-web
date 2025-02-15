@@ -1,8 +1,6 @@
 FROM golang:1.24-bullseye AS builder
 WORKDIR /go/src/app
 
-RUN apt-get update && apt-get install -y upx curl
-
 ARG VERSION=main
 ARG BUILD="N/A"
 
@@ -12,8 +10,7 @@ ENV GO111MODULE=on \
 
 COPY . /go/src/app/
 
-RUN go build -a -installsuffix cgo -ldflags="-w -s -X github.com/bakito/sealed-secrets-web/pkg/version.Version=${VERSION} -X github.com/bakito/sealed-secrets-web/pkg/version.Build=${BUILD}" -o sealed-secrets-web . && \
-    upx -q sealed-secrets-web
+RUN go build -a -installsuffix cgo -ldflags="-w -s -X github.com/bakito/sealed-secrets-web/pkg/version.Version=${VERSION} -X github.com/bakito/sealed-secrets-web/pkg/version.Build=${BUILD}" -o sealed-secrets-web .
 
 # application image
 FROM alpine:latest
