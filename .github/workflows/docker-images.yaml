@@ -3,10 +3,17 @@ name: Build images
 on:
   push:
     branches:
-      - bakito-patch-1
+      - main
+  pull_request:
+    branches:
+      - main
   release:
     types:
       - published
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   packages: write
@@ -33,12 +40,13 @@ jobs:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
-      - name: Build and push ${{github.event.release.tag_name }}
+      - name: Build images ${{github.event.release.tag_name }}
         id: docker_build_release
         uses: docker/build-push-action@v6
         if: ${{ github.event.release.tag_name != '' }}
         with:
           push: true
+          pull: true
           tags: ghcr.io/bakito/sealed-secrets-web:latest,ghcr.io/bakito/sealed-secrets-web:${{ github.event.release.tag_name }},quay.io/bakito/sealed-secrets-web:latest,quay.io/bakito/sealed-secrets-web:${{ github.event.release.tag_name }}
           platforms: linux/amd64,linux/arm64
           provenance: false
@@ -46,12 +54,13 @@ jobs:
             VERSION=${{ github.event.release.tag_name }}
             BUILD=${{ env.curr_date }}
 
-      - name: Build and push main
+      - name: Build images
         id: docker_build_main
         uses: docker/build-push-action@v6
         if: ${{ github.event.release.tag_name == '' }}
         with:
           push: ${{ github.ref == 'refs/heads/main' }}
+          pull: true
           tags: ghcr.io/bakito/sealed-secrets-web:main,quay.io/bakito/sealed-secrets-web:main
           platforms: linux/amd64,linux/arm64
           provenance: false
