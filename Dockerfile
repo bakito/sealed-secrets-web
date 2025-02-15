@@ -1,7 +1,7 @@
-FROM golang:1.23-bullseye AS builder
+FROM golang:1.24-alpine AS builder
 WORKDIR /go/src/app
 
-RUN apt-get update && apt-get install -y upx curl
+RUN apk update && apk add upx
 
 ARG VERSION=main
 ARG BUILD="N/A"

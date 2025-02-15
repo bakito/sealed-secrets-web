@@ -10,6 +10,10 @@ on:
   schedule:
     - cron: '32 0 * * 4'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analyze:
     name: Analyze
@@ -29,7 +33,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
