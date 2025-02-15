@@ -3,7 +3,7 @@ name: Build images
 on:
   push:
     branches:
-      - main
+      - bakito-patch-1
   release:
     types:
       - published
@@ -38,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v6
         if: ${{ github.event.release.tag_name != '' }}
         with:
-          push: true
+          push: false
           tags: ghcr.io/bakito/sealed-secrets-web:latest,ghcr.io/bakito/sealed-secrets-web:${{ github.event.release.tag_name }},quay.io/bakito/sealed-secrets-web:latest,quay.io/bakito/sealed-secrets-web:${{ github.event.release.tag_name }}
           platforms: linux/amd64,linux/arm64
           provenance: false
@@ -51,7 +51,7 @@ jobs:
         uses: docker/build-push-action@v6
         if: ${{ github.event.release.tag_name == '' }}
         with:
-          push: true
+          push: false
           tags: ghcr.io/bakito/sealed-secrets-web:main,quay.io/bakito/sealed-secrets-web:main
           platforms: linux/amd64,linux/arm64
           provenance: false
