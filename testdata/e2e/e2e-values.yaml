@@ -12,7 +12,7 @@ ingress:
   hosts:
     - paths:
         - path: /ssw(/|$)(.*)
-          pathType: Prefix
+          pathType: ImplementationSpecific
 
 webContext: ssw
 webLogs: true
