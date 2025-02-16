@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         # https://hub.docker.com/r/kindest/node/tags
-        k8s_version: [ "v1.28.13", "v1.29.8", "v1.30.4" ]
+        k8s_version: [ "v1.30.10", "v1.31.6", "v1.32.2" ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
