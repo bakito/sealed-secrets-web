@@ -1,6 +1,6 @@
 # sealed-secrets-web
 
-![Version: 3.1.6](https://img.shields.io/badge/Version-3.1.6-informational?style=flat-square) ![AppVersion: v3.1.6](https://img.shields.io/badge/AppVersion-v3.1.6-informational?style=flat-square)
+![Version: 3.1.7](https://img.shields.io/badge/Version-3.1.7-informational?style=flat-square) ![AppVersion: v3.1.7](https://img.shields.io/badge/AppVersion-v3.1.7-informational?style=flat-square)
 
 A web interface for Sealed Secrets by Bitnami.
 
@@ -9,14 +9,14 @@ A web interface for Sealed Secrets by Bitnami.
 ### oci
 
 ```console
-helm install my-sealed-secrets-web oci://ghcr.io/bakito/helm-charts/sealed-secrets-web --version 3.1.6
+helm install my-sealed-secrets-web oci://ghcr.io/bakito/helm-charts/sealed-secrets-web --version 3.1.7
 ```
 
 ### helm repository
 
 ```console
 helm repo add bakito https://charts.bakito.net
-helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.6
+helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.7
 ```
 
 ## Values
@@ -41,7 +41,7 @@ helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.6
 | ingress.className | string | `""` | Ingress class name |
 | ingress.defaultTls | bool | `false` | set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift) |
 | ingress.enabled | bool | `false` | Enable ingress support |
-| ingress.hosts | list | `[{"paths":[{"path":"/","pathType":"Prefix"}]}]` | Ingress hosts |
+| ingress.hosts | list | `[{"paths":[{"path":"/","pathType":"ImplementationSpecific"}]}]` | Ingress hosts |
 | ingress.labels | object | `{}` | Ingress labels |
 | ingress.tls | list | `[]` | Ingress tls |
 | initialSecretFile | string | `nil` | Define you custom initial secret file |

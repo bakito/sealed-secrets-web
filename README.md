@@ -154,7 +154,7 @@ ingress:
   - host: your.host
     paths:
     - path: /seal
-      pathType: Prefix
+      pathType: ImplementationSpecific
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-prefix@kubernetescrd
 

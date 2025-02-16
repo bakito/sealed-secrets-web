@@ -99,7 +99,7 @@ ingress:
   hosts:
     - paths:
         - path: /
-          pathType: Prefix
+          pathType: ImplementationSpecific
       # host: example.internal
 
   # -- set this to true and leave tls an empty array to use the default TLS certificate (works at least in openshift)
