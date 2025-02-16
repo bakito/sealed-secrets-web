@@ -80,7 +80,6 @@ spec:
       serviceAccountName: sealed-secrets-web
       containers:
         - name: sealed-secrets-web
-          image: "ghcr.io/bakito/sealed-secrets-web:v3.1.6"
           imagePullPolicy: IfNotPresent
           args:
             - --sealed-secrets-service-namespace=sealed-secrets
