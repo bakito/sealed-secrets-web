@@ -31,6 +31,9 @@ spec:
       {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePort)) }}
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
+    {{- with .Values.service.extraPorts }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "sealed-secrets-web.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
