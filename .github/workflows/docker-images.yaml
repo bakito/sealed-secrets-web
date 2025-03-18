@@ -40,6 +40,7 @@ jobs:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
+        if: ${{ github.event.release.tag_name != '' || github.ref == 'refs/heads/main' }}
       - name: Build images ${{github.event.release.tag_name }}
         id: docker_build_release
         uses: docker/build-push-action@v6
