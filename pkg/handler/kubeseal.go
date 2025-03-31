@@ -65,12 +65,13 @@ func contextNegotiate(c *gin.Context, code int, config gin.Negotiate) {
 func NegotiateFormat(c *gin.Context) (string, string, bool) {
 	contentType := c.NegotiateFormat(gin.MIMEJSON, gin.MIMEYAML, runtime.ContentTypeYAML)
 	var outputFormat string
-	if contentType == "" {
+	switch contentType {
+	case "":
 		c.AbortWithStatus(http.StatusNotAcceptable)
 		return "", "", true
-	} else if contentType == gin.MIMEJSON {
+	case gin.MIMEJSON:
 		outputFormat = "json"
-	} else {
+	default:
 		outputFormat = "yaml"
 	}
 	return contentType, outputFormat, false

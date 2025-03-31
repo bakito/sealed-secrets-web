@@ -134,11 +134,11 @@ func (h *SecretsHandler) GetSecret(ctx context.Context, namespace, name string) 
 		APIVersion: "v1",
 		Kind:       "Secret",
 	}
-	secret.ObjectMeta.ManagedFields = nil
-	secret.ObjectMeta.OwnerReferences = nil
-	secret.ObjectMeta.CreationTimestamp = metav1.Time{}
-	secret.ObjectMeta.ResourceVersion = ""
-	secret.ObjectMeta.UID = ""
+	secret.ManagedFields = nil
+	secret.OwnerReferences = nil
+	secret.CreationTimestamp = metav1.Time{}
+	secret.ResourceVersion = ""
+	secret.UID = ""
 
 	return secret, nil
 }
