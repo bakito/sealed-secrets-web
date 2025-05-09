@@ -124,7 +124,7 @@ Access the interface via http://localhost/ssw
 
 This section is about using sealed-secrets-web with Traefik ingress controller.
 
-Traefik does not by default strip the path when forwarding to application. If you path is `localhost/seal`, then your route will be parsed by Traefik and your application will be accessed at `/seal`, not `/`.
+Traefik does not by default strip the path when forwarding to application. If your path is `localhost/seal`, then your route will be parsed by Traefik and your application will be accessed at `/seal`, not `/`.
 
 To configure Traefik correctly, apply the following resource:
 
