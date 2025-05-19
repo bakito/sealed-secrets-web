@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install kind with registry
-        uses: bakito/kind-with-registry-action@ingress-helm-chart
+        uses: bakito/kind-with-registry-action@main
         with:
           ingress_enabled: true
           node_image: kindest/node:${{ matrix.k8s_version }}
