@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/bitnami-labs/sealed-secrets v0.29.0
-	github.com/gin-gonic/gin v1.10.0
+	github.com/gin-gonic/gin v1.10.1
 	github.com/google/uuid v1.6.0
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.37.0
