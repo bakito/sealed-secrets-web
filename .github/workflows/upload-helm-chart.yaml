@@ -16,14 +16,20 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+
       - name: Configure Git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Install Helm
-        run: |
-          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        uses: azure/setup-helm@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to ghcr.io
         uses: docker/login-action@v3
@@ -38,7 +44,6 @@ jobs:
           sed -i "s/^version:.*$/version: ${VERSION}/"        ./chart/Chart.yaml
           sed -i "s/^appVersion:.*$/appVersion: v${VERSION}/" ./chart/Chart.yaml
           make helm-docs
-          ./bin/helm-docs
           helm package ./chart/ --version $VERSION --app-version v$VERSION -d dist
           helm push dist/sealed-secrets-web-${VERSION}.tgz oci://ghcr.io/bakito/helm-charts
 

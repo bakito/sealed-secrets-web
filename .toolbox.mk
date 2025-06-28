@@ -6,7 +6,7 @@ TB_LOCALDIR ?= $(shell which cygpath > /dev/null 2>&1 && cygpath -m $$(pwd) || p
 ## Location to install dependencies to
 TB_LOCALBIN ?= $(TB_LOCALDIR)/bin
 $(TB_LOCALBIN):
-	mkdir -p $(TB_LOCALBIN)
+	if [ ! -e $(TB_LOCALBIN) ]; then mkdir -p $(TB_LOCALBIN); fi
 
 ## Tool Binaries
 TB_GINKGO ?= $(TB_LOCALBIN)/ginkgo
@@ -23,7 +23,7 @@ TB_GINKGO_VERSION ?= v2.23.4
 TB_GOFUMPT_VERSION ?= v0.8.0
 TB_GOLANGCI_LINT_VERSION ?= v2.1.6
 TB_GOLINES_VERSION ?= v0.12.2
-TB_GORELEASER_VERSION ?= v2.9.0
+TB_GORELEASER_VERSION ?= v2.10.2
 TB_HELM_DOCS_VERSION ?= v1.14.2
 TB_MOCKGEN_VERSION ?= v0.5.2
 TB_SEMVER_VERSION ?= v1.1.3
