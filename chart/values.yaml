@@ -43,10 +43,10 @@ volumeMounts: []
 # -- Additional volumes to the image updater pod
 volumes: []
 
-# -- String to partially override "argo-rollouts.fullname" template
+# -- String to partially override "sealed-secrets-web.fullname" template
 nameOverride: ""
 
-# -- String to fully override "argo-rollouts.fullname" template
+# -- String to fully override "sealed-secrets-web.fullname" template
 fullnameOverride: ""
 
 rbac:
