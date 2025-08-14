@@ -36,7 +36,7 @@ build:
 build-arm:
 	podman build --build-arg VERSION=dev --build-arg BUILD=dev --build-arg TARGETPLATFORM=linux/arm64 -t sealed-secrets-web .
 
-helm-docs: tb.helm-docs update-chart-version
+helm-docs: tb.helm-docs
 	@$(TB_HELM_DOCS)
 
 # Detect OS
