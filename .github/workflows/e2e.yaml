@@ -21,7 +21,7 @@ jobs:
         k8s_version: [ "v1.31.9", "v1.32.5", "v1.33.1" ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install kind with registry
         uses: bakito/kind-with-registry-action@main
