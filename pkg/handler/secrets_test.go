@@ -293,7 +293,7 @@ var _ = Describe("SecretsHandler", func() {
 })
 
 func setupSealedSecretsReactor(fakeSSClient *ssfake.FakeBitnamiV1alpha1, sealedSecrets []ssv1alpha1.SealedSecret) {
-	fakeSSClient.Fake.AddReactor("list", "sealedsecrets", func(action ktesting.Action) (handled bool, ret runtime.Object, err error) {
+	fakeSSClient.AddReactor("list", "sealedsecrets", func(action ktesting.Action) (handled bool, ret runtime.Object, err error) {
 		listAction := action.(ktesting.ListAction)
 		requestedNamespace := listAction.GetNamespace()
 

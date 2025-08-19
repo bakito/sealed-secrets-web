@@ -4,15 +4,15 @@ include ./.toolbox.mk
 lint: tb.golangci-lint
 	$(TB_GOLANGCI_LINT) run --fix
 
+lint-ci: tb.golangci-lint
+	$(TB_GOLANGCI_LINT) run
+
 # Run go mod tidy
 tidy:
 	go mod tidy
 
-fmt: tb.golines tb.gofumpt
-	$(TB_GOLINES) --base-formatter="$(TB_GOFUMPT)" --max-len=120 --write-output .
-
 # Run tests
-test: mocks tidy fmt helm-lint test-cover
+test: mocks tidy helm-lint test-cover
 # Run coverage tests
 test-cover: tb.ginkgo
 	$(TB_GINKGO) --cover ./...
