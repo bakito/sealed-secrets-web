@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -25,6 +26,7 @@ func parse(f *flags) (*Config, error) {
 		},
 		PrintVersion:       *f.printVersion,
 		DisableLoadSecrets: *f.disableLoadSecrets,
+		UseRegex:           *f.useRegex,
 	}
 
 	if *f.kubesealArgs != "" {
@@ -45,10 +47,13 @@ func parse(f *flags) (*Config, error) {
 	if *f.sealedSecretsServiceNamespace != "" {
 		cfg.SealedSecrets.Namespace = *f.sealedSecretsServiceNamespace
 	}
-
+	if *f.excludeNamespaces != "" {
+		cfg.ExcludeNamespaces = strings.Split(*f.excludeNamespaces, " ")
+	}
 	if *f.includeNamespaces != "" {
 		cfg.IncludeNamespaces = strings.Split(*f.includeNamespaces, " ")
 	}
+
 	if *f.initialSecretFile != "" {
 		b, err := os.ReadFile(*f.initialSecretFile)
 		if err != nil {
@@ -83,6 +88,29 @@ func parse(f *flags) (*Config, error) {
 
 	cfg.Ctx = context.Background()
 
+	if cfg.UseRegex {
+		for _, ns := range cfg.IncludeNamespaces {
+			r, err := regexp.Compile(ns)
+			if err != nil {
+				log.Printf("Skipping include Statement as its no valid Regexp: %s", r)
+				continue
+			}
+			cfg.IncludeNamespacesRegex = append(cfg.IncludeNamespacesRegex, r)
+		}
+		for _, ns := range cfg.ExcludeNamespaces {
+			r, err := regexp.Compile(ns)
+			if err != nil {
+				log.Printf("Skipping exclude Statement as its no valid Regexp: %s", r)
+				continue
+			}
+			cfg.ExcludeNamespacesRegex = append(cfg.ExcludeNamespacesRegex, r)
+		}
+	}
+
+	log.Printf("Loaded includeNamespaces: %s\n", strings.Join(cfg.IncludeNamespaces, ", "))
+	log.Printf("Loaded excludeNamespaces: %s\n", strings.Join(cfg.ExcludeNamespaces, ", "))
+	log.Printf("RegEx enabled: %t\n", cfg.UseRegex)
+
 	return cfg, nil
 }
 
@@ -100,14 +128,18 @@ func sanitizeWebContext(cfg *Config) string {
 }
 
 type Config struct {
-	Web                Web             `yaml:"web"`
-	FieldFilter        *FieldFilter    `yaml:"fieldFilter,omitempty"`
-	PrintVersion       bool            `yaml:"printVersion"`
-	DisableLoadSecrets bool            `yaml:"disableLoadSecrets"`
-	IncludeNamespaces  []string        `yaml:"includeNamespaces"`
-	SealedSecrets      SealedSecrets   `yaml:"sealedSecrets"`
-	InitialSecret      string          `yaml:"initialSecret"`
-	Ctx                context.Context `yaml:"-"`
+	Web                    Web              `yaml:"web"`
+	FieldFilter            *FieldFilter     `yaml:"fieldFilter,omitempty"`
+	PrintVersion           bool             `yaml:"printVersion"`
+	DisableLoadSecrets     bool             `yaml:"disableLoadSecrets"`
+	IncludeNamespaces      []string         `yaml:"includeNamespaces"`
+	ExcludeNamespaces      []string         `yaml:"excludeNamespaces"`
+	IncludeNamespacesRegex []*regexp.Regexp `yaml:"-"`
+	ExcludeNamespacesRegex []*regexp.Regexp `yaml:"-"`
+	UseRegex               bool             `yaml:"useRegex"`
+	SealedSecrets          SealedSecrets    `yaml:"sealedSecrets"`
+	InitialSecret          string           `yaml:"initialSecret"`
+	Ctx                    context.Context  `yaml:"-"`
 }
 
 type Web struct {
@@ -133,6 +165,8 @@ type flags struct {
 	disableLoadSecrets            *bool
 	enableWebLogs                 *bool
 	includeNamespaces             *string
+	excludeNamespaces             *string
+	useRegex                      *bool
 	kubesealArgs                  *string
 	sealedSecretsServiceName      *string
 	port                          *int
@@ -157,6 +191,16 @@ func newFlags() *flags {
 			"include-namespaces",
 			"",
 			"Optional space separated list if namespaces to be included in the sealed secret search",
+		),
+		excludeNamespaces: flag.String(
+			"exclude-namespaces",
+			"",
+			"Optional space separated list if namespaces to be excluded in the sealed secret search",
+		),
+		useRegex: flag.Bool(
+			"use-regex",
+			false,
+			"Use Regex for include/exclude Namespaces",
 		),
 		kubesealArgs: flag.String(
 			"kubeseal-arguments",
