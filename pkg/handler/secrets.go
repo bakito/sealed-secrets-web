@@ -24,7 +24,7 @@ import (
 // This function creates two clients: one for standard Kubernetes resources and one for Sealed Secrets
 func BuildClients(
 	clientConfig clientcmd.ClientConfig, // Configuration for the Kubernetes connection
-	disableLoadSecrets bool,             // Flag to disable loading secrets
+	disableLoadSecrets bool, // Flag to disable loading secrets
 ) (corev1.CoreV1Interface, ssClient.BitnamiV1alpha1Interface, error) {
 	// If loading secrets is disabled, return empty clients
 	if disableLoadSecrets {
@@ -109,7 +109,7 @@ func (h *SecretsHandler) NamespacesMatch(namespaces []string) map[string]bool {
 		// Process exclusion rules with RegEx
 		for _, r := range h.config.ExcludeNamespacesRegex {
 			// Remove namespaces that match the exclusion RegEx
-			for ns, _ := range matchedNamespaces {
+			for ns := range matchedNamespaces {
 				matched := r.FindString(ns) == ns
 				if matched {
 					// Remove the element from the slice (without preserving order)
@@ -136,7 +136,7 @@ func (h *SecretsHandler) NamespacesMatch(namespaces []string) map[string]bool {
 
 			// Remove namespaces that are in the exclusion list
 			for _, exc := range h.config.ExcludeNamespaces {
-				for ns, _ := range matchedNamespaces {
+				for ns := range matchedNamespaces {
 					if ns == exc {
 						matchedNamespaces[ns] = false
 					}

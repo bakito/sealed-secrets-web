@@ -47,7 +47,7 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Lint
-        run: make lint
+        run: make lint-ci
 
   helm:
     name: Helm Checks
