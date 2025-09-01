@@ -4,7 +4,6 @@
   "metadata": {
     "name": "mysecretname",
     "namespace": "mysecretnamespace",
-    "creationTimestamp": null
   },
   "stringData": {
     "password": "admin",

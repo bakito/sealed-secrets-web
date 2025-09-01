@@ -134,8 +134,7 @@ var _ = Describe("Main", func() {
   "apiVersion": "v1",
   "metadata": {
     "name": "%s",
-    "namespace": "%s",
-    "creationTimestamp": null
+    "namespace": "%s"
   }
 }`, name, namespace)))
 		})
