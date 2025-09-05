@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         # https://hub.docker.com/r/kindest/node/tags
-        k8s_version: [ "v1.31.9", "v1.32.5", "v1.33.1" ]
+        k8s_version: [ "v1.31.9", "v1.32.8", "v1.33.4" ]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -29,6 +29,7 @@ jobs:
           ingress_enabled: true
           node_image: kindest/node:${{ matrix.k8s_version }}
           kubectl_version: ${{ matrix.k8s_version }}
+          debug: false
       - name: ⚙️ Check Chart with Chainsaw
         run: ./testdata/e2e/chainsaw/run.sh
 
