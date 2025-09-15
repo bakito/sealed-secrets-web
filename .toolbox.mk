@@ -21,7 +21,6 @@ TB_SEMVER ?= $(TB_LOCALBIN)/semver
 
 ## Tool Versions
 TB_GINKGO_VERSION ?= v2.25.3
-TB_GINKGO_VERSION_NUM ?= $(call STRIP_V,$(TB_GINKGO_VERSION))
 TB_GOLANGCI_LINT_VERSION ?= v2.4.0
 TB_GOLANGCI_LINT_VERSION_NUM ?= $(call STRIP_V,$(TB_GOLANGCI_LINT_VERSION))
 TB_GORELEASER_VERSION ?= v2.12.0
@@ -32,7 +31,7 @@ TB_SEMVER_VERSION ?= v1.1.7
 ## Tool Installer
 .PHONY: tb.ginkgo
 tb.ginkgo: ## Download ginkgo locally if necessary.
-	@test -s $(TB_GINKGO) && $(TB_GINKGO) --version | grep -q $(TB_GINKGO_VERSION_NUM) || \
+	@test -s $(TB_GINKGO) || \
 		GOBIN=$(TB_LOCALBIN) go install github.com/onsi/ginkgo/v2/ginkgo@$(TB_GINKGO_VERSION)
 .PHONY: tb.golangci-lint
 tb.golangci-lint: ## Download golangci-lint locally if necessary.
@@ -70,7 +69,7 @@ tb.reset:
 .PHONY: tb.update
 tb.update: tb.reset
 	toolbox makefile -f $(TB_LOCALDIR)/Makefile \
-		github.com/onsi/ginkgo/v2/ginkgo?--version \
+		github.com/onsi/ginkgo/v2/ginkgo \
 		github.com/golangci/golangci-lint/v2/cmd/golangci-lint?--version \
 		github.com/goreleaser/goreleaser/v2 \
 		github.com/norwoodj/helm-docs/cmd/helm-docs \

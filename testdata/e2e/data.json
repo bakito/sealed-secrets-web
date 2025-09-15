@@ -8,8 +8,7 @@
   "kind": "Secret",
   "metadata": {
     "name": "mysecretname",
-    "namespace": "mysecretnamespace",
-    "creationTimestamp": null
+    "namespace": "mysecretnamespace"
   },
   "type": "Opaque"
 }

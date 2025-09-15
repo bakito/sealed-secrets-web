@@ -12,9 +12,7 @@ const (
 	stringDataAsJSON = `{
   "kind": "Secret",
   "apiVersion": "v1",
-  "metadata": {
-    "creationTimestamp": null
-  },
+  "metadata": {},
   "stringData": {
     "username": "admin"
   },
@@ -23,9 +21,7 @@ const (
 	dataAsJSON = `{
   "kind": "Secret",
   "apiVersion": "v1",
-  "metadata": {
-    "creationTimestamp": null
-  },
+  "metadata": {},
   "data": {
     "username": "YWRtaW4="
   },
@@ -33,8 +29,7 @@ const (
 }`
 	stringDataAsYAML = `apiVersion: v1
 kind: Secret
-metadata:
-  creationTimestamp: null
+metadata: {}
 stringData:
   username: admin
 type: Opaque
@@ -43,8 +38,7 @@ type: Opaque
 data:
   username: YWRtaW4=
 kind: Secret
-metadata:
-  creationTimestamp: null
+metadata: {}
 type: Opaque
 `
 )
