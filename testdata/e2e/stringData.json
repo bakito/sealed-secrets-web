@@ -3,7 +3,7 @@
   "kind": "Secret",
   "metadata": {
     "name": "mysecretname",
-    "namespace": "mysecretnamespace",
+    "namespace": "mysecretnamespace"
   },
   "stringData": {
     "password": "admin",

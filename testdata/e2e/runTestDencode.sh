@@ -13,6 +13,7 @@ curl --silent --show-error --request POST 'http://localhost/ssw/api/dencode' \
   --header 'Content-Type: application/yaml' \
   --header 'Accept: application/yaml' \
   --data-binary '@data.yaml' \
+  | tee /dev/stderr \
   | yq --prettyPrint | diff --strip-trailing-cr --ignore-blank-lines stringData.yaml -
 
 echo "Test /api/dencode should b64 encode secret springData having yaml input and json output"
@@ -20,6 +21,7 @@ curl --silent --show-error --request POST 'http://localhost/ssw/api/dencode' \
   --header 'Content-Type: application/yaml' \
   --header 'Accept: application/json' \
   --data-binary '@stringData.yaml' \
+  | tee /dev/stderr \
   | jq --sort-keys . \
   | diff <(jq --sort-keys . data.json)  -
 
@@ -28,6 +30,7 @@ curl --silent --show-error --request POST 'http://localhost/ssw/api/dencode' \
   --header 'Content-Type: application/yaml' \
   --header 'Accept: application/json' \
   --data-binary '@data.yaml' \
+  | tee /dev/stderr \
   | jq --sort-keys . \
   | diff <(jq --sort-keys . stringData.json) -
 
@@ -36,6 +39,7 @@ curl --silent --show-error --request POST 'http://localhost/ssw/api/dencode' \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
   --data-binary '@stringData.json' \
+  | tee /dev/stderr \
   | jq --sort-keys . \
   | diff <(jq --sort-keys . data.json)  -
 
@@ -44,6 +48,7 @@ curl --silent --show-error --request POST 'http://localhost/ssw/api/dencode' \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
   --data-binary '@data.json' \
+  | tee /dev/stderr \
   | jq --sort-keys . \
   | diff <(jq --sort-keys . stringData.json) -
 
@@ -60,4 +65,5 @@ curl --silent --show-error --request POST 'http://localhost/ssw/api/dencode' \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/yaml' \
   --data-binary '@data.json' \
+  | tee /dev/stderr \
   | yq --prettyPrint | diff --strip-trailing-cr --ignore-blank-lines stringData.yaml -
