@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
+	"github.com/bakito/sealed-secrets-web/pkg/matcher"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/core"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/ssclient"
 	"github.com/bitnami-labs/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
@@ -129,7 +130,7 @@ var _ = Describe("Main", func() {
 			req, _ := http.NewRequest("GET", fmt.Sprintf("/api/secret/%s/%s", namespace, name), nil)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(http.StatusOK))
-			Ω(w.Body.String()).Should(Equal(fmt.Sprintf(`{
+			Ω(w.Body.String()).Should(matcher.EqualDiff(fmt.Sprintf(`{
   "kind": "Secret",
   "apiVersion": "v1",
   "metadata": {
