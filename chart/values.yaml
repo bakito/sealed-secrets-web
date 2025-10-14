@@ -60,6 +60,8 @@ serviceAccount:
   name: sealed-secrets-web
   # -- Automatically mount the service account token
   automountServiceAccountToken: true
+  # -- ServiceAccount annotations
+  annotations: {}
 
 service:
   # -- Sets the type of the Service

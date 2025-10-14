@@ -62,6 +62,7 @@ helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.9
 | service.nodePort | string | `nil` | Kubernetes Service Nodeport |
 | service.port | int | `80` | Service port |
 | service.type | string | `"ClusterIP"` | Sets the type of the Service |
+| serviceAccount.annotations | object | `{}` | ServiceAccount annotations |
 | serviceAccount.automountServiceAccountToken | bool | `true` | Automatically mount the service account token |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `"sealed-secrets-web"` | The name of the service account to use. |
