@@ -289,6 +289,61 @@ var _ = Describe("SecretsHandler", func() {
 				}))
 			})
 		})
+
+		Context("with synced status", func() {
+			It("should include synced status in results", func() {
+				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
+					createSealedSecretWithStatus("synced-secret", "ns1", true, ""),
+					createSealedSecretWithStatus("failed-secret", "ns1", false, "decryption failed"),
+					{ObjectMeta: metav1.ObjectMeta{Name: "no-status", Namespace: "ns1"}},
+				})
+
+				result, err := handler.list(context.Background())
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(len(result)).Should(Equal(3))
+
+				// Check synced secret
+				syncedSecret := findSecret(result, "synced-secret")
+				Ω(syncedSecret).ShouldNot(BeNil())
+				Ω(syncedSecret.Synced).ShouldNot(BeNil())
+				Ω(*syncedSecret.Synced).Should(BeTrue())
+				Ω(syncedSecret.Message).Should(Equal(""))
+
+				// Check failed secret
+				failedSecret := findSecret(result, "failed-secret")
+				Ω(failedSecret).ShouldNot(BeNil())
+				Ω(failedSecret.Synced).ShouldNot(BeNil())
+				Ω(*failedSecret.Synced).Should(BeFalse())
+				Ω(failedSecret.Message).Should(Equal("decryption failed"))
+
+				// Check secret without status
+				noStatusSecret := findSecret(result, "no-status")
+				Ω(noStatusSecret).ShouldNot(BeNil())
+				Ω(noStatusSecret.Synced).Should(BeNil())
+			})
+		})
+
+		Context("with showOnlySyncedSecrets enabled", func() {
+			BeforeEach(func() {
+				cfg.ShowOnlySyncedSecrets = true
+			})
+
+			It("should only return synced secrets", func() {
+				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
+					createSealedSecretWithStatus("synced-secret", "ns1", true, ""),
+					createSealedSecretWithStatus("failed-secret", "ns2", false, "decryption failed"),
+					{ObjectMeta: metav1.ObjectMeta{Name: "no-status", Namespace: "ns3"}},
+				})
+
+				result, err := handler.list(context.Background())
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(len(result)).Should(Equal(1))
+				Ω(result[0].Name).Should(Equal("synced-secret"))
+				Ω(result[0].Namespace).Should(Equal("ns1"))
+				Ω(result[0].Synced).ShouldNot(BeNil())
+				Ω(*result[0].Synced).Should(BeTrue())
+			})
+		})
 	})
 })
 
@@ -308,4 +363,35 @@ func setupSealedSecretsReactor(fakeSSClient *ssfake.FakeBitnamiV1alpha1, sealedS
 
 		return true, ssList, nil
 	})
+}
+
+// Helper function to create a SealedSecret with synced status
+func createSealedSecretWithStatus(name, namespace string, synced bool, message string) ssv1alpha1.SealedSecret {
+	status := v1.ConditionTrue
+	if !synced {
+		status = v1.ConditionFalse
+	}
+
+	return ssv1alpha1.SealedSecret{
+		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},
+		Status: &ssv1alpha1.SealedSecretStatus{
+			Conditions: []ssv1alpha1.SealedSecretCondition{
+				{
+					Type:    "Synced",
+					Status:  status,
+					Message: message,
+				},
+			},
+		},
+	}
+}
+
+// Helper function to find a secret by name in a list
+func findSecret(secrets []Secret, name string) *Secret {
+	for _, s := range secrets {
+		if s.Name == name {
+			return &s
+		}
+	}
+	return nil
 }

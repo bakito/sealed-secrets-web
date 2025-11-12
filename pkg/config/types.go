@@ -24,9 +24,10 @@ func parse(f *flags) (*Config, error) {
 			Context: *f.webContext,
 			Logger:  *f.enableWebLogs,
 		},
-		PrintVersion:       *f.printVersion,
-		DisableLoadSecrets: *f.disableLoadSecrets,
-		UseRegex:           *f.useRegex,
+		PrintVersion:          *f.printVersion,
+		DisableLoadSecrets:    *f.disableLoadSecrets,
+		ShowOnlySyncedSecrets: *f.showOnlySyncedSecrets,
+		UseRegex:              *f.useRegex,
 	}
 
 	if *f.kubesealArgs != "" {
@@ -132,6 +133,7 @@ type Config struct {
 	FieldFilter            *FieldFilter     `yaml:"fieldFilter,omitempty"`
 	PrintVersion           bool             `yaml:"printVersion"`
 	DisableLoadSecrets     bool             `yaml:"disableLoadSecrets"`
+	ShowOnlySyncedSecrets  bool             `yaml:"showOnlySyncedSecrets"`
 	IncludeNamespaces      []string         `yaml:"includeNamespaces"`
 	ExcludeNamespaces      []string         `yaml:"excludeNamespaces"`
 	IncludeNamespacesRegex []*regexp.Regexp `yaml:"-"`
@@ -163,6 +165,7 @@ func (ss SealedSecrets) String() string {
 
 type flags struct {
 	disableLoadSecrets            *bool
+	showOnlySyncedSecrets         *bool
 	enableWebLogs                 *bool
 	includeNamespaces             *string
 	excludeNamespaces             *string
@@ -185,6 +188,11 @@ func newFlags() *flags {
 			"disable-load-secrets",
 			false,
 			"Disable the loading of existing secrets",
+		),
+		showOnlySyncedSecrets: flag.Bool(
+			"show-only-synced-secrets",
+			false,
+			"Show only successfully synced SealedSecrets in the list (filters out failed/unsynced secrets)",
 		),
 		enableWebLogs: flag.Bool("enable-web-logs", false, "Enable web logs"),
 		includeNamespaces: flag.String(

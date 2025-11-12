@@ -221,7 +221,34 @@ func (h *SecretsHandler) listForNamespace(ctx context.Context, ns string) ([]Sec
 
 	// Convert SealedSecrets to the simpler Secret structure
 	for _, item := range ssList.Items {
-		secrets = append(secrets, Secret{Namespace: item.Namespace, Name: item.Name})
+		secret := Secret{
+			Namespace: item.Namespace,
+			Name:      item.Name,
+		}
+
+		// Extract synced status from conditions
+		if item.Status != nil && len(item.Status.Conditions) > 0 {
+			// Find the "Synced" condition
+			for _, condition := range item.Status.Conditions {
+				if condition.Type == "Synced" {
+					synced := condition.Status == v1.ConditionTrue
+					secret.Synced = &synced
+					secret.Message = condition.Message
+					break
+				}
+			}
+		}
+
+		// Only add secrets that match the filter criteria
+		if h.config.ShowOnlySyncedSecrets {
+			// If filtering is enabled, only show synced secrets
+			if secret.Synced != nil && *secret.Synced {
+				secrets = append(secrets, secret)
+			}
+		} else {
+			// Show all secrets
+			secrets = append(secrets, secret)
+		}
 	}
 	return secrets, nil
 }
@@ -357,6 +384,8 @@ func encodeSecret(secret *v1.Secret, outputFormat string) ([]byte, error) {
 
 // Secret represents the basic data of a Kubernetes Secret
 type Secret struct {
-	Namespace string `json:"namespace" yaml:"namespace"` // Namespace where the secret is located
-	Name      string `json:"name"      yaml:"name"`      // Name of the secret
+	Namespace string `json:"namespace" yaml:"namespace"`                 // Namespace where the secret is located
+	Name      string `json:"name"      yaml:"name"`                      // Name of the secret
+	Synced    *bool  `json:"synced,omitempty" yaml:"synced,omitempty"`   // Whether the SealedSecret has been successfully synced (nil if status unknown)
+	Message   string `json:"message,omitempty" yaml:"message,omitempty"` // Status message from the SealedSecret condition
 }
