@@ -331,14 +331,15 @@ var _ = Describe("SecretsHandler", func() {
 			It("should only return synced secrets", func() {
 				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
 					createSealedSecretWithStatus("synced-secret", "ns1", true, ""),
-					createSealedSecretWithStatus("failed-secret", "ns1", false, "decryption failed"),
-					{ObjectMeta: metav1.ObjectMeta{Name: "no-status", Namespace: "ns1"}},
+					createSealedSecretWithStatus("failed-secret", "ns2", false, "decryption failed"),
+					{ObjectMeta: metav1.ObjectMeta{Name: "no-status", Namespace: "ns3"}},
 				})
 
 				result, err := handler.list(context.Background())
 				Ω(err).ShouldNot(HaveOccurred())
 				Ω(len(result)).Should(Equal(1))
 				Ω(result[0].Name).Should(Equal("synced-secret"))
+				Ω(result[0].Namespace).Should(Equal("ns1"))
 				Ω(result[0].Synced).ShouldNot(BeNil())
 				Ω(*result[0].Synced).Should(BeTrue())
 			})

@@ -1,6 +1,7 @@
 # sealed-secrets-web
 
-![Version: 3.1.9](https://img.shields.io/badge/Version-3.1.9-informational?style=flat-square) ![AppVersion: v3.1.9](https://img.shields.io/badge/AppVersion-v3.1.9-informational?style=flat-square)
+
+![Version: 3.1.9](https://img.shields.io/badge/Version-3.1.9-informational?style=flat-square) ![AppVersion: v3.1.9](https://img.shields.io/badge/AppVersion-v3.1.9-informational?style=flat-square) 
 
 A web interface for Sealed Secrets by Bitnami.
 
@@ -66,6 +67,7 @@ helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.9
 | serviceAccount.automountServiceAccountToken | bool | `true` | Automatically mount the service account token |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `"sealed-secrets-web"` | The name of the service account to use. |
+| showOnlySyncedSecrets | bool | `false` | If set to true, only successfully synced SealedSecrets will be shown in the list (filters out failed/unsynced secrets) |
 | tolerations | list | `[]` | [Tolerations] for use with node taints |
 | volumeMounts | list | `[]` | Additional volumeMounts to the image updater main container |
 | volumes | list | `[]` | Additional volumes to the image updater pod |
