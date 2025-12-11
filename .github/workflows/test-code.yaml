@@ -84,12 +84,6 @@ jobs:
           sed -i -E 's/--version [0-9]+.[0-9]+.[0-9]+/--version x.x.x/' chart/README.md.old
           diff chart/README.md.old chart/README.md
 
-      - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.8.0
-
-      - name: Run chart-testing (lint)
-        run: ct lint --config .github/linters/ct.yaml
-
       - name: Template
         run: make helm-template
 

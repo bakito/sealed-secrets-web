@@ -7,7 +7,7 @@ helm upgrade --install sealed-secrets-web chart \
   -f testdata/e2e/e2e-values.yaml \
   --set format=${1} \
   --set sealedSecrets.certURL=${2} \
-  --atomic
+  --wait=watcher
 
 echo "Wait for service to respond"
 timeout 30s bash <<EOT
