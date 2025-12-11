@@ -42,7 +42,7 @@ jobs:
           helm install sealed-secrets sealed-secrets/sealed-secrets \
             --namespace sealed-secrets \
             --create-namespace \
-            --atomic
+            --wait=watcher
       - name: Install sealed-secrets-web with yaml format In-Cluster
         run: ./testdata/e2e/installSealedSecretsWebChart.sh yaml ""
 
