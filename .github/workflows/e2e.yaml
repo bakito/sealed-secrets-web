@@ -13,7 +13,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🖼 Build image
+        run: ./testdata/e2e/image-01-build-and-save.sh
+
+      - name: 📦 Upload image tar
+        uses: actions/upload-artifact@v5
+        with:
+          name: image-tar
+          path: /tmp/image.tar
+          retention-days: 1
+
   e2e:
+    needs: build-image
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -33,8 +51,14 @@ jobs:
       - name: ⚙️ Check Chart with Chainsaw
         run: ./testdata/e2e/chainsaw/run.sh
 
-      - name: Build image
-        run: ./testdata/e2e/buildImage.sh
+      - name: 📥 Download image tar
+        uses: actions/download-artifact@v6
+        with:
+          name: image-tar
+          path: /tmp
+
+      - name: 🖼 Load image
+        run: ./testdata/e2e/image-02-load-and-push.sh
 
       - name: Install sealed-secrets
         run: |
