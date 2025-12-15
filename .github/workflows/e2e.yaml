@@ -24,7 +24,7 @@ jobs:
         run: ./testdata/e2e/image-01-build-and-save.sh
 
       - name: 📦 Upload image tar
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: image-tar
           path: /tmp/image.tar
