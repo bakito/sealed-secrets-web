@@ -52,7 +52,7 @@ jobs:
         run: ./testdata/e2e/chainsaw/run.sh
 
       - name: 📥 Download image tar
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: image-tar
           path: /tmp
