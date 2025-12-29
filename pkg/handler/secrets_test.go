@@ -152,7 +152,7 @@ var _ = Describe("SecretsHandler", func() {
 		)
 
 		BeforeEach(func() {
-			fakeClient = fake.NewSimpleClientset()
+			fakeClient = fake.NewClientset()
 			fakeSSClient = &ssfake.FakeBitnamiV1alpha1{
 				Fake: &ktesting.Fake{},
 			}
