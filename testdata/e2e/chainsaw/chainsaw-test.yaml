@@ -43,3 +43,33 @@ spec:
         - assert:
             file: expected-service-name.yaml
 ---
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sealed-secrets-web-disable-load-secrets
+spec:
+  timeouts:
+    apply: 5s
+    assert: 10s
+  steps:
+    - try:
+        - apply:
+            file: template-disable-load-secrets.yaml
+        - assert:
+            file: expected-disable-load-secrets.yaml
+---
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sealed-secrets-web-enable-load-secrets
+spec:
+  timeouts:
+    apply: 5s
+    assert: 10s
+  steps:
+    - try:
+        - apply:
+            file: template-enable-load-secrets.yaml
+        - assert:
+            file: expected-enable-load-secrets.yaml
+---

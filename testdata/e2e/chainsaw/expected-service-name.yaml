@@ -7,40 +7,6 @@ metadata:
   namespace: ($namespace)
 automountServiceAccountToken: true
 ---
-# Source: sealed-secrets-web/templates/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: cs-test-3-sealed-secrets-web
-rules:
-  - apiGroups:
-      - bitnami.com
-    resources:
-      - sealedsecrets
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - ""
-    resources:
-      - secrets
-    verbs:
-      - get
----
-# Source: sealed-secrets-web/templates/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: cs-test-3-sealed-secrets-web
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cs-test-3-sealed-secrets-web
-subjects:
-  - kind: ServiceAccount
-    name: sealed-secrets-web
-    namespace: ($namespace)
----
 # Source: sealed-secrets-web/templates/service.yaml
 apiVersion: v1
 kind: Service
@@ -83,6 +49,7 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - --sealed-secrets-service-namespace=sealed-secrets
+            - --disable-load-secrets
           ports:
             - name: http
               containerPort: 8080

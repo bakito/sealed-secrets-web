@@ -14,19 +14,6 @@ metadata:
   name: cs-test-1-sealed-secrets-web
 rules:
   - apiGroups:
-      - bitnami.com
-    resources:
-      - sealedsecrets
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - ""
-    resources:
-      - secrets
-    verbs:
-      - get
-  - apiGroups:
       - ""
     resources:
       - services
@@ -93,6 +80,7 @@ spec:
           args:
             - --sealed-secrets-service-namespace=sealed-secrets
             - --sealed-secrets-service-name=sealed-secrets
+            - --disable-load-secrets
           ports:
             - name: http
               containerPort: 8080

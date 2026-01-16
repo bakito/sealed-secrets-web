@@ -1,6 +1,6 @@
 # sealed-secrets-web
 
-![Version: 3.1.9](https://img.shields.io/badge/Version-3.1.9-informational?style=flat-square) ![AppVersion: v3.1.9](https://img.shields.io/badge/AppVersion-v3.1.9-informational?style=flat-square)
+![Version: 3.1.9](https://img.shields.io/badge/Version-3.1.9-informational?style=flat-square) ![AppVersion: v3.1.9](https://img.shields.io/badge/AppVersion-v3.1.9-informational?style=flat-square) 
 
 A web interface for Sealed Secrets by Bitnami.
 
@@ -29,7 +29,7 @@ helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.9
 | deployment.livenessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/_health","port":"http"}}` | Liveness Probes |
 | deployment.readinessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/_health","port":"http"}}` | Readiness Probes |
 | deployment.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"runAsGroup":1000,"runAsUser":1001}` | Hardening security |
-| disableLoadSecrets | bool | `false` | If set to true secrets cannot be read from this tool, only seal new ones |
+| disableLoadSecrets | bool | `true` | If set to true secrets cannot be read from this tool, only seal new ones |
 | extraContainers | list | `[]` | Additional containers to run in the pod |
 | fullnameOverride | string | `""` | String to fully override "sealed-secrets-web.fullname" template |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
