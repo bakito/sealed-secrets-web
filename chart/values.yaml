@@ -8,7 +8,7 @@ revisionHistoryLimit: 10
 includeLocalNamespaceOnly: false
 
 # -- If set to true secrets cannot be read from this tool, only seal new ones
-disableLoadSecrets: false
+disableLoadSecrets: true
 
 # -- If set to true, only successfully synced SealedSecrets will be shown in the list (filters out failed/unsynced secrets)
 showOnlySyncedSecrets: false
