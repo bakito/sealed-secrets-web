@@ -31,7 +31,7 @@ RUN . /tmp/buildenv && \
   upx -q sealed-secrets-web
 
 # Final application image
-FROM --platform=$TARGETPLATFORM alpine:latest
+FROM alpine:latest
 WORKDIR /opt/go
 
 LABEL maintainer="bakito <github@bakito.ch>" \
