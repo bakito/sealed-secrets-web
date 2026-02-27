@@ -187,7 +187,32 @@
         })
       },
       methods : {
+        validateBase64Data() {
+          try {
+            const parsed = this.secretFormat === 'json'
+              ? JSON.parse(this.editor1Content)
+              : YAML.parse(this.editor1Content)
+            if (parsed && parsed.data && typeof parsed.data === 'object') {
+              for (const [, val] of Object.entries(parsed.data)) {
+                try {
+                  atob(val)
+                } catch {
+                  return 'Data must be uniformly base64-encoded or in plain text. Use .data for encoded or .stringData for plaintext'
+                }
+              }
+            }
+          } catch {
+            // unparseable content — let the backend handle it
+          }
+          return null
+        },
         seal() {
+          const validationError = this.validateBase64Data()
+          if (validationError) {
+            this.messageType = 'error'
+            this.message = validationError
+            return
+          }
           axios.post('{{.WebContext}}api/kubeseal', this.editor1Content,
             { headers: {
                 'Content-Type': this.contentType(this.secretFormat),

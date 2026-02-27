@@ -41,4 +41,30 @@ kind: Secret
 metadata: {}
 type: Opaque
 `
+	invalidBase64DataAsJSON = `{
+  "kind": "Secret",
+  "apiVersion": "v1",
+  "metadata": {},
+  "data": {
+    "test": "mysecret/"
+  },
+  "type": "Opaque"
+}`
+	invalidBase64DataAsYAML = `apiVersion: v1
+data:
+  test: mysecret/
+kind: Secret
+metadata: {}
+type: Opaque
+`
+	mixedBase64DataAsJSON = `{
+  "kind": "Secret",
+  "apiVersion": "v1",
+  "metadata": {},
+  "data": {
+    "valid": "YWRtaW4=",
+    "invalid": "mysecret/"
+  },
+  "type": "Opaque"
+}`
 )
