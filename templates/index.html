@@ -235,13 +235,36 @@
             this.message = err.response.data
           });
         },
+        decodeSecretData(content, format) {
+          try {
+            const parsed = format === 'json'
+              ? JSON.parse(content)
+              : YAML.parse(content)
+            if (!parsed || !parsed.data || typeof parsed.data !== 'object') {
+              return content
+            }
+            if (!parsed.stringData) {
+              parsed.stringData = {}
+            }
+            for (const [key, val] of Object.entries(parsed.data)) {
+              parsed.stringData[key] = atob(val)
+            }
+            delete parsed.data
+            if (format === 'json') {
+              return JSON.stringify(parsed, null, 2)
+            }
+            return '# loaded as plain text from secret\'s list\n' + YAML.stringify(parsed)
+          } catch {
+            return content
+          }
+        },
         loadSecret(namespace, name) {
           axios.get("{{.WebContext}}api/secret/" + namespace + "/" + name,
             { headers: {
                 'Accept': this.contentType(this.secretFormat)},
               transformResponse: (r) => r},
           ).then(res => {
-            this.editor1Content = res.data
+            this.editor1Content = this.decodeSecretData(res.data, this.secretFormat)
             this.editor1.setValue(this.editor1Content, 1)
             this.dialogVisible = false
           }).catch(err => {
