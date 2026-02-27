@@ -197,7 +197,7 @@
                 try {
                   atob(val)
                 } catch {
-                  return 'Data must be uniformly base64-encoded or in plain text. Use .data for encoded or .stringData for plaintext'
+                  return 'Data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext'
                 }
               }
             }
@@ -260,7 +260,7 @@
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {
             this.messageType = 'error'
-            this.message = err.response
+            this.message = JSON.parse(err.response.data).error
           });
         },
         changeSecretFormat(selected) {

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"io"
 	"log"
 	"net/http"
@@ -18,7 +19,19 @@ func (h *Handler) Dencode(c *gin.Context) {
 		return
 	}
 
-	secret, err := readSecret(scheme.Codecs.UniversalDecoder(), c.Request.Body)
+	body, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		log.Printf("Error in %s: %s\n", Sanitize(c.Request.URL.Path), Sanitize(err.Error()))
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := validateBase64Data(body); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	secret, err := readSecret(scheme.Codecs.UniversalDecoder(), bytes.NewReader(body))
 	if err != nil {
 		log.Printf("Error in %s: %s\n", Sanitize(c.Request.URL.Path), Sanitize(err.Error()))
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
