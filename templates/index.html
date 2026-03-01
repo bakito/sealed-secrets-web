@@ -223,7 +223,11 @@
             this.editor2.setValue(this.editor2Content, 1)
           }).catch(err => {
             this.messageType = 'error'
-            this.message = err.response.data
+            try {
+              this.message = YAML.parse(err.response.data).error
+            } catch {
+              this.message = err.response.data
+            }
           });
         },
         loadSecrets() {
