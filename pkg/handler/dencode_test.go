@@ -90,7 +90,7 @@ var _ = Describe("Handler ", func() {
 			h.Dencode(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(ContainSubstring("Data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
+			Ω(recorder.Body.String()).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
 		})
 		It("should return 422 with friendly message if .data contains invalid base64 (yaml)", func() {
 			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(invalidBase64DataAsYAML)))
@@ -99,7 +99,7 @@ var _ = Describe("Handler ", func() {
 			h.Dencode(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(ContainSubstring("Data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
+			Ω(recorder.Body.String()).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
 		})
 	})
 })

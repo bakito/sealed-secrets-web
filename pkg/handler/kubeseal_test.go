@@ -96,7 +96,7 @@ var _ = Describe("Handler ", func() {
 			h.KubeSeal(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(ContainSubstring("Data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
+			Ω(recorder.Body.String()).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
 		})
 
 		It("should return 422 if .data contains invalid base64 (yaml)", func() {
@@ -107,7 +107,7 @@ var _ = Describe("Handler ", func() {
 			h.KubeSeal(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(ContainSubstring("Data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
+			Ω(recorder.Body.String()).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
 		})
 
 		It("should pass through .stringData without validation", func() {
@@ -130,7 +130,7 @@ var _ = Describe("Handler ", func() {
 			h.KubeSeal(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(ContainSubstring("Data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
+			Ω(recorder.Body.String()).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
 		})
 	})
 })

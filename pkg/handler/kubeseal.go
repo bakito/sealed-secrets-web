@@ -14,7 +14,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-const errInvalidBase64 = "Data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"
+const errInvalidBase64 = "data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"
 
 func (h *Handler) KubeSeal(c *gin.Context) {
 	outputContentType, outputFormat, done := NegotiateFormat(c)
