@@ -3,7 +3,7 @@ set -e
 
 echo "Test /api/kubeseal should seal secret having yaml input and yaml output"
 
-SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/ssw/api/kubeseal' \
+SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/api/kubeseal' \
   --header 'Accept: application/yaml' \
   --data-binary '@stringData.yaml')
 
@@ -14,7 +14,7 @@ echo "$SEALED_SECRET" | yq -r .metadata.namespace | grep --quiet "mysecretnamesp
 
 echo "Test /api/kubeseal should seal secret having json input and yaml output"
 
-SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/ssw/api/kubeseal' \
+SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/api/kubeseal' \
   --header 'Accept: application/yaml' \
   --data-binary '@stringData.json')
 
@@ -25,7 +25,7 @@ echo "$SEALED_SECRET" | yq -r .metadata.namespace | grep --quiet "mysecretnamesp
 
 echo "Test /api/kubeseal should seal secret having yaml input and json output"
 
-SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/ssw/api/kubeseal' \
+SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/api/kubeseal' \
   --header 'Accept: application/json' \
   --data-binary '@stringData.yaml')
 
@@ -36,7 +36,7 @@ echo "$SEALED_SECRET" | jq -r .metadata.namespace | grep --quiet "mysecretnamesp
 
 echo "Test /api/kubeseal should seal secret having json input and json output"
 
-SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/ssw/api/kubeseal' \
+SEALED_SECRET=$(curl --silent --show-error --request POST 'http://localhost/api/kubeseal' \
   --header 'Accept: application/json' \
   --data-binary '@stringData.json')
 

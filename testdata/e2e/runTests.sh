@@ -15,5 +15,5 @@ fi
 
 ./runTestDencode.sh
 
-curl -s --show-error -H "Content-Type: application/json" -X POST --data @raw.json http://localhost/ssw/api/raw \
+curl -s --show-error -H "Content-Type: application/json" -X POST --data @raw.json http://localhost/api/raw \
     | jq -r -e .secret

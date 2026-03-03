@@ -34,9 +34,10 @@ jobs:
     needs: build-image
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         # https://hub.docker.com/r/kindest/node/tags
-        k8s_version: [ "v1.32.8", "v1.33.4" , "v1.34.0" ]
+        k8s_version: [ "v1.33.7", "v1.34.3", "v1.35.1"]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -44,7 +45,7 @@ jobs:
       - name: Install kind with registry
         uses: bakito/kind-with-registry-action@main
         with:
-          ingress_enabled: true
+          kind_cluster_name: e2e
           node_image: kindest/node:${{ matrix.k8s_version }}
           kubectl_version: ${{ matrix.k8s_version }}
           debug: false
