@@ -187,7 +187,32 @@
         })
       },
       methods : {
+        validateBase64Data() {
+          try {
+            const parsed = this.secretFormat === 'json'
+              ? JSON.parse(this.editor1Content)
+              : YAML.parse(this.editor1Content)
+            if (parsed && parsed.data && typeof parsed.data === 'object') {
+              for (const [, val] of Object.entries(parsed.data)) {
+                try {
+                  atob(val)
+                } catch {
+                  return 'data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext'
+                }
+              }
+            }
+          } catch {
+            // unparseable content — let the backend handle it
+          }
+          return null
+        },
         seal() {
+          const validationError = this.validateBase64Data()
+          if (validationError) {
+            this.messageType = 'error'
+            this.message = validationError
+            return
+          }
           axios.post('{{.WebContext}}api/kubeseal', this.editor1Content,
             { headers: {
                 'Content-Type': this.contentType(this.secretFormat),
@@ -198,7 +223,11 @@
             this.editor2.setValue(this.editor2Content, 1)
           }).catch(err => {
             this.messageType = 'error'
-            this.message = err.response.data
+            try {
+              this.message = YAML.parse(err.response.data).error
+            } catch {
+              this.message = err.response.data
+            }
           });
         },
         loadSecrets() {
@@ -210,13 +239,36 @@
             this.message = err.response.data
           });
         },
+        decodeSecretData(content, format) {
+          try {
+            const parsed = format === 'json'
+              ? JSON.parse(content)
+              : YAML.parse(content)
+            if (!parsed || !parsed.data || typeof parsed.data !== 'object') {
+              return content
+            }
+            if (!parsed.stringData) {
+              parsed.stringData = {}
+            }
+            for (const [key, val] of Object.entries(parsed.data)) {
+              parsed.stringData[key] = atob(val)
+            }
+            delete parsed.data
+            if (format === 'json') {
+              return JSON.stringify(parsed, null, 2)
+            }
+            return '# loaded as plain text from secret\'s list\n' + YAML.stringify(parsed)
+          } catch {
+            return content
+          }
+        },
         loadSecret(namespace, name) {
           axios.get("{{.WebContext}}api/secret/" + namespace + "/" + name,
             { headers: {
                 'Accept': this.contentType(this.secretFormat)},
               transformResponse: (r) => r},
           ).then(res => {
-            this.editor1Content = res.data
+            this.editor1Content = this.decodeSecretData(res.data, this.secretFormat)
             this.editor1.setValue(this.editor1Content, 1)
             this.dialogVisible = false
           }).catch(err => {
@@ -235,7 +287,7 @@
             this.editor1.setValue(this.editor1Content, 1)
           }).catch(err => {
             this.messageType = 'error'
-            this.message = err.response
+            this.message = JSON.parse(err.response.data).error
           });
         },
         changeSecretFormat(selected) {
