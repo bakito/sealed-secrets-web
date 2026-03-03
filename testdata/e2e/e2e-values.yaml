@@ -1,5 +1,5 @@
 image:
-  repository: localhost:5001/sealed-secrets-web
+  repository: sealed-secrets-web
   tag: e2e
   pullPolicy: Always
 
