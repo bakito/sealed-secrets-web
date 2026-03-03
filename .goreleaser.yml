@@ -7,8 +7,10 @@ checksum:
 snapshot:
   version_template: "{{ .Tag }}-next"
 changelog:
+  use: github
   sort: asc
   filters:
     exclude:
       - '^docs:'
       - '^test:'
+      - '^chore'
