@@ -22,11 +22,11 @@ var _ = Describe("Filter", func() {
 			ff = cfg.FieldFilter
 		})
 		It("should remove nil fields", func() {
-			secretData := map[string]interface{}{
-				"spec": map[string]interface{}{
-					"template": map[string]interface{}{
+			secretData := map[string]any{
+				"spec": map[string]any{
+					"template": map[string]any{
 						"data": nil,
-						"metadata": map[string]interface{}{
+						"metadata": map[string]any{
 							"creationTimestamp": nil,
 						},
 					},
@@ -39,14 +39,14 @@ var _ = Describe("Filter", func() {
 			Ω(SubMap(secretData, "spec", "template", "metadata")).ShouldNot(HaveKey("creationTimestamp"))
 		})
 		It("should keep non nil fields", func() {
-			secretData := map[string]interface{}{
-				"metadata": map[string]interface{}{
+			secretData := map[string]any{
+				"metadata": map[string]any{
 					"creationTimestamp": "00:00",
 				},
-				"spec": map[string]interface{}{
-					"template": map[string]interface{}{
-						"data": map[string]interface{}{},
-						"metadata": map[string]interface{}{
+				"spec": map[string]any{
+					"template": map[string]any{
+						"data": map[string]any{},
+						"metadata": map[string]any{
 							"creationTimestamp": "00:00",
 						},
 					},
@@ -70,14 +70,14 @@ var _ = Describe("Filter", func() {
 			ff = cfg.FieldFilter
 		})
 		It("should remove the fields", func() {
-			secretData := map[string]interface{}{
-				"metadata": map[string]interface{}{
+			secretData := map[string]any{
+				"metadata": map[string]any{
 					"creationTimestamp": "foo",
 					"managedFields":     "foo",
 					"resourceVersion":   "foo",
 					"selfLink":          "foo",
 					"uid":               "foo",
-					"annotations": map[string]interface{}{
+					"annotations": map[string]any{
 						"kubectl.kubernetes.io/last-applied-configuration": "foo",
 						"foo": "bar",
 					},

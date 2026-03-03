@@ -17,7 +17,7 @@ func (h *Handler) Validate(c *gin.Context) {
 	err := h.sealer.Validate(c, c.Request.Body)
 
 	if err != nil {
-		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		c.Data(http.StatusBadRequest, "text/plain", []byte(err.Error()))
 	} else {
 		c.Data(http.StatusOK, "text/plain", []byte("OK"))
