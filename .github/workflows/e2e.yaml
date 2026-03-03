@@ -46,7 +46,6 @@ jobs:
         uses: bakito/kind-with-registry-action@renovate/kindest-node-1.x
         with:
           kind_cluster_name: e2e
-          ingress_enabled: true
           node_image: kindest/node:${{ matrix.k8s_version }}
           kubectl_version: ${{ matrix.k8s_version }}
           debug: false

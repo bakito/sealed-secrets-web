@@ -1,18 +1,15 @@
 image:
   repository: sealed-secrets-web
   tag: e2e
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30080
 
 ingress:
-  enabled: true
-  className: "nginx"
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    nginx.ingress.kubernetes.io/use-regex: "true"
-  hosts:
-    - paths:
-        - path: /ssw(/|$)(.*)
-          pathType: ImplementationSpecific
+  enabled: false
 
 webContext: ssw
 webLogs: true
