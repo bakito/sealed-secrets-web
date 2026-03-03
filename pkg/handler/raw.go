@@ -9,19 +9,19 @@ import (
 )
 
 type secret struct {
-	Secret string `json:"secret"`
+	Secret string `json:"secret"` //nolint:gosec // G117 sealed secrets handler deals with secrets
 }
 
 func (h *Handler) Raw(c *gin.Context) {
 	data := &seal.Raw{}
 	if err := c.ShouldBindJSON(&data); err != nil {
-		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}
 	r, err := h.sealer.Raw(*data)
 	if err != nil {
-		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

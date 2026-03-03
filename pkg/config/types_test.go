@@ -57,15 +57,15 @@ var _ = Describe("Types", func() {
 			f.config = &testConfigFile
 		})
 		It("should set the sealedSecretsCertURL", func() {
-			f.sealedSecretsCertURL = ptr("cert.url")
+			f.sealedSecretsCertURL = new("cert.url")
 			cfg, err = parse(f)
 			Ω(cfg.SealedSecrets.CertURL).Should(Equal("cert.url"))
 			Ω(cfg.SealedSecrets.Namespace).Should(Equal("sealed-secrets"))
 			Ω(cfg.SealedSecrets.Service).Should(Equal("sealed-secrets"))
 		})
 		It("should set the service namespace and name", func() {
-			f.sealedSecretsServiceName = ptr("name")
-			f.sealedSecretsServiceNamespace = ptr("namespace")
+			f.sealedSecretsServiceName = new("name")
+			f.sealedSecretsServiceNamespace = new("namespace")
 			cfg, err = parse(f)
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.SealedSecrets.CertURL).Should(BeEmpty())
@@ -73,7 +73,7 @@ var _ = Describe("Types", func() {
 			Ω(cfg.SealedSecrets.Service).Should(Equal("name"))
 		})
 		It("should set included namespaces correctly", func() {
-			f.includeNamespaces = ptr("foo bar")
+			f.includeNamespaces = new("foo bar")
 			cfg, err = parse(f)
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.IncludeNamespaces).Should(ContainElements("foo", "bar"))
@@ -86,7 +86,3 @@ var _ = Describe("Types", func() {
 		})
 	})
 })
-
-func ptr(v string) *string {
-	return &v
-}

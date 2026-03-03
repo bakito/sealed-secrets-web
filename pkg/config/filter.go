@@ -7,7 +7,7 @@ type FieldFilter struct {
 	SkipIfNil [][]string `yaml:"skipIfNil"`
 }
 
-func (ff *FieldFilter) Apply(sec map[string]interface{}) {
+func (ff *FieldFilter) Apply(sec map[string]any) {
 	for _, fieldPath := range ff.Skip {
 		unstructured.RemoveNestedField(sec, fieldPath...)
 	}
@@ -17,7 +17,7 @@ func (ff *FieldFilter) Apply(sec map[string]interface{}) {
 	}
 }
 
-func removeFieldIfNull(sec map[string]interface{}, fields ...string) {
+func removeFieldIfNull(sec map[string]any, fields ...string) {
 	path := fields[:len(fields)-1]
 	name := fields[len(fields)-1]
 	if m, ok, _ := unstructured.NestedMap(sec, path...); ok {
