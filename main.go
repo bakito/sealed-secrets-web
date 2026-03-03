@@ -116,7 +116,7 @@ func renderIndexHTML(cfg *config.Config) (string, error) {
 		initialSecret = cfg.InitialSecret
 	}
 
-	data := map[string]interface{}{
+	data := map[string]any{
 		"DisableLoadSecrets":     cfg.DisableLoadSecrets,
 		"DisableValidateSecrets": cfg.SealedSecrets.CertURL != "",
 		"WebContext":             cfg.Web.Context,

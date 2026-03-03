@@ -24,7 +24,7 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		log.Printf("Error reading body in %s: %v\n", Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error reading body in %s: %v\n", Sanitize(c.FullPath()), err)
 		contextNegotiate(c, http.StatusInternalServerError, gin.Negotiate{
 			Offered: []string{outputContentType},
 			Data:    gin.H{"error": err.Error()},
@@ -42,7 +42,7 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 
 	ss, err := h.sealer.Seal(outputFormat, bytes.NewReader(body))
 	if err != nil {
-		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		contextNegotiate(c, http.StatusInternalServerError, gin.Negotiate{
 			Offered: []string{outputContentType},
 			Data:    gin.H{"error": err.Error()},
@@ -59,7 +59,7 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 // Returns an error if any value fails decoding, or nil if the body has no .data
 // or all values are valid.
 func validateBase64Data(body []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := yaml.Unmarshal(body, &raw); err != nil {
 		return nil // not parseable; let the sealer produce its own error
 	}
@@ -67,7 +67,7 @@ func validateBase64Data(body []byte) error {
 	if !ok {
 		return nil
 	}
-	dataMap, ok := dataField.(map[string]interface{})
+	dataMap, ok := dataField.(map[string]any)
 	if !ok {
 		return nil
 	}

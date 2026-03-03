@@ -21,7 +21,7 @@ func (h *Handler) Dencode(c *gin.Context) {
 
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		log.Printf("Error in %s: %s\n", Sanitize(c.Request.URL.Path), Sanitize(err.Error()))
+		log.Printf("Error in %s: %s\n", Sanitize(c.FullPath()), Sanitize(err.Error()))
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}
@@ -33,14 +33,14 @@ func (h *Handler) Dencode(c *gin.Context) {
 
 	secret, err := readSecret(scheme.Codecs.UniversalDecoder(), bytes.NewReader(body))
 	if err != nil {
-		log.Printf("Error in %s: %s\n", Sanitize(c.Request.URL.Path), Sanitize(err.Error()))
+		log.Printf("Error in %s: %s\n", Sanitize(c.FullPath()), Sanitize(err.Error()))
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}
 
 	encode, err := encodeSecret(h.dencode(secret), outputFormat)
 	if err != nil {
-		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

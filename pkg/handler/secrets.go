@@ -300,7 +300,7 @@ func (h *SecretsHandler) AllSecrets(c *gin.Context) {
 	sec, err := h.list(c)
 	if err != nil {
 		// Log error and return it to the client
-		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -331,7 +331,7 @@ func (h *SecretsHandler) Secret(c *gin.Context) {
 	secret, err := h.GetSecret(c, namespace, name)
 	if err != nil {
 		// Log error and return it to the client
-		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -340,7 +340,7 @@ func (h *SecretsHandler) Secret(c *gin.Context) {
 	encode, err := encodeSecret(secret, outputFormat)
 	if err != nil {
 		// Log encoding error and return it
-		log.Printf("Error in %s: %v\n", Sanitize(c.Request.URL.Path), err)
+		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
