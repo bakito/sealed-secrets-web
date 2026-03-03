@@ -11,5 +11,4 @@ service:
 ingress:
   enabled: false
 
-webContext: ssw
 webLogs: true

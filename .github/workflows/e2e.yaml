@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install kind with registry
-        uses: bakito/kind-with-registry-action@renovate/kindest-node-1.x
+        uses: bakito/kind-with-registry-action@main
         with:
           kind_cluster_name: e2e
           node_image: kindest/node:${{ matrix.k8s_version }}
