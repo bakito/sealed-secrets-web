@@ -18,13 +18,13 @@ jobs:
     outputs:
       image: ${{ steps.meta.outputs.tags }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: 🖼 Build image
         run: ./testdata/e2e/image-01-build-and-save.sh
 
       - name: 📦 Upload image tar
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: image-tar
           path: /tmp/image.tar
@@ -41,10 +41,10 @@ jobs:
         format: [ "yaml", "json" ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install kind with registry
-        uses: bakito/kind-with-registry-action@main
+        uses: bakito/kind-with-registry-action@9c031e8b0c6f20fec65ca5a58901d05e585ff5d0 # v1.0.0
         with:
           kind_cluster_name: e2e
           node_image: kindest/node:${{ matrix.k8s_version }}
@@ -54,7 +54,7 @@ jobs:
         run: ./testdata/e2e/chainsaw/run.sh
 
       - name: 📥 Download image tar
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: image-tar
           path: /tmp
