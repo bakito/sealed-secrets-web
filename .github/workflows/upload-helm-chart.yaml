@@ -12,6 +12,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+      id-token: write # Required for keyless cosign signing via GitHub OIDC
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -29,6 +34,9 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
 
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@ba7bc0a3fef59531c69a25acd34668d6d3fe6f22 # v4.1.0
+
       - name: Login to ghcr.io
         uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
         with:
@@ -36,14 +44,27 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build chart
+      - name: Build and push chart
+        id: push
         run: |
-          VERSION=$(echo "${{github.event.release.tag_name }}" | sed 's/v//g')
+          VERSION=$(echo "${{ github.event.release.tag_name }}" | sed 's/v//g')
           sed -i "s/^version:.*$/version: ${VERSION}/"        ./chart/Chart.yaml
           sed -i "s/^appVersion:.*$/appVersion: v${VERSION}/" ./chart/Chart.yaml
           make helm-docs
           helm package ./chart/ --version $VERSION --app-version v$VERSION -d dist
-          helm push dist/sealed-secrets-web-${VERSION}.tgz oci://ghcr.io/bakito/helm-charts
+
+          # Capture the digest from helm push output for signing
+          helm push dist/sealed-secrets-web-${VERSION}.tgz oci://ghcr.io/bakito/helm-charts 2>&1 \
+            | tee push-output.txt
+          CHART_DIGEST=$(awk '/Digest: /{print $2}' push-output.txt)
+
+          echo "chart_digest=${CHART_DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "chart_version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Sign chart with Cosign (keyless)
+        run: |
+          cosign sign --yes \
+            "ghcr.io/bakito/helm-charts/sealed-secrets-web@${{ steps.push.outputs.chart_digest }}"
 
       - name: Install chart-releaser
         uses: engineerd/configurator@dc6b312d89ab097f73f3ebbf507a69dd7399c5d0 # v0.0.10
@@ -55,7 +76,7 @@ jobs:
       - name: Upload Chart
         run: cr upload
         env:
-          CR_OWNER: "${{github.repository_owner}}"
-          CR_TOKEN: "${{secrets.CR_TOKEN}}"
+          CR_OWNER: "${{ github.repository_owner }}"
+          CR_TOKEN: "${{ secrets.CR_TOKEN }}"
           CR_GIT_REPO: "helm-charts"
           CR_PACKAGE_PATH: dist
