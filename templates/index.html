@@ -240,26 +240,55 @@
           });
         },
         decodeSecretData(content, format) {
+          let parsed
           try {
-            const parsed = format === 'json'
+            parsed = format === 'json'
               ? JSON.parse(content)
               : YAML.parse(content)
+          } catch {
+            return { content, error: 'Could not parse secret: invalid ' + format.toUpperCase() }
+          }
+          try {
             if (!parsed || !parsed.data || typeof parsed.data !== 'object') {
-              return content
+              return { content, error: null }
             }
             if (!parsed.stringData) {
               parsed.stringData = {}
             }
             for (const [key, val] of Object.entries(parsed.data)) {
-              parsed.stringData[key] = atob(val)
+              try {
+                parsed.stringData[key] = val != null ? atob(val) : ''
+              } catch {
+                return { content, error: `Invalid base64 in key "${key}"` }
+              }
             }
             delete parsed.data
             if (format === 'json') {
-              return JSON.stringify(parsed, null, 2)
+              return { content: JSON.stringify(parsed, null, 2), error: null }
             }
-            return '# loaded as plain text from secret\'s list\n' + YAML.stringify(parsed)
+            const { stringData, ...rest } = parsed
+            let yaml = '# loaded as plain text from secret\'s list\n' + YAML.stringify(rest)
+            if (stringData && Object.keys(stringData).length > 0) {
+              yaml += 'stringData:\n'
+              for (const [key, val] of Object.entries(stringData)) {
+                const crlfNormalized = val.replace(/\r\n/g, '\n')
+                const hasStandaloneCR = crlfNormalized.includes('\r')
+                const hasControlChars = /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(val) || hasStandaloneCR
+                if (typeof val === 'string' && !hasControlChars && crlfNormalized.includes('\n')) {
+                  const chomping = crlfNormalized.endsWith('\n') ? '|' : '|-'
+                  const body = crlfNormalized.endsWith('\n') ? crlfNormalized.slice(0, -1) : crlfNormalized
+                  yaml += `  ${key}: ${chomping}\n`
+                  for (const line of body.split('\n')) {
+                    yaml += `    ${line}\n`
+                  }
+                } else {
+                  yaml += `  ${key}: ${YAML.stringify(val).trim()}\n`
+                }
+              }
+            }
+            return { content: yaml, error: null }
           } catch {
-            return content
+            return { content, error: 'Could not decode secret data' }
           }
         },
         loadSecret(namespace, name) {
@@ -268,7 +297,12 @@
                 'Accept': this.contentType(this.secretFormat)},
               transformResponse: (r) => r},
           ).then(res => {
-            this.editor1Content = this.decodeSecretData(res.data, this.secretFormat)
+            const { content: decoded, error: decodeError } = this.decodeSecretData(res.data, this.secretFormat)
+            if (decodeError) {
+              this.messageType = 'warning'
+              this.message = decodeError
+            }
+            this.editor1Content = decoded
             this.editor1.setValue(this.editor1Content, 1)
             this.dialogVisible = false
           }).catch(err => {
