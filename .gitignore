@@ -126,5 +126,8 @@ gomock*
 mysecret.*
 mysealedsecret.*
 
+# Node
+node_modules/
+
 static/ace/ace-builds
 testdata/e2e/kind-config.yaml
