@@ -26,7 +26,7 @@ kubectl wait --namespace ingress-nginx \
 ./testdata/e2e/buildImage.sh
 
 # install sealed secrets
-helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+helm repo add sealed-secrets https://bitnami.github.io/sealed-secrets
 helm upgrade --install sealed-secrets sealed-secrets/sealed-secrets \
   --namespace sealed-secrets \
   --create-namespace --wait
