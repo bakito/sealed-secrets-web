@@ -18,7 +18,7 @@ jobs:
     outputs:
       image: ${{ steps.meta.outputs.tags }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: 🖼 Build image
         run: ./testdata/e2e/image-01-build-and-save.sh
@@ -41,7 +41,7 @@ jobs:
         format: [ "yaml", "json" ]
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Install kind with registry
         uses: bakito/kind-with-registry-action@9c031e8b0c6f20fec65ca5a58901d05e585ff5d0 # v1.0.0
