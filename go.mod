@@ -1,6 +1,6 @@
 module github.com/bakito/sealed-secrets-web
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/bitnami-labs/sealed-secrets v0.37.0
