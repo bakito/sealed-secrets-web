@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Install kind with registry
-        uses: bakito/kind-with-registry-action@9c031e8b0c6f20fec65ca5a58901d05e585ff5d0 # v1.0.0
+        uses: bakito/kind-with-registry-action@b13dc5fd599a5c774e7ca721d6e7a34f7269d2d8 # v1.0.1
         with:
           kind_cluster_name: e2e
           node_image: kindest/node:${{ matrix.k8s_version }}
