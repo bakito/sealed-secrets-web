@@ -5,18 +5,20 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/bitnami/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"go.uber.org/mock/gomock"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/matcher"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/core"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/ssclient"
-	"github.com/bitnami/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"go.uber.org/mock/gomock"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var _ = Describe("Main", func() {
@@ -49,26 +51,26 @@ var _ = Describe("Main", func() {
 			router = setupRouter(coreClient, alpha1Client, cfg, nil)
 		})
 		It("return OK on health", func() {
-			req, _ := http.NewRequest("GET", "/_health", nil)
+			req, _ := http.NewRequest(http.MethodGet, "/_health", http.NoBody)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(http.StatusOK))
 			Ω(w.Body.String()).Should(Equal("OK"))
 		})
 		It("return version info on version", func() {
-			req, _ := http.NewRequest("GET", "/api/version", nil)
+			req, _ := http.NewRequest(http.MethodGet, "/api/version", http.NoBody)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(http.StatusOK))
 			Ω(w.Body.String()).Should(Equal(`{"build":"","version":"dev"}`))
 		})
 
 		It("return the index page", func() {
-			req, _ := http.NewRequest("GET", "/", nil)
+			req, _ := http.NewRequest(http.MethodGet, "/", http.NoBody)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(http.StatusOK))
 		})
 
 		It("redirect on any other url", func() {
-			req, _ := http.NewRequest("GET", "/foo/bar", nil)
+			req, _ := http.NewRequest(http.MethodGet, "/foo/bar", http.NoBody)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(301))
 			Ω(w.Body.String()).Should(ContainSubstring("Moved Permanently"))
@@ -85,12 +87,12 @@ var _ = Describe("Main", func() {
 					},
 				},
 			}, nil)
-			req, _ := http.NewRequest("GET", "/api/secrets", nil)
+			req, _ := http.NewRequest(http.MethodGet, "/api/secrets", http.NoBody)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(http.StatusOK))
 			Ω(
 				w.Body.String(),
-			).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":"%s","name":"%s"}]}`, namespace, name)))
+			).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":%q,"name":%q}]}`, namespace, name)))
 		})
 
 		It("list sealed secrets only for given namespaces", func() {
@@ -114,12 +116,12 @@ var _ = Describe("Main", func() {
 					},
 				},
 			}, nil)
-			req, _ := http.NewRequest("GET", "/api/secrets", nil)
+			req, _ := http.NewRequest(http.MethodGet, "/api/secrets", http.NoBody)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(http.StatusOK))
 			Ω(
 				w.Body.String(),
-			).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":"%s","name":"%s"},{"namespace":"%s","name":"%s"}]}`, "a", name, "b", name)))
+			).Should(Equal(fmt.Sprintf(`{"secrets":[{"namespace":%q,"name":%q},{"namespace":%q,"name":%q}]}`, "a", name, "b", name)))
 		})
 
 		It("get secret from namespace by name", func() {
@@ -127,7 +129,7 @@ var _ = Describe("Main", func() {
 			secrets.EXPECT().Get(gomock.Any(), name, gomock.Any()).Return(&corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Name: name},
 			}, nil)
-			req, _ := http.NewRequest("GET", fmt.Sprintf("/api/secret/%s/%s", namespace, name), nil)
+			req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/secret/%s/%s", namespace, name), http.NoBody)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(http.StatusOK))
 			Ω(w.Body.String()).Should(matcher.EqualDiff(fmt.Sprintf(`{
@@ -143,10 +145,10 @@ var _ = Describe("Main", func() {
 		It("secrets endpoints are disabled", func() {
 			cfg.DisableLoadSecrets = true
 			router = setupRouter(coreClient, alpha1Client, cfg, nil)
-			req, _ := http.NewRequest("GET", "/api/secrets", nil)
+			req, _ := http.NewRequest(http.MethodGet, "/api/secrets", http.NoBody)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(403))
-			req, _ = http.NewRequest("GET", "/api/secret/namespace/name", nil)
+			req, _ = http.NewRequest(http.MethodGet, "/api/secret/namespace/name", http.NoBody)
 			router.ServeHTTP(w, req)
 			Ω(w.Code).Should(Equal(403))
 		})

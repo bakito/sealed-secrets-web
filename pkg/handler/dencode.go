@@ -8,7 +8,7 @@ import (
 
 	"github.com/bitnami/sealed-secrets/pkg/multidocyaml"
 	"github.com/gin-gonic/gin"
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 )
@@ -38,7 +38,7 @@ func (h *Handler) Dencode(c *gin.Context) {
 		return
 	}
 
-	encode, err := encodeSecret(h.dencode(secret), outputFormat)
+	encode, err := encodeSecret(h.dencodeInternal(secret), outputFormat)
 	if err != nil {
 		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -47,7 +47,7 @@ func (h *Handler) Dencode(c *gin.Context) {
 	c.Data(http.StatusOK, outputContentType, encode)
 }
 
-func (h *Handler) dencode(secret *v1.Secret) *v1.Secret {
+func (*Handler) dencodeInternal(secret *corev1.Secret) *corev1.Secret {
 	if len(secret.StringData) > 0 {
 		if secret.Data == nil {
 			secret.Data = map[string][]byte{}
@@ -71,7 +71,7 @@ func (h *Handler) dencode(secret *v1.Secret) *v1.Secret {
 	return secret
 }
 
-func readSecret(codec runtime.Decoder, r io.Reader) (*v1.Secret, error) {
+func readSecret(codec runtime.Decoder, r io.Reader) (*corev1.Secret, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
@@ -81,8 +81,8 @@ func readSecret(codec runtime.Decoder, r io.Reader) (*v1.Secret, error) {
 		return nil, err
 	}
 
-	var ret v1.Secret
-	if err = runtime.DecodeInto(codec, data, &ret); err != nil {
+	var ret corev1.Secret
+	if err := runtime.DecodeInto(codec, data, &ret); err != nil {
 		return nil, err
 	}
 

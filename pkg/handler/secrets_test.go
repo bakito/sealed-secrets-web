@@ -4,16 +4,18 @@ import (
 	"context"
 	"regexp"
 
-	"github.com/bakito/sealed-secrets-web/pkg/config"
 	ssv1alpha1 "github.com/bitnami/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
 	ssfake "github.com/bitnami/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1/fake"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 	ktesting "k8s.io/client-go/testing"
+
+	"github.com/bakito/sealed-secrets-web/pkg/config"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("SecretsHandler", func() {
@@ -220,9 +222,9 @@ var _ = Describe("SecretsHandler", func() {
 			It("should return secrets from all namespaces except excluded ones", func() {
 				// Setup namespaces in fake client
 				fakeClient = fake.NewClientset(
-					&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns1"}},
-					&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns2"}},
-					&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns3"}},
+					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns1"}},
+					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns2"}},
+					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns3"}},
 				)
 
 				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
@@ -251,9 +253,9 @@ var _ = Describe("SecretsHandler", func() {
 			It("should return secrets matching regex pattern", func() {
 				// Setup namespaces in fake client
 				fakeClient = fake.NewClientset(
-					&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "app-prod"}},
-					&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "kube-system"}},
-					&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "app-staging"}},
+					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "app-prod"}},
+					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "kube-system"}},
+					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "app-staging"}},
 				)
 
 				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
@@ -348,28 +350,33 @@ var _ = Describe("SecretsHandler", func() {
 })
 
 func setupSealedSecretsReactor(fakeSSClient *ssfake.FakeBitnamiV1alpha1, sealedSecrets []ssv1alpha1.SealedSecret) {
-	fakeSSClient.AddReactor("list", "sealedsecrets", func(action ktesting.Action) (handled bool, ret runtime.Object, err error) {
-		listAction := action.(ktesting.ListAction)
-		requestedNamespace := listAction.GetNamespace()
+	fakeSSClient.AddReactor(
+		"list",
+		"sealedsecrets",
+		func(action ktesting.Action) (handled bool, ret runtime.Object, err error) {
+			listAction, ok := action.(ktesting.ListAction)
+			Ω(ok).Should(BeTrue())
+			requestedNamespace := listAction.GetNamespace()
 
-		ssList := &ssv1alpha1.SealedSecretList{}
-		for _, ss := range sealedSecrets {
-			// If namespace is empty string, return all secrets
-			// Otherwise, only return secrets from the requested namespace
-			if requestedNamespace == "" || ss.Namespace == requestedNamespace {
-				ssList.Items = append(ssList.Items, ss)
+			ssList := &ssv1alpha1.SealedSecretList{}
+			for _, ss := range sealedSecrets {
+				// If namespace is empty string, return all secrets
+				// Otherwise, only return secrets from the requested namespace
+				if requestedNamespace == "" || ss.Namespace == requestedNamespace {
+					ssList.Items = append(ssList.Items, ss)
+				}
 			}
-		}
 
-		return true, ssList, nil
-	})
+			return true, ssList, nil
+		},
+	)
 }
 
-// Helper function to create a SealedSecret with synced status
+// Helper function to create a SealedSecret with synced status.
 func createSealedSecretWithStatus(name, namespace string, synced bool, message string) ssv1alpha1.SealedSecret {
-	status := v1.ConditionTrue
+	status := corev1.ConditionTrue
 	if !synced {
-		status = v1.ConditionFalse
+		status = corev1.ConditionFalse
 	}
 
 	return ssv1alpha1.SealedSecret{
@@ -386,7 +393,7 @@ func createSealedSecretWithStatus(name, namespace string, synced bool, message s
 	}
 }
 
-// Helper function to find a secret by name in a list
+// Helper function to find a secret by name in a list.
 func findSecret(secrets []Secret, name string) *Secret {
 	for _, s := range secrets {
 		if s.Name == name {

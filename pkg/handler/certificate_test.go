@@ -1,15 +1,17 @@
 package handler
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/bakito/sealed-secrets-web/pkg/mocks/seal"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/mock/gomock"
+
+	"github.com/bakito/sealed-secrets-web/pkg/mocks/seal"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"go.uber.org/mock/gomock"
 )
 
 var _ = Describe("Handler ", func() {
@@ -40,7 +42,7 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("text/plain; charset=utf-8"))
 		})
 		It("should successfully fail when requesting a certificate", func() {
-			sealer.EXPECT().Certificate(gomock.Any()).Return(nil, fmt.Errorf("unexpected error"))
+			sealer.EXPECT().Certificate(gomock.Any()).Return(nil, errors.New("unexpected error"))
 			h.Certificate(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusInternalServerError))

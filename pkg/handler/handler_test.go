@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/version"
-	"github.com/gin-gonic/gin"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -29,7 +31,7 @@ var _ = Describe("Handler ", func() {
 		})
 		Context("Health", func() {
 			It("should return OK", func() {
-				c.Request, _ = http.NewRequest("GET", "/_health", nil)
+				c.Request, _ = http.NewRequest(http.MethodGet, "/_health", http.NoBody)
 				h.Health(c)
 
 				Ω(recorder.Code).Should(Equal(http.StatusOK))
@@ -39,7 +41,7 @@ var _ = Describe("Handler ", func() {
 		})
 		Context("Index", func() {
 			It("should return the index html", func() {
-				c.Request, _ = http.NewRequest("GET", "/", nil)
+				c.Request, _ = http.NewRequest(http.MethodGet, "/", http.NoBody)
 				h.Index(c)
 
 				Ω(recorder.Code).Should(Equal(http.StatusOK))
@@ -49,7 +51,7 @@ var _ = Describe("Handler ", func() {
 		})
 		Context("RedirectToIndex", func() {
 			It("should redirect to index", func() {
-				c.Request, _ = http.NewRequest("GET", "/foo", nil)
+				c.Request, _ = http.NewRequest(http.MethodGet, "/foo", http.NoBody)
 				h.RedirectToIndex("/ssw/")(c)
 
 				Ω(recorder.Code).Should(Equal(http.StatusMovedPermanently))
@@ -61,7 +63,7 @@ var _ = Describe("Handler ", func() {
 		})
 		Context("Version", func() {
 			It("should return the current version", func() {
-				c.Request, _ = http.NewRequest("GET", "/version", nil)
+				c.Request, _ = http.NewRequest(http.MethodGet, "/version", http.NoBody)
 				h.Version(c)
 
 				Ω(recorder.Code).Should(Equal(http.StatusOK))

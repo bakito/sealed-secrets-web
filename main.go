@@ -11,15 +11,17 @@ import (
 	"os"
 	"time"
 
+	ssclient "github.com/bitnami/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1"
+	"github.com/gin-gonic/gin"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/tools/clientcmd"
+
 	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/handler"
 	"github.com/bakito/sealed-secrets-web/pkg/seal"
 	"github.com/bakito/sealed-secrets-web/pkg/version"
-	ssClient "github.com/bitnami/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1"
-	"github.com/gin-gonic/gin"
-	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (
@@ -71,7 +73,7 @@ func main() {
 
 func setupRouter(
 	coreClient corev1.CoreV1Interface,
-	ssClient ssClient.BitnamiV1alpha1Interface,
+	ssClient ssclient.BitnamiV1alpha1Interface,
 	cfg *config.Config,
 	sealer seal.Sealer,
 ) *gin.Engine {

@@ -13,10 +13,10 @@ import (
 )
 
 func Parse() (*Config, error) {
-	return parse(newFlags())
+	return parseInternal(newFlags())
 }
 
-func parse(f *flags) (*Config, error) {
+func parseInternal(f *flags) (*Config, error) {
 	flag.Parse()
 	cfg := &Config{
 		Web: Web{
@@ -69,7 +69,7 @@ func parse(f *flags) (*Config, error) {
 			return nil, err
 		}
 
-		if err = yaml.Unmarshal(b, cfg); err != nil {
+		if err := yaml.Unmarshal(b, cfg); err != nil {
 			return nil, err
 		}
 	}
@@ -123,7 +123,7 @@ func sanitizeWebContext(cfg *Config) string {
 		wc = "/" + wc
 	}
 	if !strings.HasSuffix(wc, "/") {
-		wc = wc + "/"
+		wc += "/"
 	}
 	return wc
 }
@@ -141,7 +141,7 @@ type Config struct {
 	UseRegex               bool             `yaml:"useRegex"`
 	SealedSecrets          SealedSecrets    `yaml:"sealedSecrets"`
 	InitialSecret          string           `yaml:"initialSecret"`
-	Ctx                    context.Context  `yaml:"-"`
+	Ctx                    context.Context  `yaml:"-"` //nolint:containedctx
 }
 
 type Web struct {
@@ -158,7 +158,7 @@ type SealedSecrets struct {
 
 func (ss SealedSecrets) String() string {
 	if ss.CertURL != "" {
-		return fmt.Sprintf("Cert URL: %s", ss.CertURL)
+		return "Cert URL: " + ss.CertURL
 	}
 	return fmt.Sprintf("Namespace: %s / ServiceName: %s", ss.Namespace, ss.Service)
 }

@@ -4,8 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/bakito/sealed-secrets-web/pkg/seal"
 	"github.com/gin-gonic/gin"
+
+	"github.com/bakito/sealed-secrets-web/pkg/seal"
 )
 
 type secret struct {
