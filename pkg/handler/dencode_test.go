@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/gin-gonic/gin"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -24,7 +25,7 @@ var _ = Describe("Handler ", func() {
 			h = &Handler{}
 		})
 		It("should encode input as json and output as json", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(stringDataAsJSON)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/dencode", bytes.NewReader([]byte(stringDataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 			h.Dencode(c)
@@ -34,7 +35,7 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/json"))
 		})
 		It("should decode input as json and output as json", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(dataAsJSON)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/dencode", bytes.NewReader([]byte(dataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 			h.Dencode(c)
@@ -44,7 +45,7 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/json"))
 		})
 		It("should encode input as yaml and output as yaml", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(stringDataAsYAML)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/dencode", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
 			h.Dencode(c)
@@ -54,7 +55,7 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/yaml"))
 		})
 		It("should decode input as yaml and output as yaml", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(dataAsYAML)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/dencode", bytes.NewReader([]byte(dataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
 			h.Dencode(c)
@@ -64,7 +65,7 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/yaml"))
 		})
 		It("should encode input as json and output as text not acceptable", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(dataAsJSON)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/dencode", bytes.NewReader([]byte(dataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "text/plain")
 			h.Dencode(c)
@@ -74,7 +75,7 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Header().Get("Content-Type")).Should(BeEmpty())
 		})
 		It("should encode input as json and output as text unprocessable entity", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte("invalidInputSecret")))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/dencode", bytes.NewReader([]byte("invalidInputSecret")))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 			h.Dencode(c)
@@ -84,22 +85,26 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("application/json; charset=utf-8"))
 		})
 		It("should return 422 with friendly message if .data contains invalid base64 (json)", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(invalidBase64DataAsJSON)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/dencode", bytes.NewReader([]byte(invalidBase64DataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 			h.Dencode(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
+			Ω(
+				recorder.Body.String(),
+			).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
 		})
 		It("should return 422 with friendly message if .data contains invalid base64 (yaml)", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/dencode", bytes.NewReader([]byte(invalidBase64DataAsYAML)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/dencode", bytes.NewReader([]byte(invalidBase64DataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
 			h.Dencode(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
+			Ω(
+				recorder.Body.String(),
+			).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
 		})
 	})
 })

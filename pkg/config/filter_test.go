@@ -5,7 +5,8 @@ import (
 	"io"
 	"os"
 
-	. "github.com/bakito/sealed-secrets-web/pkg/test"
+	"github.com/bakito/sealed-secrets-web/pkg/test"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -35,8 +36,8 @@ var _ = Describe("Filter", func() {
 
 			ff.Apply(secretData)
 
-			Ω(SubMap(secretData, "spec", "template")).ShouldNot(HaveKey("data"))
-			Ω(SubMap(secretData, "spec", "template", "metadata")).ShouldNot(HaveKey("creationTimestamp"))
+			Ω(test.SubMap(secretData, "spec", "template")).ShouldNot(HaveKey("data"))
+			Ω(test.SubMap(secretData, "spec", "template", "metadata")).ShouldNot(HaveKey("creationTimestamp"))
 		})
 		It("should keep non nil fields", func() {
 			secretData := map[string]any{
@@ -56,7 +57,7 @@ var _ = Describe("Filter", func() {
 			ff.Apply(secretData)
 
 			Ω(secretData["metadata"]).Should(HaveKey("creationTimestamp"))
-			Ω(SubMap(secretData, "spec", "template")).Should(HaveKey("data"))
+			Ω(test.SubMap(secretData, "spec", "template")).Should(HaveKey("data"))
 		})
 	})
 	Context("removeRuntimeFields", func() {
@@ -65,7 +66,7 @@ var _ = Describe("Filter", func() {
 			resetFlagsForTesting()
 			f := newFlags()
 			f.config = &testConfigFile
-			cfg, err := parse(f)
+			cfg, err := parseInternal(f)
 			Ω(err).ShouldNot(HaveOccurred())
 			ff = cfg.FieldFilter
 		})
@@ -91,9 +92,9 @@ var _ = Describe("Filter", func() {
 			Ω(secretData["metadata"]).ShouldNot(HaveKey("selfLink"))
 			Ω(secretData["metadata"]).ShouldNot(HaveKey("uid"))
 			Ω(
-				SubMap(secretData, "metadata", "annotations"),
+				test.SubMap(secretData, "metadata", "annotations"),
 			).ShouldNot(HaveKey("kubectl.kubernetes.io/last-applied-configuration"))
-			Ω(SubMap(secretData, "metadata", "annotations")).Should(HaveKey("foo"))
+			Ω(test.SubMap(secretData, "metadata", "annotations")).Should(HaveKey("foo"))
 		})
 	})
 })

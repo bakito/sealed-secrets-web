@@ -61,7 +61,7 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 func validateBase64Data(body []byte) error {
 	var raw map[string]any
 	if err := yaml.Unmarshal(body, &raw); err != nil {
-		return nil // not parseable; let the sealer produce its own error
+		return nil //nolint:nilerr // not parseable; let the sealer produce its own error
 	}
 	dataField, ok := raw["data"]
 	if !ok {
@@ -115,8 +115,8 @@ func contextNegotiate(c *gin.Context, code int, config gin.Negotiate) {
 	}
 }
 
-func NegotiateFormat(c *gin.Context) (string, string, bool) {
-	contentType := c.NegotiateFormat(gin.MIMEJSON, gin.MIMEYAML, runtime.ContentTypeYAML)
+func NegotiateFormat(c *gin.Context) (contentType, outputformat string, done bool) {
+	contentType = c.NegotiateFormat(gin.MIMEJSON, gin.MIMEYAML, runtime.ContentTypeYAML)
 	var outputFormat string
 	switch contentType {
 	case "":

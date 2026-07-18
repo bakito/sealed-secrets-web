@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/bakito/sealed-secrets-web/pkg/mocks/seal"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/mock/gomock"
+
+	"github.com/bakito/sealed-secrets-web/pkg/mocks/seal"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"go.uber.org/mock/gomock"
 )
 
 var _ = Describe("Handler ", func() {
@@ -34,7 +36,7 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should return ras data for the given content", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/raw", bytes.NewReader([]byte(rawData)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/raw", bytes.NewReader([]byte(rawData)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
@@ -48,7 +50,7 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should return an error if body can not be parsed as json", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/raw", bytes.NewReader([]byte("foo")))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/raw", bytes.NewReader([]byte("foo")))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
@@ -62,7 +64,7 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should return an error if body can not be parsed", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/raw", bytes.NewReader([]byte(rawData)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/raw", bytes.NewReader([]byte(rawData)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 

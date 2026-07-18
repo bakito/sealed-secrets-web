@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/bakito/sealed-secrets-web/pkg/mocks/seal"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/mock/gomock"
+
+	"github.com/bakito/sealed-secrets-web/pkg/mocks/seal"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"go.uber.org/mock/gomock"
 )
 
 var _ = Describe("Handler ", func() {
@@ -34,7 +36,7 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should kubeseal input as json and output as json", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsJSON)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
@@ -48,7 +50,7 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should kubeseal input as yaml and output as yaml", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
 
@@ -62,7 +64,7 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should return an error if seal is not successful", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
 
@@ -76,7 +78,7 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should kubeseal input with valid base64 .data values as json and output as json", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(dataAsJSON)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/kubeseal", bytes.NewReader([]byte(dataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
@@ -89,29 +91,33 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should return 422 if .data contains invalid base64 (json)", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(invalidBase64DataAsJSON)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/kubeseal", bytes.NewReader([]byte(invalidBase64DataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
 			h.KubeSeal(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
+			Ω(
+				recorder.Body.String(),
+			).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
 		})
 
 		It("should return 422 if .data contains invalid base64 (yaml)", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(invalidBase64DataAsYAML)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/kubeseal", bytes.NewReader([]byte(invalidBase64DataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
 
 			h.KubeSeal(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
+			Ω(
+				recorder.Body.String(),
+			).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
 		})
 
 		It("should pass through .stringData without validation", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsJSON)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/kubeseal", bytes.NewReader([]byte(stringDataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
@@ -123,14 +129,16 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should return 422 if .data contains mixed valid and invalid base64", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/kubeseal", bytes.NewReader([]byte(mixedBase64DataAsJSON)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/kubeseal", bytes.NewReader([]byte(mixedBase64DataAsJSON)))
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
 			h.KubeSeal(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusUnprocessableEntity))
-			Ω(recorder.Body.String()).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
+			Ω(
+				recorder.Body.String(),
+			).Should(ContainSubstring("data must be uniformly base64-encoded or in plain text, not mixed up. Use .data for encoded or .stringData for plaintext"))
 		})
 	})
 })

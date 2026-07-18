@@ -6,12 +6,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/gin-gonic/gin"
+	"go.uber.org/mock/gomock"
+
 	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/seal"
-	"github.com/gin-gonic/gin"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"go.uber.org/mock/gomock"
 )
 
 var _ = Describe("Handler ", func() {
@@ -38,7 +40,7 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should return success if validation succeeds", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/yaml")
 
 			sealer.EXPECT().Validate(gomock.Any(), gomock.Any()).Return(nil)
@@ -51,7 +53,7 @@ var _ = Describe("Handler ", func() {
 		})
 
 		It("should return an error if validation fails", func() {
-			c.Request, _ = http.NewRequest("POST", "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/yaml")
 
 			sealer.EXPECT().Validate(gomock.Any(), gomock.Any()).Return(errors.New("Validation failed"))
@@ -65,7 +67,7 @@ var _ = Describe("Handler ", func() {
 
 		It("should return an error if certURL is used", func() {
 			cfg.SealedSecrets.CertURL = "http://sealed-secrets/v1/cert.pem"
-			c.Request, _ = http.NewRequest("POST", "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
+			c.Request, _ = http.NewRequest(http.MethodPost, "/v1/validate", bytes.NewReader([]byte(stringDataAsYAML)))
 			c.Request.Header.Set("Content-Type", "application/yaml")
 
 			h.Validate(c)
