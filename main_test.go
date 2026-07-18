@@ -9,7 +9,7 @@ import (
 	"github.com/bakito/sealed-secrets-web/pkg/matcher"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/core"
 	"github.com/bakito/sealed-secrets-web/pkg/mocks/ssclient"
-	"github.com/bitnami-labs/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
+	"github.com/bitnami/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"

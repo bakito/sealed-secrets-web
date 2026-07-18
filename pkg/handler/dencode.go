@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/bitnami-labs/sealed-secrets/pkg/multidocyaml"
+	"github.com/bitnami/sealed-secrets/pkg/multidocyaml"
 	"github.com/gin-gonic/gin"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"

@@ -9,7 +9,7 @@ import (
 )
 
 type secret struct {
-	Secret string `json:"secret"` //nolint:gosec // G117 sealed secrets handler deals with secrets
+	Secret string `json:"secret"`
 }
 
 func (h *Handler) Raw(c *gin.Context) {
