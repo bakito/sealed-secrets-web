@@ -5,13 +5,13 @@
   <img src="./assets/logo.png" />
   <br><br>
 
-A web interface for [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) by Bitnami.
+A web interface for [Sealed Secrets](https://github.com/bitnami/sealed-secrets) by Bitnami.
 
   <img src="./assets/example1.png" width="100%" />
   <img src="./assets/example2.png" width="100%" />
 </div>
 
-**Sealed Secrets Web** is a web interface for [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) by
+**Sealed Secrets Web** is a web interface for [Sealed Secrets](https://github.com/bitnami/sealed-secrets) by
 Bitnami. The web interface let you encode, decode the keys in the `data` field of a secret, load existing Sealed Secrets
 and create Sealed Secrets. Under the hood it uses Sealed Secrets service API to encrypt your secrets. The web interface
 should be installed to your Kubernetes cluster, so your developers do not need access to
@@ -100,7 +100,7 @@ curl -request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/raw' \
 ### Validate sealed secret
 
 > **_NOTE:_**  Validate is only available when using cluster internal api (e.g. certURL not set)
-> see [bitnami-labs/sealed-secrets](https://github.com/bitnami-labs/sealed-secrets/issues/1208)
+> see [bitnami-labs/sealed-secrets](https://github.com/bitnami/sealed-secrets/issues/1208)
 
 ```bash
 curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/validate' \

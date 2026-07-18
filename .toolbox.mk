@@ -20,12 +20,18 @@ TB_MOCKGEN ?= $(TB_LOCALBIN)/mockgen
 TB_SEMVER ?= $(TB_LOCALBIN)/semver
 
 ## Tool Versions
-TB_GINKGO_VERSION ?= v2.28.1
-TB_GOLANGCI_LINT_VERSION ?= v2.10.1
+# renovate: packageName=github.com/onsi/ginkgo/v2
+TB_GINKGO_VERSION ?= v2.32.0
+# renovate: packageName=github.com/golangci/golangci-lint/v2
+TB_GOLANGCI_LINT_VERSION ?= v2.12.2
 TB_GOLANGCI_LINT_VERSION_NUM ?= $(call STRIP_V,$(TB_GOLANGCI_LINT_VERSION))
-TB_GORELEASER_VERSION ?= v2.14.1
+# renovate: packageName=github.com/goreleaser/goreleaser/v2
+TB_GORELEASER_VERSION ?= v2.17.0
+# renovate: packageName=github.com/norwoodj/helm-docs/cmd/helm-docs
 TB_HELM_DOCS_VERSION ?= v1.14.2
+# renovate: packageName=github.com/uber-go/mock
 TB_MOCKGEN_VERSION ?= v0.6.0
+# renovate: packageName=github.com/bakito/semver
 TB_SEMVER_VERSION ?= v1.1.10
 
 ## Tool Installer
@@ -68,7 +74,7 @@ tb.reset:
 ## Update Tools
 .PHONY: tb.update
 tb.update: tb.reset
-	toolbox makefile -f $(TB_LOCALDIR)/Makefile \
+	toolbox makefile --renovate -f $(TB_LOCALDIR)/Makefile \
 		github.com/onsi/ginkgo/v2/ginkgo \
 		github.com/golangci/golangci-lint/v2/cmd/golangci-lint?--version \
 		github.com/goreleaser/goreleaser/v2 \
