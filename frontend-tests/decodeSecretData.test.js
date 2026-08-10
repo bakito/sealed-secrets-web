@@ -29,8 +29,13 @@ function b64(str) {
   return btoa(str)
 }
 
-function makeSecret(dataEntries) {
-  return `apiVersion: v1\nkind: Secret\nmetadata:\n  name: test\n  namespace: default\ntype: Opaque\ndata:\n${Object.entries(dataEntries).map(([k, v]) => `  ${k}: ${b64(v)}`).join('\n')}\n`
+// UTF-8-safe base64 encoding, for values containing non-Latin1 characters
+function b64Utf8(str) {
+  return btoa(String.fromCharCode(...new TextEncoder().encode(str)))
+}
+
+function makeSecret(dataEntries, encoder = b64) {
+  return `apiVersion: v1\nkind: Secret\nmetadata:\n  name: test\n  namespace: default\ntype: Opaque\ndata:\n${Object.entries(dataEntries).map(([k, v]) => `  ${k}: ${encoder(v)}`).join('\n')}\n`
 }
 
 // Convenience wrappers — most tests only care about the decoded content string
@@ -352,6 +357,21 @@ describe('decodeSecretData – nested content with literal \\n sequences', () =>
   it('preserves literal \\r (two chars) inside a multiline block scalar unchanged', () => {
     const val = 'line: "value\\rhere"\nother: data\n'
     const out = decode(makeSecret({ key: val }))
+    expect(YAML.parse(stripComment(out)).stringData.key).toBe(val)
+  })
+})
+
+describe('decodeSecretData – UTF-8 multi-byte characters', () => {
+  it('decodes German umlauts correctly instead of producing mojibake', () => {
+    const secret = `apiVersion: v1\nkind: Secret\nmetadata:\n  name: test\n  namespace: default\ntype: Opaque\ndata:\n  name: ${b64Utf8('müller')}\n`
+    const out = decode(secret)
+    expect(out).toContain('  name: müller')
+    expect(out).not.toContain('mÃ¼ller')
+  })
+
+  it('round-trips a broader set of multi-byte UTF-8 characters (ö, ä, ü, emoji, CJK)', () => {
+    const val = 'Öl Straße naïve 日本語 🚀'
+    const out = decode(makeSecret({ key: val }, b64Utf8))
     expect(YAML.parse(stripComment(out)).stringData.key).toBe(val)
   })
 })
