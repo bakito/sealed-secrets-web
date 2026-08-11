@@ -22,7 +22,7 @@ function decodeSecretData(content, format) {
     }
     for (const [key, val] of Object.entries(parsed.data)) {
       try {
-        parsed.stringData[key] = val != null ? atob(val) : ''
+        parsed.stringData[key] = val != null ? new TextDecoder().decode(Uint8Array.from(atob(val), c => c.charCodeAt(0))) : ''
       } catch {
         return { content, error: `Invalid base64 in key "${key}"` }
       }
