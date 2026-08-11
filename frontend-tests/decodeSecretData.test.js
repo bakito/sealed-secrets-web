@@ -26,7 +26,7 @@ beforeAll(() => {
 // Helpers
 // ---------------------------------------------------------------------------
 function b64(str) {
-  return btoa(str)
+  return btoa(String.fromCharCode(...new TextEncoder().encode(str)))
 }
 
 function makeSecret(dataEntries) {
@@ -369,5 +369,105 @@ describe('decodeSecretData – JSON format', () => {
     const parsed = JSON.parse(out)
     expect(parsed.stringData.password).toBe('secret')
     expect(parsed.data).toBeUndefined()
+  })
+})
+
+describe('decodeSecretData – UTF-8 multi-byte characters (issue #461)', () => {
+  it('correctly decodes German umlauts (ö, ä, ü) without mojibake', () => {
+    const out = decode(makeSecret({ name: 'müller' }))
+    expect(YAML.parse(stripComment(out)).stringData.name).toBe('müller')
+    expect(out).toContain('müller')
+    expect(out).not.toContain('mÃ¼ller')
+  })
+
+  it('correctly decodes French accented characters', () => {
+    const out = decode(makeSecret({ greeting: 'café' }))
+    expect(YAML.parse(stripComment(out)).stringData.greeting).toBe('café')
+    expect(out).toContain('café')
+    expect(out).not.toContain('cafÃ©')
+  })
+
+  it('correctly decodes Spanish ñ character', () => {
+    const out = decode(makeSecret({ language: 'español' }))
+    expect(YAML.parse(stripComment(out)).stringData.language).toBe('español')
+    expect(out).toContain('español')
+    expect(out).not.toContain('espaÃ±ol')
+  })
+
+  it('correctly decodes combined German umlauts and accents in one value', () => {
+    const out = decode(makeSecret({ login: 'café español müller' }))
+    const parsed = YAML.parse(stripComment(out)).stringData.login
+    expect(parsed).toBe('café español müller')
+    expect(out).toContain('café español müller')
+  })
+
+  it('correctly decodes UTF-8 in multiline block scalar', () => {
+    const val = 'Name: Müller\nCity: München\nCountry: Österreich\n'
+    const out = decode(makeSecret({ info: val }))
+    const parsed = YAML.parse(stripComment(out)).stringData.info
+    expect(parsed).toBe(val)
+    expect(out).toContain('Müller')
+    expect(out).toContain('München')
+    expect(out).toContain('Österreich')
+  })
+
+  it('correctly decodes Chinese characters', () => {
+    const out = decode(makeSecret({ greeting: '你好' }))
+    expect(YAML.parse(stripComment(out)).stringData.greeting).toBe('你好')
+    expect(out).toContain('你好')
+  })
+
+  it('correctly decodes Japanese characters (hiragana)', () => {
+    const out = decode(makeSecret({ greeting: 'こんにちは' }))
+    expect(YAML.parse(stripComment(out)).stringData.greeting).toBe('こんにちは')
+    expect(out).toContain('こんにちは')
+  })
+
+  it('correctly decodes emoji characters', () => {
+    const out = decode(makeSecret({ status: 'Ready 🚀' }))
+    const parsed = YAML.parse(stripComment(out)).stringData.status
+    expect(parsed).toBe('Ready 🚀')
+    expect(out).toContain('Ready 🚀')
+  })
+
+  it('correctly decodes Cyrillic characters', () => {
+    const out = decode(makeSecret({ name: 'Иванов' }))
+    expect(YAML.parse(stripComment(out)).stringData.name).toBe('Иванов')
+    expect(out).toContain('Иванов')
+  })
+
+  it('correctly decodes Arabic characters', () => {
+    const out = decode(makeSecret({ greeting: 'مرحبا' }))
+    expect(YAML.parse(stripComment(out)).stringData.greeting).toBe('مرحبا')
+    expect(out).toContain('مرحبا')
+  })
+
+  it('round-trips UTF-8 characters correctly via JSON format', () => {
+    const input = JSON.stringify({
+      apiVersion: 'v1',
+      kind: 'Secret',
+      metadata: { name: 'test', namespace: 'default' },
+      type: 'Opaque',
+      data: { name: b64('müller'), city: b64('Zürich') },
+    })
+    const out = decode(input, 'json')
+    const parsed = JSON.parse(out)
+    expect(parsed.stringData.name).toBe('müller')
+    expect(parsed.stringData.city).toBe('Zürich')
+  })
+
+  it('handles mix of ASCII and UTF-8 characters in same secret', () => {
+    const secret = makeSecret({
+      ascii: 'hello',
+      german: 'müller',
+      french: 'café',
+      japanese: 'こんにちは',
+    })
+    const out = decode(secret)
+    const parsed = YAML.parse(stripComment(out)).stringData
+    expect(parsed.ascii).toBe('hello')
+    expect(parsed.german).toBe('müller')
+    expect(parsed.french).toBe('café')
+    expect(parsed.japanese).toBe('こんにちは')
   })
 })
