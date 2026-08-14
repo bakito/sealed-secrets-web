@@ -65,10 +65,13 @@ jobs:
           cache-dependency-path: frontend-tests/package-lock.json
 
       - name: Install dependencies
-        run: npm ci --prefix frontend-tests
+        run: make test-npm-ci
+
+      - name: Audit
+        run: make test-npm-audit
 
       - name: Run tests
-        run: npm test --prefix frontend-tests
+        run: make test-npm-run
 
   helm:
     name: Helm Checks

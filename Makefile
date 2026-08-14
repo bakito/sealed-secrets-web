@@ -17,8 +17,15 @@ test: mocks tidy helm-lint test-cover
 test-cover: tb.ginkgo
 	$(TB_GINKGO) --cover ./...
 
-test-npm:
+test-npm: test-npm-ci test-npm-audit test-npm-run
+
+test-npm-ci:
 	npm ci --prefix frontend-tests
+
+test-npm-audit:
+	npm audit --prefix frontend-tests
+
+test-npm-run:
 	npm test --prefix frontend-tests
 
 release: tb.goreleaser tb.semver
