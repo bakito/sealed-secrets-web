@@ -1,12 +1,12 @@
 module github.com/bakito/sealed-secrets-web
 
-go 1.26.5
+go 1.26.6
 
 require (
 	github.com/bitnami/sealed-secrets v0.38.4
 	github.com/gin-gonic/gin v1.12.0
 	github.com/google/uuid v1.6.0
-	github.com/onsi/ginkgo/v2 v2.32.0
+	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.42.1
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 	go.uber.org/mock v0.6.0
