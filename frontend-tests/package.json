@@ -5,5 +5,8 @@
   },
   "dependencies": {
     "vitest": "^4.1.5"
+  },
+  "overrides": {
+    "nanoid": "3.3.18"
   }
 }

@@ -17,6 +17,10 @@ test: mocks tidy helm-lint test-cover
 test-cover: tb.ginkgo
 	$(TB_GINKGO) --cover ./...
 
+test-npm:
+	npm ci --prefix frontend-tests
+	npm test --prefix frontend-tests
+
 release: tb.goreleaser tb.semver
 	@version=$$($(TB_SEMVER)); \
 	git tag -s $$version -m"Release $$version"; \
