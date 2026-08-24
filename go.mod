@@ -1,9 +1,9 @@
 module github.com/bakito/sealed-secrets-web
 
-go 1.26.6
+go 1.26.7
 
 require (
-	github.com/bitnami/sealed-secrets v0.38.4
+	github.com/bitnami/sealed-secrets v0.39.1
 	github.com/gin-gonic/gin v1.12.0
 	github.com/google/uuid v1.6.0
 	github.com/onsi/ginkgo/v2 v2.32.1
@@ -59,7 +59,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/mattn/go-isatty v0.0.22 // indirect
+	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/mkmik/multierror v0.4.0 // indirect
