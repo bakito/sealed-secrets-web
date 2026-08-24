@@ -1,5 +1,5 @@
 # Build stage with multi-arch support
-FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine AS builder
 WORKDIR /go/src/app
 
 RUN apk update && apk add upx
