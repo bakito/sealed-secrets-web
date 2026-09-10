@@ -2,29 +2,23 @@
 FROM --platform=$BUILDPLATFORM golang:1.27-alpine AS builder
 WORKDIR /go/src/app
 
-RUN apk update && apk add upx
+RUN apk add --no-cache upx
 
 ARG VERSION=main
 ARG BUILD="N/A"
 ARG TARGETPLATFORM
-ARG BUILDPLATFORM
-
-# Parse target platform
-RUN case "$TARGETPLATFORM" in \
-  "linux/amd64") export GOARCH=amd64 ;; \
-  "linux/arm64") export GOARCH=arm64 ;; \
-  "linux/arm/v7") export GOARCH=arm GOARM=7 ;; \
-  "linux/386") export GOARCH=386 ;; \
-  *) export GOARCH=amd64 ;; \
-  esac && echo "GOARCH=$GOARCH" > /tmp/buildenv && echo "GOARM=${GOARM}" >> /tmp/buildenv
+ARG TARGETOS=linux
+ARG TARGETARCH
+ARG TARGETVARIANT
 
 ENV GO111MODULE=on \
   CGO_ENABLED=0 \
-  GOOS=linux
+  GOOS=${TARGETOS}
 
 COPY . /go/src/app/
 
-RUN . /tmp/buildenv && \
+RUN GOARCH=${TARGETARCH} \
+  GOARM=$([ "$TARGETARCH" = "arm" ] && { [ -n "$TARGETVARIANT" ] && echo "${TARGETVARIANT#v}" || echo "7"; } || echo "") \
   go build -a -installsuffix cgo \
     -ldflags="-w -s -X github.com/bakito/sealed-secrets-web/pkg/version.Version=${VERSION} -X github.com/bakito/sealed-secrets-web/pkg/version.Build=${BUILD}" \
     -o sealed-secrets-web . && \
@@ -41,6 +35,9 @@ EXPOSE 8080
 RUN apk add --no-cache dumb-init
 
 COPY --from=builder /go/src/app/sealed-secrets-web /opt/go/sealed-secrets-web
+
+# Verify the binary is built for the correct architecture and runs
+RUN /opt/go/sealed-secrets-web --version
 
 USER 1001
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "/opt/go/sealed-secrets-web"]
