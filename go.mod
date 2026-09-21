@@ -6,8 +6,8 @@ require (
 	github.com/bitnami/sealed-secrets v0.40.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/google/uuid v1.6.0
-	github.com/onsi/ginkgo/v2 v2.32.2
-	github.com/onsi/gomega v1.43.0
+	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/onsi/gomega v1.43.1
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 	go.uber.org/mock v0.6.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -77,7 +77,7 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.6.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/arch v0.27.0 // indirect
 	golang.org/x/crypto v0.56.0 // indirect
 	golang.org/x/mod v0.40.0 // indirect
