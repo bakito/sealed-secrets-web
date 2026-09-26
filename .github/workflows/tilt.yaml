@@ -1,0 +1,84 @@
+name: Tilt
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: tilt-e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Setup Kubernetes
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: sealed-secrets-web-e2e
+
+      - name: Install Tilt
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
+          tilt version
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Install Chainsaw
+        uses: kyverno/action-install-chainsaw@v0.2.14
+
+      - name: Start Tilt
+        run: |
+          tilt ci -- --e2e
+
+      - name: Run Chainsaw E2E tests
+        run: |
+          ./testdata/e2e/chainsaw/run.sh
+
+      - name: Kubernetes diagnostics
+        if: always()
+        run: |
+          echo "=== Pods ==="
+          kubectl get pods -A -o wide || true
+
+          echo "=== Deployments ==="
+          kubectl get deployments -A || true
+
+          echo "=== Services ==="
+          kubectl get services -A || true
+
+          echo "=== SealedSecrets ==="
+          kubectl get sealedsecrets -A || true
+
+          echo "=== Events ==="
+          kubectl get events -A \
+            --sort-by=.lastTimestamp || true
+
+      - name: Helm status
+        if: always()
+        run: |
+          helm list -A || true
+
+          helm status sealed-secrets \
+            -n sealed-secrets || true
+
+          helm status sealed-secrets-web \
+            -n sealed-secrets-web || true
