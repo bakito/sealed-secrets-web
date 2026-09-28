@@ -71,7 +71,7 @@ func (a *apiSealer) Certificate(ctx context.Context) ([]byte, error) {
 
 func (a *apiSealer) Seal(outputFormat string, secret io.Reader) ([]byte, error) {
 	var buf bytes.Buffer
-	if err := kubeseal.Seal(
+	err := kubeseal.Seal(
 		a.clientConfig,
 		outputFormat,
 		secret,
@@ -82,7 +82,8 @@ func (a *apiSealer) Seal(outputFormat string, secret io.Reader) ([]byte, error) 
 		false,
 		"",
 		"",
-	); err != nil {
+	)
+	if err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
@@ -94,9 +95,10 @@ func (a *apiSealer) Raw(data Raw) ([]byte, error) {
 	if data.Scope != "" {
 		_ = scope.Set(data.Scope)
 	}
-	if err := kubeseal.EncryptSecretItem(
+	err := kubeseal.EncryptSecretItem(
 		&buf, data.Name, data.Namespace, []byte(data.Value),
-		scope, a.pubKey); err != nil {
+		scope, a.pubKey)
+	if err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
