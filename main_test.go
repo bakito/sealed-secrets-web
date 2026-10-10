@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/mock/gomock"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/bakito/sealed-secrets-web/pkg/config"
 	"github.com/bakito/sealed-secrets-web/pkg/matcher"
@@ -82,8 +81,8 @@ var _ = Describe("Main", func() {
 			ssClient.EXPECT().List(gomock.Any(), gomock.Any()).Return(&v1alpha1.SealedSecretList{
 				Items: []v1alpha1.SealedSecret{
 					{
-						ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Name: name},
-						Spec:       v1alpha1.SealedSecretSpec{Template: v1alpha1.SecretTemplateSpec{}},
+						Namespace: namespace, Name: name,
+						Spec: v1alpha1.SealedSecretSpec{Template: v1alpha1.SecretTemplateSpec{}},
 					},
 				},
 			}, nil)
@@ -102,8 +101,8 @@ var _ = Describe("Main", func() {
 			ssClient.EXPECT().List(gomock.Any(), gomock.Any()).Return(&v1alpha1.SealedSecretList{
 				Items: []v1alpha1.SealedSecret{
 					{
-						ObjectMeta: metav1.ObjectMeta{Namespace: "a", Name: name},
-						Spec:       v1alpha1.SealedSecretSpec{Template: v1alpha1.SecretTemplateSpec{}},
+						Namespace: "a", Name: name,
+						Spec: v1alpha1.SealedSecretSpec{Template: v1alpha1.SecretTemplateSpec{}},
 					},
 				},
 			}, nil)
@@ -111,8 +110,8 @@ var _ = Describe("Main", func() {
 			ssClient.EXPECT().List(gomock.Any(), gomock.Any()).Return(&v1alpha1.SealedSecretList{
 				Items: []v1alpha1.SealedSecret{
 					{
-						ObjectMeta: metav1.ObjectMeta{Namespace: "b", Name: name},
-						Spec:       v1alpha1.SealedSecretSpec{Template: v1alpha1.SecretTemplateSpec{}},
+						Namespace: "b", Name: name,
+						Spec: v1alpha1.SealedSecretSpec{Template: v1alpha1.SecretTemplateSpec{}},
 					},
 				},
 			}, nil)
@@ -127,7 +126,7 @@ var _ = Describe("Main", func() {
 		It("get secret from namespace by name", func() {
 			coreClient.EXPECT().Secrets(namespace).Return(secrets)
 			secrets.EXPECT().Get(gomock.Any(), name, gomock.Any()).Return(&corev1.Secret{
-				ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Name: name},
+				Namespace: namespace, Name: name,
 			}, nil)
 			req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/secret/%s/%s", namespace, name), http.NoBody)
 			router.ServeHTTP(w, req)

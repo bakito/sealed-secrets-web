@@ -7,7 +7,6 @@ import (
 	ssv1alpha1 "github.com/bitnami/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
 	ssfake "github.com/bitnami/sealed-secrets/pkg/client/clientset/versioned/typed/sealedsecrets/v1alpha1/fake"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 	ktesting "k8s.io/client-go/testing"
@@ -180,8 +179,8 @@ var _ = Describe("SecretsHandler", func() {
 		Context("when no filters are configured", func() {
 			It("should return all sealed secrets", func() {
 				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret1", Namespace: "ns1"}},
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret2", Namespace: "ns2"}},
+					{Name: "secret1", Namespace: "ns1"},
+					{Name: "secret2", Namespace: "ns2"},
 				})
 
 				result, err := handler.list(context.Background())
@@ -200,9 +199,9 @@ var _ = Describe("SecretsHandler", func() {
 
 			It("should return only secrets from included namespaces", func() {
 				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret1", Namespace: "ns1"}},
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret2", Namespace: "ns2"}},
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret3", Namespace: "ns3"}},
+					{Name: "secret1", Namespace: "ns1"},
+					{Name: "secret2", Namespace: "ns2"},
+					{Name: "secret3", Namespace: "ns3"},
 				})
 
 				result, err := handler.list(context.Background())
@@ -222,15 +221,15 @@ var _ = Describe("SecretsHandler", func() {
 			It("should return secrets from all namespaces except excluded ones", func() {
 				// Setup namespaces in fake client
 				fakeClient = fake.NewClientset(
-					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns1"}},
-					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns2"}},
-					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns3"}},
+					&corev1.Namespace{Name: "ns1"},
+					&corev1.Namespace{Name: "ns2"},
+					&corev1.Namespace{Name: "ns3"},
 				)
 
 				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret1", Namespace: "ns1"}},
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret2", Namespace: "ns2"}},
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret3", Namespace: "ns3"}},
+					{Name: "secret1", Namespace: "ns1"},
+					{Name: "secret2", Namespace: "ns2"},
+					{Name: "secret3", Namespace: "ns3"},
 				})
 
 				handler = NewHandler(fakeClient.CoreV1(), fakeSSClient, cfg)
@@ -253,15 +252,15 @@ var _ = Describe("SecretsHandler", func() {
 			It("should return secrets matching regex pattern", func() {
 				// Setup namespaces in fake client
 				fakeClient = fake.NewClientset(
-					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "app-prod"}},
-					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "kube-system"}},
-					&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "app-staging"}},
+					&corev1.Namespace{Name: "app-prod"},
+					&corev1.Namespace{Name: "kube-system"},
+					&corev1.Namespace{Name: "app-staging"},
 				)
 
 				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret1", Namespace: "app-prod"}},
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret2", Namespace: "kube-system"}},
-					{ObjectMeta: metav1.ObjectMeta{Name: "secret3", Namespace: "app-staging"}},
+					{Name: "secret1", Namespace: "app-prod"},
+					{Name: "secret2", Namespace: "kube-system"},
+					{Name: "secret3", Namespace: "app-staging"},
 				})
 
 				handler = NewHandler(fakeClient.CoreV1(), fakeSSClient, cfg)
@@ -277,9 +276,9 @@ var _ = Describe("SecretsHandler", func() {
 		Context("sorting", func() {
 			It("should sort results by namespace then by name", func() {
 				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
-					{ObjectMeta: metav1.ObjectMeta{Name: "z-secret", Namespace: "ns2"}},
-					{ObjectMeta: metav1.ObjectMeta{Name: "b-secret", Namespace: "ns1"}},
-					{ObjectMeta: metav1.ObjectMeta{Name: "a-secret", Namespace: "ns1"}},
+					{Name: "z-secret", Namespace: "ns2"},
+					{Name: "b-secret", Namespace: "ns1"},
+					{Name: "a-secret", Namespace: "ns1"},
 				})
 
 				result, err := handler.list(context.Background())
@@ -297,7 +296,7 @@ var _ = Describe("SecretsHandler", func() {
 				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
 					createSealedSecretWithStatus("synced-secret", "ns1", true, ""),
 					createSealedSecretWithStatus("failed-secret", "ns1", false, "decryption failed"),
-					{ObjectMeta: metav1.ObjectMeta{Name: "no-status", Namespace: "ns1"}},
+					{Name: "no-status", Namespace: "ns1"},
 				})
 
 				result, err := handler.list(context.Background())
@@ -334,7 +333,7 @@ var _ = Describe("SecretsHandler", func() {
 				setupSealedSecretsReactor(fakeSSClient, []ssv1alpha1.SealedSecret{
 					createSealedSecretWithStatus("synced-secret", "ns1", true, ""),
 					createSealedSecretWithStatus("failed-secret", "ns2", false, "decryption failed"),
-					{ObjectMeta: metav1.ObjectMeta{Name: "no-status", Namespace: "ns3"}},
+					{Name: "no-status", Namespace: "ns3"},
 				})
 
 				result, err := handler.list(context.Background())
@@ -380,7 +379,7 @@ func createSealedSecretWithStatus(name, namespace string, synced bool, message s
 	}
 
 	return ssv1alpha1.SealedSecret{
-		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},
+		Name: name, Namespace: namespace,
 		Status: &ssv1alpha1.SealedSecretStatus{
 			Conditions: []ssv1alpha1.SealedSecretCondition{
 				{
