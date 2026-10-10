@@ -25,6 +25,9 @@ test-npm-ci:
 test-npm-audit:
 	npm audit --prefix frontend-tests
 
+test-npm-audit-fix:
+	npm audit fix --prefix frontend-tests
+
 test-npm-run:
 	npm test --prefix frontend-tests
 
