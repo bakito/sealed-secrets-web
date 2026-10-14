@@ -40,7 +40,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
-			sealer.EXPECT().Raw(gomock.Any()).Return([]byte("foo"), nil)
+			sealer.EXPECT().Raw(gomock.Any(), gomock.Any()).Return([]byte("foo"), nil)
 
 			h.Raw(c)
 
@@ -68,7 +68,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
-			sealer.EXPECT().Raw(gomock.Any()).Return(nil, errors.New("error processing raw"))
+			sealer.EXPECT().Raw(gomock.Any(), gomock.Any()).Return(nil, errors.New("error processing raw"))
 
 			h.Raw(c)
 

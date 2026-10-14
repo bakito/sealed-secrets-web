@@ -62,7 +62,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could build k8s clients:%v", err.Error())
 	}
-	sealer, err := seal.NewAPISealer(cfg.Ctx, cfg.SealedSecrets)
+	sealer, err := seal.NewAPISealer(cfg.Ctx, cfg.SealedSecrets, cfg.SealedSecrets.CertRefreshInterval)
 	if err != nil {
 		log.Fatalf("Setup sealer: %s", err.Error())
 	}
