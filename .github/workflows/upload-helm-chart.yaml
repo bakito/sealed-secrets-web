@@ -20,11 +20,14 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: "go.mod"
+          cache: false
 
       - name: Configure Git
         run: |
@@ -47,7 +50,7 @@ jobs:
       - name: Build and push chart
         id: push
         run: |
-          VERSION=$(echo "${{ github.event.release.tag_name }}" | sed 's/v//g')
+          VERSION=$(echo "${GITHUB_EVENT_RELEASE_TAG_NAME}" | sed 's/v//g')
           sed -i "s/^version:.*$/version: ${VERSION}/"        ./chart/Chart.yaml
           sed -i "s/^appVersion:.*$/appVersion: v${VERSION}/" ./chart/Chart.yaml
           make helm-docs
@@ -60,11 +63,15 @@ jobs:
 
           echo "chart_digest=${CHART_DIGEST}" >> "$GITHUB_OUTPUT"
           echo "chart_version=${VERSION}" >> "$GITHUB_OUTPUT"
+        env:
+          GITHUB_EVENT_RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
 
       - name: Sign chart with Cosign (keyless)
         run: |
           cosign sign --yes \
-            "ghcr.io/bakito/helm-charts/sealed-secrets-web@${{ steps.push.outputs.chart_digest }}"
+            "ghcr.io/bakito/helm-charts/sealed-secrets-web@${STEPS_PUSH_OUTPUTS_CHART_DIGEST}"
+        env:
+          STEPS_PUSH_OUTPUTS_CHART_DIGEST: ${{ steps.push.outputs.chart_digest }}
 
       - name: Install chart-releaser
         uses: engineerd/configurator@dc6b312d89ab097f73f3ebbf507a69dd7399c5d0 # v0.0.10
