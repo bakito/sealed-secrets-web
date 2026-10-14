@@ -1,0 +1,31 @@
+image:
+  repository: sealed-secrets-web
+  tag: e2e
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30080
+
+ingress:
+  enabled: false
+
+webLogs: true
+
+# Use config file for multi-key configuration
+deployment:
+  args:
+    defaultArgsEnabled: false
+    additionalArgs:
+      - --config=/etc/sealed-secrets-web/config.yaml
+
+volumes:
+  - name: config
+    configMap:
+      name: sealed-secrets-web-config
+
+volumeMounts:
+  - name: config
+    mountPath: /etc/sealed-secrets-web
+    readOnly: true
