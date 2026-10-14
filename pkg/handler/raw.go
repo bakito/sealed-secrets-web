@@ -20,7 +20,7 @@ func (h *Handler) Raw(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}
-	r, err := h.sealer.Raw(*data)
+	r, err := h.sealer.Raw(c.Request.Context(), *data)
 	if err != nil {
 		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

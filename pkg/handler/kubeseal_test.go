@@ -40,7 +40,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
-			sealer.EXPECT().Seal("json", gomock.Any()).Return([]byte(sealAsJSON), nil)
+			sealer.EXPECT().Seal(gomock.Any(), "json", gomock.Any()).Return([]byte(sealAsJSON), nil)
 
 			h.KubeSeal(c)
 
@@ -54,7 +54,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
 
-			sealer.EXPECT().Seal("yaml", gomock.Any()).Return([]byte(sealedAsYAML), nil)
+			sealer.EXPECT().Seal(gomock.Any(), "yaml", gomock.Any()).Return([]byte(sealedAsYAML), nil)
 
 			h.KubeSeal(c)
 
@@ -68,7 +68,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
 
-			sealer.EXPECT().Seal(gomock.Any(), gomock.Any()).Return(nil, errors.New("error sealing"))
+			sealer.EXPECT().Seal(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("error sealing"))
 
 			h.KubeSeal(c)
 
@@ -82,7 +82,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
-			sealer.EXPECT().Seal("json", gomock.Any()).Return([]byte(sealAsJSON), nil)
+			sealer.EXPECT().Seal(gomock.Any(), "json", gomock.Any()).Return([]byte(sealAsJSON), nil)
 
 			h.KubeSeal(c)
 
@@ -121,7 +121,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
-			sealer.EXPECT().Seal("json", gomock.Any()).Return([]byte(sealAsJSON), nil)
+			sealer.EXPECT().Seal(gomock.Any(), "json", gomock.Any()).Return([]byte(sealAsJSON), nil)
 
 			h.KubeSeal(c)
 
