@@ -98,4 +98,7 @@ jobs:
           done
 
       - name: Image digest
-        run: echo ${{ steps.docker_build_release.outputs.digest }}${{ steps.docker_build_main.outputs.digest }}
+        run: echo ${STEPS_DOCKER_BUILD_RELEASE_OUTPUTS_DIGEST}${STEPS_DOCKER_BUILD_MAIN_OUTPUTS_DIGEST}
+        env:
+          STEPS_DOCKER_BUILD_RELEASE_OUTPUTS_DIGEST: ${{ steps.docker_build_release.outputs.digest }}
+          STEPS_DOCKER_BUILD_MAIN_OUTPUTS_DIGEST: ${{ steps.docker_build_main.outputs.digest }}
