@@ -22,7 +22,7 @@ var _ = Describe("Handler ", func() {
 			recorder *httptest.ResponseRecorder
 			c        *gin.Context
 			mock     *gomock.Controller
-			sealer   *seal.MockSealer
+			sealer   *seal.MockSealerWithKeys
 			h        *Handler
 			cfg      *config.Config
 		)
@@ -31,7 +31,7 @@ var _ = Describe("Handler ", func() {
 			recorder = httptest.NewRecorder()
 			c, _ = gin.CreateTestContext(recorder)
 			mock = gomock.NewController(GinkgoT())
-			sealer = seal.NewMockSealer(mock)
+			sealer = seal.NewMockSealerWithKeys(mock)
 			cfg = &config.Config{}
 			h = &Handler{
 				sealer: sealer,

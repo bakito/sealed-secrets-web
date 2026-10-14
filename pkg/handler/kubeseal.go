@@ -40,7 +40,8 @@ func (h *Handler) KubeSeal(c *gin.Context) {
 		return
 	}
 
-	ss, err := h.sealer.Seal(c.Request.Context(), outputFormat, bytes.NewReader(body))
+	keyLabel := c.GetHeader("X-Sealing-Key")
+	ss, err := h.sealer.SealWithKey(c.Request.Context(), keyLabel, outputFormat, bytes.NewReader(body))
 	if err != nil {
 		log.Printf("Error in %s: %v\n", Sanitize(c.FullPath()), err)
 		contextNegotiate(c, http.StatusInternalServerError, gin.Negotiate{

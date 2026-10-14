@@ -21,6 +21,9 @@
         <v-spacer></v-spacer>
         <v-btn @click="dencode" text>Encode / Decode</v-btn>
         {{ if eq .DisableLoadSecrets false}}<v-btn @click="loadSecrets" text>Secrets</v-btn>{{end}}
+        {{ if .HasMultipleKeys }}
+        <v-select :items="sealingKeys" v-model="selectedKey" hide-details dense solo style="max-width: 200px; margin-right: 8px;" item-text="label" item-value="value"></v-select>
+        {{ end }}
         <v-btn @click="seal" text>Seal</v-btn>
         {{ if eq .DisableValidateSecrets false}}
         <v-btn @click="validate" text>Validate</v-btn>{{end}}
@@ -128,6 +131,8 @@
           editor2Content: '',
           secretFormat: 'yaml',
           sealedSecretFormat: 'yaml',
+          sealingKeys: [],
+          selectedKey: 'default',
           options: {
             selectionStyle: "line",
             highlightActiveLine: true,
@@ -186,6 +191,8 @@
         this.editor2.on('change', () => {
           this.editor2Content = this.editor2.getValue()
         })
+
+        this.fetchKeys()
       },
       methods : {
         validateBase64Data() {
@@ -207,6 +214,15 @@
           }
           return null
         },
+        fetchKeys() {
+          axios.get('{{.WebContext}}api/keys').then(res => {
+            if (res.data.keys && res.data.keys.length > 1) {
+              this.sealingKeys = res.data.keys.map(k => ({ title: k, value: k }))
+            }
+          }).catch(() => {
+            // Ignore errors - keys feature is optional
+          });
+        },
         seal() {
           const validationError = this.validateBase64Data()
           if (validationError) {
@@ -214,10 +230,15 @@
             this.message = validationError
             return
           }
+          const headers = {
+            'Content-Type': this.contentType(this.secretFormat),
+            'Accept': this.contentType(this.sealedSecretFormat)
+          }
+          if (this.selectedKey) {
+            headers['X-Sealing-Key'] = this.selectedKey
+          }
           axios.post('{{.WebContext}}api/kubeseal', this.editor1Content,
-            { headers: {
-                'Content-Type': this.contentType(this.secretFormat),
-                'Accept': this.contentType(this.sealedSecretFormat)},
+            { headers: headers,
               transformResponse: (r) => r}
           ).then(res => {
             this.editor2Content = res.data

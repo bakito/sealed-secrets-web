@@ -8,7 +8,8 @@ import (
 )
 
 func (h *Handler) Certificate(c *gin.Context) {
-	certificate, err := h.sealer.Certificate(c)
+	keyLabel := c.GetHeader("X-Sealing-Key")
+	certificate, err := h.sealer.CertificateWithKey(c, keyLabel)
 	if err != nil {
 		log.Printf("Error in reading Certificate %s\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

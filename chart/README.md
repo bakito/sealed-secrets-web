@@ -54,6 +54,7 @@ helm install my-sealed-secrets-web bakito/sealed-secrets-web --version 3.1.9
 | sealedSecrets.certURL | string | `""` | URL sealed secrets certificate (required if sealed secrets is not reachable with in cluster service)    Validation api will be disabled when cert URL is used. |
 | sealedSecrets.namespace | string | `"sealed-secrets"` | Namespace of the sealed secrets service |
 | sealedSecrets.serviceName | string | `"sealed-secrets"` | Name of the sealed secrets service |
+| sealedSecretsKeys | list | `[]` | Additional sealing keys for multi-key setups. When configured, a dropdown appears in the UI to select which key to use. |
 | service.annotations | object | `{}` | Service annotations |
 | service.clusterIP | string | `""` | Kubernetes Service clusterIP |
 | service.extraPorts | list | `[]` | Additional ports to add to the service |

@@ -21,7 +21,7 @@ var _ = Describe("Handler ", func() {
 			recorder *httptest.ResponseRecorder
 			c        *gin.Context
 			mock     *gomock.Controller
-			sealer   *seal.MockSealer
+			sealer   *seal.MockSealerWithKeys
 			h        *Handler
 		)
 		BeforeEach(func() {
@@ -29,7 +29,7 @@ var _ = Describe("Handler ", func() {
 			recorder = httptest.NewRecorder()
 			c, _ = gin.CreateTestContext(recorder)
 			mock = gomock.NewController(GinkgoT())
-			sealer = seal.NewMockSealer(mock)
+			sealer = seal.NewMockSealerWithKeys(mock)
 			h = &Handler{
 				sealer: sealer,
 			}
@@ -40,7 +40,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
-			sealer.EXPECT().Seal(gomock.Any(), "json", gomock.Any()).Return([]byte(sealAsJSON), nil)
+			sealer.EXPECT().SealWithKey(gomock.Any(), gomock.Any(), "json", gomock.Any()).Return([]byte(sealAsJSON), nil)
 
 			h.KubeSeal(c)
 
@@ -54,7 +54,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
 
-			sealer.EXPECT().Seal(gomock.Any(), "yaml", gomock.Any()).Return([]byte(sealedAsYAML), nil)
+			sealer.EXPECT().SealWithKey(gomock.Any(), gomock.Any(), "yaml", gomock.Any()).Return([]byte(sealedAsYAML), nil)
 
 			h.KubeSeal(c)
 
@@ -68,7 +68,9 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/yaml")
 			c.Request.Header.Set("Accept", "application/yaml")
 
-			sealer.EXPECT().Seal(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("error sealing"))
+			sealer.EXPECT().
+				SealWithKey(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+				Return(nil, errors.New("error sealing"))
 
 			h.KubeSeal(c)
 
@@ -82,7 +84,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
-			sealer.EXPECT().Seal(gomock.Any(), "json", gomock.Any()).Return([]byte(sealAsJSON), nil)
+			sealer.EXPECT().SealWithKey(gomock.Any(), gomock.Any(), "json", gomock.Any()).Return([]byte(sealAsJSON), nil)
 
 			h.KubeSeal(c)
 
@@ -121,7 +123,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
-			sealer.EXPECT().Seal(gomock.Any(), "json", gomock.Any()).Return([]byte(sealAsJSON), nil)
+			sealer.EXPECT().SealWithKey(gomock.Any(), gomock.Any(), "json", gomock.Any()).Return([]byte(sealAsJSON), nil)
 
 			h.KubeSeal(c)
 

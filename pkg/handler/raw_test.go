@@ -21,7 +21,7 @@ var _ = Describe("Handler ", func() {
 			recorder *httptest.ResponseRecorder
 			c        *gin.Context
 			mock     *gomock.Controller
-			sealer   *seal.MockSealer
+			sealer   *seal.MockSealerWithKeys
 			h        *Handler
 		)
 		BeforeEach(func() {
@@ -29,7 +29,7 @@ var _ = Describe("Handler ", func() {
 			recorder = httptest.NewRecorder()
 			c, _ = gin.CreateTestContext(recorder)
 			mock = gomock.NewController(GinkgoT())
-			sealer = seal.NewMockSealer(mock)
+			sealer = seal.NewMockSealerWithKeys(mock)
 			h = &Handler{
 				sealer: sealer,
 			}
@@ -40,7 +40,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
-			sealer.EXPECT().Raw(gomock.Any(), gomock.Any()).Return([]byte("foo"), nil)
+			sealer.EXPECT().RawWithKey(gomock.Any(), gomock.Any(), gomock.Any()).Return([]byte("foo"), nil)
 
 			h.Raw(c)
 
@@ -68,7 +68,7 @@ var _ = Describe("Handler ", func() {
 			c.Request.Header.Set("Content-Type", "application/json")
 			c.Request.Header.Set("Accept", "application/json")
 
-			sealer.EXPECT().Raw(gomock.Any(), gomock.Any()).Return(nil, errors.New("error processing raw"))
+			sealer.EXPECT().RawWithKey(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("error processing raw"))
 
 			h.Raw(c)
 

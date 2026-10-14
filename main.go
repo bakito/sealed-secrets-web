@@ -62,7 +62,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could build k8s clients:%v", err.Error())
 	}
-	sealer, err := seal.NewAPISealer(cfg.Ctx, cfg.SealedSecrets, cfg.SealedSecrets.CertRefreshInterval)
+	sealer, err := seal.NewAPISealer(cfg.Ctx, cfg.SealedSecrets, cfg.SealedSecretsKeys, cfg.SealedSecrets.CertRefreshInterval)
 	if err != nil {
 		log.Fatalf("Setup sealer: %s", err.Error())
 	}
@@ -75,7 +75,7 @@ func setupRouter(
 	coreClient corev1.CoreV1Interface,
 	ssClient ssclient.BitnamiV1alpha1Interface,
 	cfg *config.Config,
-	sealer seal.Sealer,
+	sealer seal.SealerWithKeys,
 ) *gin.Engine {
 	indexHTML, err := renderIndexHTML(cfg)
 	if err != nil {
@@ -100,6 +100,7 @@ func setupRouter(
 	api.GET("/version", h.Version)
 	api.POST("/raw", h.Raw)
 	api.GET("/certificate", h.Certificate)
+	api.GET("/keys", h.Keys)
 	api.POST("/kubeseal", h.KubeSeal)
 	api.POST("/dencode", h.Dencode)
 	api.POST("/validate", h.Validate)
@@ -124,6 +125,7 @@ func renderIndexHTML(cfg *config.Config) (string, error) {
 		"WebContext":             cfg.Web.Context,
 		"InitialSecret":          initialSecret,
 		"Version":                version.Version,
+		"HasMultipleKeys":        len(cfg.SealedSecretsKeys) > 0,
 	}
 
 	var tpl bytes.Buffer

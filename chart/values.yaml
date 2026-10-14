@@ -28,6 +28,15 @@ sealedSecrets:
   #    Validation api will be disabled when cert URL is used.
   certURL: ""
 
+# -- Additional sealing keys for multi-key setups. When configured, a dropdown appears in the UI to select which key to use.
+sealedSecretsKeys: []
+#  - label: "database"
+#    namespace: sealed-secrets
+#    service: sealed-secrets-db
+#  - label: "oauth"
+#    namespace: sealed-secrets
+#    service: sealed-secrets-oauth
+
 image:
   # --  Repository to use
   repository: ghcr.io/bakito/sealed-secrets-web

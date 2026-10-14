@@ -20,7 +20,7 @@ var _ = Describe("Handler ", func() {
 			recorder *httptest.ResponseRecorder
 			c        *gin.Context
 			mock     *gomock.Controller
-			sealer   *seal.MockSealer
+			sealer   *seal.MockSealerWithKeys
 			h        *Handler
 		)
 		BeforeEach(func() {
@@ -28,13 +28,14 @@ var _ = Describe("Handler ", func() {
 			recorder = httptest.NewRecorder()
 			c, _ = gin.CreateTestContext(recorder)
 			mock = gomock.NewController(GinkgoT())
-			sealer = seal.NewMockSealer(mock)
+			sealer = seal.NewMockSealerWithKeys(mock)
 			h = &Handler{
 				sealer: sealer,
 			}
 		})
 		It("should successfully return a certificate", func() {
-			sealer.EXPECT().Certificate(gomock.Any()).Return([]byte(validCertificate), nil)
+			c.Request, _ = http.NewRequest(http.MethodGet, "/api/certificate", http.NoBody)
+			sealer.EXPECT().CertificateWithKey(gomock.Any(), gomock.Any()).Return([]byte(validCertificate), nil)
 			h.Certificate(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusOK))
@@ -42,7 +43,8 @@ var _ = Describe("Handler ", func() {
 			Ω(recorder.Header().Get("Content-Type")).Should(Equal("text/plain; charset=utf-8"))
 		})
 		It("should successfully fail when requesting a certificate", func() {
-			sealer.EXPECT().Certificate(gomock.Any()).Return(nil, errors.New("unexpected error"))
+			c.Request, _ = http.NewRequest(http.MethodGet, "/api/certificate", http.NoBody)
+			sealer.EXPECT().CertificateWithKey(gomock.Any(), gomock.Any()).Return(nil, errors.New("unexpected error"))
 			h.Certificate(c)
 
 			Ω(recorder.Code).Should(Equal(http.StatusInternalServerError))

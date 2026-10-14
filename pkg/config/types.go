@@ -130,19 +130,20 @@ func sanitizeWebContext(cfg *Config) string {
 }
 
 type Config struct {
-	Web                    Web              `yaml:"web"`
-	FieldFilter            *FieldFilter     `yaml:"fieldFilter,omitempty"`
-	PrintVersion           bool             `yaml:"printVersion"`
-	DisableLoadSecrets     bool             `yaml:"disableLoadSecrets"`
-	ShowOnlySyncedSecrets  bool             `yaml:"showOnlySyncedSecrets"`
-	IncludeNamespaces      []string         `yaml:"includeNamespaces"`
-	ExcludeNamespaces      []string         `yaml:"excludeNamespaces"`
-	IncludeNamespacesRegex []*regexp.Regexp `yaml:"-"`
-	ExcludeNamespacesRegex []*regexp.Regexp `yaml:"-"`
-	UseRegex               bool             `yaml:"useRegex"`
-	SealedSecrets          SealedSecrets    `yaml:"sealedSecrets"`
-	InitialSecret          string           `yaml:"initialSecret"`
-	Ctx                    context.Context  `yaml:"-"` //nolint:containedctx
+	Web                    Web                `yaml:"web"`
+	FieldFilter            *FieldFilter       `yaml:"fieldFilter,omitempty"`
+	PrintVersion           bool               `yaml:"printVersion"`
+	DisableLoadSecrets     bool               `yaml:"disableLoadSecrets"`
+	ShowOnlySyncedSecrets  bool               `yaml:"showOnlySyncedSecrets"`
+	IncludeNamespaces      []string           `yaml:"includeNamespaces"`
+	ExcludeNamespaces      []string           `yaml:"excludeNamespaces"`
+	IncludeNamespacesRegex []*regexp.Regexp   `yaml:"-"`
+	ExcludeNamespacesRegex []*regexp.Regexp   `yaml:"-"`
+	UseRegex               bool               `yaml:"useRegex"`
+	SealedSecrets          SealedSecrets      `yaml:"sealedSecrets"`
+	SealedSecretsKeys      []SealedSecretsKey `yaml:"sealedSecretsKeys"`
+	InitialSecret          string             `yaml:"initialSecret"`
+	Ctx                    context.Context    `yaml:"-"` //nolint:containedctx
 }
 
 type Web struct {
@@ -163,6 +164,14 @@ func (ss SealedSecrets) String() string {
 		return "Cert URL: " + ss.CertURL
 	}
 	return fmt.Sprintf("Namespace: %s / ServiceName: %s", ss.Namespace, ss.Service)
+}
+
+// SealedSecretsKey represents a named sealing key that can be selected in the UI.
+type SealedSecretsKey struct {
+	Label     string `yaml:"label"`
+	Service   string `yaml:"service"`
+	Namespace string `yaml:"namespace"`
+	CertURL   string `yaml:"certURL,omitempty"`
 }
 
 type flags struct {

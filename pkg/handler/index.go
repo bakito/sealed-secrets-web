@@ -11,13 +11,13 @@ import (
 )
 
 type Handler struct {
-	sealer    seal.Sealer
+	sealer    seal.SealerWithKeys
 	indexHTML string
 	filter    *config.FieldFilter
 	cfg       *config.Config
 }
 
-func New(indexHTML string, sealer seal.Sealer, cfg *config.Config) *Handler {
+func New(indexHTML string, sealer seal.SealerWithKeys, cfg *config.Config) *Handler {
 	return &Handler{
 		sealer:    sealer,
 		indexHTML: indexHTML,
@@ -40,4 +40,9 @@ func (*Handler) RedirectToIndex(context string) func(ctx *gin.Context) {
 
 func (*Handler) Version(c *gin.Context) {
 	c.JSONP(http.StatusOK, map[string]string{"version": version.Version, "build": version.Build})
+}
+
+func (h *Handler) Keys(c *gin.Context) {
+	keys := h.sealer.Keys()
+	c.JSON(http.StatusOK, gin.H{"keys": keys})
 }

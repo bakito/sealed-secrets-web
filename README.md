@@ -97,6 +97,39 @@ curl -request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/raw' \
      --data '{ "name": "mysecretname", "namespace": "mysecretnamespace", "value": "value to seal" }'
 ```
 
+### Multiple Sealing Keys
+
+When your cluster has multiple sealing keys (e.g. for separation of concerns), you can configure them in your Helm values:
+
+```yaml
+sealedSecrets:
+  namespace: sealed-secrets
+  serviceName: sealed-secrets
+
+sealedSecretsKeys:
+  - label: "database"
+    namespace: sealed-secrets
+    service: sealed-secrets-db
+  - label: "oauth"
+    namespace: sealed-secrets
+    service: sealed-secrets-oauth
+```
+
+A dropdown will appear in the UI toolbar allowing you to select which key to use when sealing. The API also supports selecting a key via the `X-Sealing-Key` header:
+
+```bash
+curl --request POST 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/kubeseal' \
+  --header 'Accept: application/yaml' \
+  --header 'X-Sealing-Key: database' \
+  --data-binary '@stringData.yaml'
+```
+
+To list available keys:
+
+```bash
+curl --request GET 'https://<SEALED_SECRETS_WEB_BASE_URL>/api/keys'
+```
+
 ### Validate sealed secret
 
 > **_NOTE:_**  Validate is only available when using cluster internal api (e.g. certURL not set)
