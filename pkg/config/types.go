@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -151,9 +152,10 @@ type Web struct {
 }
 
 type SealedSecrets struct {
-	Service   string `yaml:"service"`
-	Namespace string `yaml:"namespace"`
-	CertURL   string `yaml:"certURL,omitempty"`
+	Service             string        `yaml:"service"`
+	Namespace           string        `yaml:"namespace"`
+	CertURL             string        `yaml:"certURL,omitempty"`
+	CertRefreshInterval time.Duration `yaml:"certRefreshInterval,omitempty"`
 }
 
 func (ss SealedSecrets) String() string {
