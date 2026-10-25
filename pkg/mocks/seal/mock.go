@@ -58,33 +58,33 @@ func (mr *MockSealerMockRecorder) Certificate(ctx any) *gomock.Call {
 }
 
 // Raw mocks base method.
-func (m *MockSealer) Raw(data seal.Raw) ([]byte, error) {
+func (m *MockSealer) Raw(ctx context.Context, data seal.Raw) ([]byte, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Raw", data)
+	ret := m.ctrl.Call(m, "Raw", ctx, data)
 	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Raw indicates an expected call of Raw.
-func (mr *MockSealerMockRecorder) Raw(data any) *gomock.Call {
+func (mr *MockSealerMockRecorder) Raw(ctx, data any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Raw", reflect.TypeOf((*MockSealer)(nil).Raw), data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Raw", reflect.TypeOf((*MockSealer)(nil).Raw), ctx, data)
 }
 
 // Seal mocks base method.
-func (m *MockSealer) Seal(outputFormat string, secret io.Reader) ([]byte, error) {
+func (m *MockSealer) Seal(ctx context.Context, outputFormat string, secret io.Reader) ([]byte, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Seal", outputFormat, secret)
+	ret := m.ctrl.Call(m, "Seal", ctx, outputFormat, secret)
 	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Seal indicates an expected call of Seal.
-func (mr *MockSealerMockRecorder) Seal(outputFormat, secret any) *gomock.Call {
+func (mr *MockSealerMockRecorder) Seal(ctx, outputFormat, secret any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Seal", reflect.TypeOf((*MockSealer)(nil).Seal), outputFormat, secret)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Seal", reflect.TypeOf((*MockSealer)(nil).Seal), ctx, outputFormat, secret)
 }
 
 // Validate mocks base method.
