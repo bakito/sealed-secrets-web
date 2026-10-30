@@ -32,7 +32,7 @@ TB_HELM_DOCS_VERSION ?= v1.14.2
 # renovate: packageName=github.com/uber-go/mock
 TB_MOCKGEN_VERSION ?= v0.6.0
 # renovate: packageName=github.com/bakito/semver
-TB_SEMVER_VERSION ?= v1.1.10
+TB_SEMVER_VERSION ?= v1.1.13
 
 ## Tool Installer
 .PHONY: tb.ginkgo
