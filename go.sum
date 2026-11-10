@@ -6,8 +6,8 @@ github.com/Masterminds/semver/v3 v3.5.0 h1:kQceYJfbupGfZOKZQg0kou0DgAKhzDg2NZPAw
 github.com/Masterminds/semver/v3 v3.5.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
 github.com/Masterminds/sprig/v3 v3.3.0 h1:mQh0Yrg1XPo6vjYXgtf5OtijNAKJRNcTdOOGZe3tPhs=
 github.com/Masterminds/sprig/v3 v3.3.0/go.mod h1:Zy1iXRYNqNLUolqCpL4uhk6SHUMAOSCzdgBfDb35Lz0=
-github.com/bitnami/sealed-secrets v0.41.1 h1:uEW6f+zS3eVqCx7WSdNQuZPx2GBz7jOIvWhLuvDbZEA=
-github.com/bitnami/sealed-secrets v0.41.1/go.mod h1:AP3QV4vFf0TH8HpubfruMA47xTqJaMBQYSfNOBgO1VE=
+github.com/bitnami/sealed-secrets v0.41.2 h1:mscEwtgeNtFS/I+nmkpKDPkD+N2bgLsNerHTVrUdRyk=
+github.com/bitnami/sealed-secrets v0.41.2/go.mod h1:AP3QV4vFf0TH8HpubfruMA47xTqJaMBQYSfNOBgO1VE=
 github.com/bytedance/gopkg v0.1.4 h1:oZnQwnX82KAIWb7033bEwtxvTqXcYMxDBaQxo5JJHWM=
 github.com/bytedance/gopkg v0.1.4/go.mod h1:v1zWfPm21Fb+OsyXN2VAHdL6TBb2L88anLQgdyje6R4=
 github.com/bytedance/sonic v1.15.1 h1:nJD5PmM0vY7J8CT6MxoqbVAAMhkSmV2HgRAUrrpLoOw=
