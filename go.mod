@@ -1,6 +1,6 @@
 module github.com/bakito/sealed-secrets-web
 
-go 1.27.3
+go 1.27.4
 
 require (
 	github.com/bitnami/sealed-secrets v0.41.2
@@ -11,9 +11,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 	go.uber.org/mock v0.6.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.37.1
-	k8s.io/apimachinery v0.37.1
-	k8s.io/client-go v0.37.1
+	k8s.io/api v0.37.2
+	k8s.io/apimachinery v0.37.2
+	k8s.io/client-go v0.37.2
 	sigs.k8s.io/yaml v1.6.0
 )
 
